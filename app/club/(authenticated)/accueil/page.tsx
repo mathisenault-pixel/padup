@@ -98,29 +98,45 @@ export default function AccueilPage() {
 
   const getAlertColor = (type: string) => {
     switch (type) {
-      case 'urgent': return 'border-red-300 bg-red-50'
-      case 'warning': return 'border-yellow-300 bg-yellow-50'
-      case 'info': return 'border-blue-300 bg-blue-50'
-      default: return 'border-gray-300 bg-gray-50'
+      case 'urgent': return 'border-red-200 bg-red-50'
+      case 'warning': return 'border-amber-200 bg-amber-50'
+      case 'info': return 'border-slate-200 bg-slate-50'
+      default: return 'border-slate-200 bg-slate-50'
     }
   }
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'urgent': return '🚨'
-      case 'warning': return '⚠️'
-      case 'info': return 'ℹ️'
-      default: return '📢'
+      case 'urgent':
+        return (
+          <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+        )
+      case 'warning':
+        return (
+          <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+        )
+      default:
+        return (
+          <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+        )
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Tableau de bord</h1>
-          <p className="text-slate-600 mt-1">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <h1 className="text-4xl font-bold text-slate-900">Tableau de bord</h1>
+          <p className="text-slate-600 mt-2">
+            {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
         </div>
         
         {/* Sélecteur de date */}
@@ -129,116 +145,126 @@ export default function AccueilPage() {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent outline-none font-semibold"
+            className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none font-medium text-slate-900"
           />
         </div>
       </div>
 
       {/* Sélecteur de période */}
-      <div className="bg-white rounded-xl p-2 border-2 border-slate-200 shadow-lg inline-flex gap-2">
+      <div className="bg-white rounded-xl p-2 border border-slate-200 shadow-sm inline-flex gap-2">
         <button
           onClick={() => setPeriode('jour')}
           className={`px-6 py-3 rounded-lg font-semibold transition-all ${
             periode === 'jour'
-              ? 'bg-slate-800 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-50'
           }`}
         >
-          📅 Jour
+          Jour
         </button>
         <button
           onClick={() => setPeriode('semaine')}
           className={`px-6 py-3 rounded-lg font-semibold transition-all ${
             periode === 'semaine'
-              ? 'bg-slate-800 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-50'
           }`}
         >
-          📊 Semaine
+          Semaine
         </button>
         <button
           onClick={() => setPeriode('mois')}
           className={`px-6 py-3 rounded-lg font-semibold transition-all ${
             periode === 'mois'
-              ? 'bg-slate-800 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-50'
           }`}
         >
-          📆 Mois
+          Mois
         </button>
         <button
           onClick={() => setPeriode('annee')}
           className={`px-6 py-3 rounded-lg font-semibold transition-all ${
             periode === 'annee'
-              ? 'bg-slate-800 text-white shadow-md'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md'
+              : 'text-slate-600 hover:bg-slate-50'
           }`}
         >
-          📈 Année
+          Année
         </button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-2xl border border-blue-400">
+        <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-6 text-white shadow-md">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-blue-100 font-semibold">Réservations</span>
-            <span className="text-4xl">📅</span>
+            <span className="text-amber-100 text-sm font-medium">Réservations</span>
+            <svg className="w-6 h-6 text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
           </div>
-          <p className="text-4xl font-black mb-1">{currentStats.reservations}</p>
-          <p className="text-blue-100 text-sm font-medium">{getPeriodeLabel()}</p>
+          <p className="text-4xl font-bold mb-1">{currentStats.reservations}</p>
+          <p className="text-amber-100 text-sm font-medium">{getPeriodeLabel()}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-2xl border border-green-400">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-green-100 font-semibold">Revenus</span>
-            <span className="text-4xl">💰</span>
+            <span className="text-slate-600 text-sm font-medium">Revenus</span>
+            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <p className="text-4xl font-black mb-1">{currentStats.revenus.toLocaleString()}€</p>
-          <p className="text-green-100 text-sm font-medium">{getPeriodeLabel()}</p>
+          <p className="text-4xl font-bold text-slate-900 mb-1">{currentStats.revenus.toLocaleString()}€</p>
+          <p className="text-slate-500 text-sm font-medium">{getPeriodeLabel()}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white shadow-2xl border border-orange-400">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-orange-100 font-semibold">Taux occupation</span>
-            <span className="text-4xl">📊</span>
+            <span className="text-slate-600 text-sm font-medium">Taux occupation</span>
+            <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
           </div>
-          <p className="text-4xl font-black mb-1">{currentStats.tauxOccupation}%</p>
-          <p className="text-orange-100 text-sm font-medium">{getPeriodeLabel()}</p>
+          <p className="text-4xl font-bold text-slate-900 mb-1">{currentStats.tauxOccupation}%</p>
+          <p className="text-slate-500 text-sm font-medium">{getPeriodeLabel()}</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-2xl border border-purple-400">
+        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-purple-100 font-semibold">Nouveaux clients</span>
-            <span className="text-4xl">👥</span>
+            <span className="text-slate-600 text-sm font-medium">Nouveaux clients</span>
+            <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
           </div>
-          <p className="text-4xl font-black mb-1">{currentStats.nouveauxClients}</p>
-          <p className="text-purple-100 text-sm font-medium">{getPeriodeLabel()}</p>
+          <p className="text-4xl font-bold text-slate-900 mb-1">{currentStats.nouveauxClients}</p>
+          <p className="text-slate-500 text-sm font-medium">{getPeriodeLabel()}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alertes */}
-        <div className="lg:col-span-1 bg-white rounded-xl p-6 border-2 border-slate-200 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-900">🔔 Alertes</h2>
-            <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-bold border-2 border-red-300">
-              {alertes.filter(a => a.type === 'urgent').length}
-            </span>
+        <div className="lg:col-span-1 bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-900">Alertes</h2>
+            {alertes.filter(a => a.type === 'urgent').length > 0 && (
+              <span className="w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                {alertes.filter(a => a.type === 'urgent').length}
+              </span>
+            )}
           </div>
 
           <div className="space-y-3">
             {alertes.map((alerte) => (
               <div
                 key={alerte.id}
-                className={`p-4 rounded-lg border-2 ${getAlertColor(alerte.type)}`}
+                className={`p-4 rounded-lg border ${getAlertColor(alerte.type)}`}
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl">{getAlertIcon(alerte.type)}</span>
+                  {getAlertIcon(alerte.type)}
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-slate-900">{alerte.titre}</h3>
-                      <span className="text-xs text-slate-600 font-semibold">{alerte.heure}</span>
+                      <h3 className="font-bold text-slate-900 text-sm">{alerte.titre}</h3>
+                      <span className="text-xs text-slate-500">{alerte.heure}</span>
                     </div>
                     <p className="text-sm text-slate-700">{alerte.message}</p>
                   </div>
@@ -247,21 +273,27 @@ export default function AccueilPage() {
             ))}
           </div>
 
-          <button className="w-full mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-all border-2 border-slate-300">
+          <button className="w-full mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-medium transition-all text-sm">
             Voir toutes les alertes
           </button>
         </div>
 
         {/* Réservations du jour */}
-        <div className="lg:col-span-2 bg-white rounded-xl p-6 border-2 border-slate-200 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-900">📅 Planning du jour</h2>
-            <button className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold transition-all">
-              + Nouvelle réservation
+        <div className="lg:col-span-2 bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-900">Planning du jour</h2>
+            <button 
+              onClick={() => alert('Fonctionnalité en développement')}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg font-semibold transition-all shadow-sm"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Nouvelle réservation
             </button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             {reservationsJour.map((reservation) => (
               <div
                 key={reservation.id}
@@ -269,9 +301,9 @@ export default function AccueilPage() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-16 text-center">
-                    <span className="text-lg font-black text-slate-900">{reservation.heure}</span>
+                    <span className="text-lg font-bold text-slate-900">{reservation.heure}</span>
                   </div>
-                  <div className="w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg flex items-center justify-center text-white font-bold shadow">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
                     {reservation.terrain}
                   </div>
                   <div>
@@ -280,72 +312,101 @@ export default function AccueilPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold border-2 ${
+                  <span className={`px-3 py-1 rounded-md text-xs font-semibold border ${
                     reservation.statut === 'Confirmée'
-                      ? 'bg-green-100 text-green-800 border-green-300'
-                      : 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                      ? 'bg-green-100 text-green-700 border-green-200'
+                      : 'bg-amber-100 text-amber-700 border-amber-200'
                   }`}>
                     {reservation.statut}
                   </span>
-                  <button className="p-2 hover:bg-slate-200 rounded-lg transition-all">
-                    ⋮
+                  <button 
+                    onClick={() => alert('Options de réservation')}
+                    className="p-2 hover:bg-slate-200 rounded-lg transition-all"
+                  >
+                    <svg className="w-5 h-5 text-slate-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
                   </button>
                 </div>
               </div>
             ))}
           </div>
 
-          <button className="w-full mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-all border-2 border-slate-300">
+          <button 
+            onClick={() => alert('Voir le planning complet')}
+            className="w-full mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-medium transition-all text-sm"
+          >
             Voir le planning complet
           </button>
         </div>
       </div>
 
       {/* Graphique rapide */}
-      <div className="bg-white rounded-xl p-6 border-2 border-slate-200 shadow-xl">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">📈 Évolution {getPeriodeLabel().toLowerCase()}</h2>
+      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900 mb-6">Évolution {getPeriodeLabel().toLowerCase()}</h2>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Matinée (8h-12h)</p>
-            <p className="text-2xl font-bold text-slate-900">45%</p>
-            <p className="text-xs text-slate-500 mt-1">15 réservations</p>
+            <p className="text-sm text-slate-600 mb-2 font-medium">Matinée (8h-12h)</p>
+            <p className="text-3xl font-bold text-slate-900 mb-1">45%</p>
+            <p className="text-xs text-slate-500">15 réservations</p>
           </div>
           <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Après-midi (12h-18h)</p>
-            <p className="text-2xl font-bold text-slate-900">62%</p>
-            <p className="text-xs text-slate-500 mt-1">21 réservations</p>
+            <p className="text-sm text-slate-600 mb-2 font-medium">Après-midi (12h-18h)</p>
+            <p className="text-3xl font-bold text-slate-900 mb-1">62%</p>
+            <p className="text-xs text-slate-500">21 réservations</p>
+          </div>
+          <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <p className="text-sm text-amber-700 mb-2 font-medium">Soirée (18h-22h)</p>
+            <p className="text-3xl font-bold text-amber-900 mb-1">89%</p>
+            <p className="text-xs text-amber-600">30 réservations</p>
           </div>
           <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Soirée (18h-22h)</p>
-            <p className="text-2xl font-bold text-slate-900">89%</p>
-            <p className="text-xs text-slate-500 mt-1">30 réservations</p>
-          </div>
-          <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Nuit (22h-00h)</p>
-            <p className="text-2xl font-bold text-slate-900">34%</p>
-            <p className="text-xs text-slate-500 mt-1">7 réservations</p>
+            <p className="text-sm text-slate-600 mb-2 font-medium">Nuit (22h-00h)</p>
+            <p className="text-3xl font-bold text-slate-900 mb-1">34%</p>
+            <p className="text-xs text-slate-500">7 réservations</p>
           </div>
         </div>
       </div>
 
       {/* Actions rapides */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <button className="p-6 bg-white hover:bg-slate-50 rounded-xl border-2 border-slate-200 shadow-lg transition-all text-center">
-          <div className="text-4xl mb-2">📊</div>
-          <p className="font-bold text-slate-900">Voir les stats</p>
+        <button 
+          onClick={() => alert('Statistiques détaillées')}
+          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
+        >
+          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <p className="font-semibold text-slate-900">Voir les stats</p>
         </button>
-        <button className="p-6 bg-white hover:bg-slate-50 rounded-xl border-2 border-slate-200 shadow-lg transition-all text-center">
-          <div className="text-4xl mb-2">👥</div>
-          <p className="font-bold text-slate-900">Gérer les clients</p>
+        <button 
+          onClick={() => alert('Gestion des clients')}
+          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
+        >
+          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <p className="font-semibold text-slate-900">Gérer les clients</p>
         </button>
-        <button className="p-6 bg-white hover:bg-slate-50 rounded-xl border-2 border-slate-200 shadow-lg transition-all text-center">
-          <div className="text-4xl mb-2">⚙️</div>
-          <p className="font-bold text-slate-900">Exploitation</p>
+        <button 
+          onClick={() => alert('Paramètres d\'exploitation')}
+          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
+        >
+          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <p className="font-semibold text-slate-900">Exploitation</p>
         </button>
-        <button className="p-6 bg-white hover:bg-slate-50 rounded-xl border-2 border-slate-200 shadow-lg transition-all text-center">
-          <div className="text-4xl mb-2">💰</div>
-          <p className="font-bold text-slate-900">Voir les revenus</p>
+        <button 
+          onClick={() => alert('Détails des revenus')}
+          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
+        >
+          <svg className="w-10 h-10 text-amber-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="font-semibold text-slate-900">Voir les revenus</p>
         </button>
       </div>
     </div>

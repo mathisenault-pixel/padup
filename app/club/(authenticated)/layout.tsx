@@ -42,7 +42,7 @@ export default async function ClubAuthLayout({
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-white tracking-tight">Pad&apos;Up</h1>
-                  <p className="text-xs text-slate-400 font-medium tracking-wide">Business Dashboard</p>
+                  <p className="text-xs text-slate-400 font-medium tracking-wide">Conçu par des joueurs pour les joueurs</p>
                 </div>
               </div>
             </div>

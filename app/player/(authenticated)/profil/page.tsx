@@ -258,7 +258,7 @@ export default function ProfilPage() {
             </label>
             <select
               value={profil.niveau}
-              onChange={(e) => setProfil({ ...profil, niveau: e.target.value as any })}
+              onChange={(e) => setProfil({ ...profil, niveau: e.target.value as ProfilInfo['niveau'] })}
               disabled={!isEditing}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none disabled:bg-slate-50 disabled:text-slate-600 text-slate-900"
             >
@@ -289,7 +289,7 @@ export default function ProfilPage() {
             </label>
             <select
               value={profil.mainDominante}
-              onChange={(e) => setProfil({ ...profil, mainDominante: e.target.value as any })}
+              onChange={(e) => setProfil({ ...profil, mainDominante: e.target.value as ProfilInfo['mainDominante'] })}
               disabled={!isEditing}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none disabled:bg-slate-50 disabled:text-slate-600 text-slate-900"
             >
@@ -305,7 +305,7 @@ export default function ProfilPage() {
             </label>
             <select
               value={profil.positionPreferee}
-              onChange={(e) => setProfil({ ...profil, positionPreferee: e.target.value as any })}
+              onChange={(e) => setProfil({ ...profil, positionPreferee: e.target.value as ProfilInfo['positionPreferee'] })}
               disabled={!isEditing}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none disabled:bg-slate-50 disabled:text-slate-600 text-slate-900"
             >

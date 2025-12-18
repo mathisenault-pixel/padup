@@ -3,13 +3,22 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import type { UserRole } from '@/lib/supabase/types'
 
-export async function signup(formData: FormData) {
+export async function signup(formData: FormData): Promise<{ error: string } | never> {
   const supabase = await createClient()
 
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const role = formData.get('role') as 'player' | 'club'
+  const email = formData.get('email')
+  const password = formData.get('password')
+  const role = formData.get('role')
+
+  if (!email || !password || !role || typeof email !== 'string' || typeof password !== 'string') {
+    return { error: 'Données invalides' }
+  }
+
+  if (role !== 'player' && role !== 'club') {
+    return { error: 'Rôle invalide' }
+  }
 
   const { data: authData, error } = await supabase.auth.signUp({
     email,
@@ -25,7 +34,7 @@ export async function signup(formData: FormData) {
       .from('profiles')
       .insert({
         id: authData.user.id,
-        role: role,
+        role: role as UserRole,
       })
 
     if (profileError) {
@@ -42,12 +51,20 @@ export async function signup(formData: FormData) {
   }
 }
 
-export async function login(formData: FormData) {
+export async function login(formData: FormData): Promise<{ error: string } | never> {
   const supabase = await createClient()
 
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const expectedRole = formData.get('role') as 'player' | 'club'
+  const email = formData.get('email')
+  const password = formData.get('password')
+  const expectedRole = formData.get('role')
+
+  if (!email || !password || !expectedRole || typeof email !== 'string' || typeof password !== 'string') {
+    return { error: 'Données invalides' }
+  }
+
+  if (expectedRole !== 'player' && expectedRole !== 'club') {
+    return { error: 'Rôle invalide' }
+  }
 
   const { data: authData, error } = await supabase.auth.signInWithPassword({
     email,
@@ -80,7 +97,7 @@ export async function login(formData: FormData) {
   }
 }
 
-export async function logout() {
+export async function logout(): Promise<never> {
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')

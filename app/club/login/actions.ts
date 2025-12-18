@@ -4,11 +4,15 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-export async function login(formData: FormData) {
+export async function login(formData: FormData): Promise<{ error: string } | never> {
   const supabase = await createClient()
 
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const email = formData.get('email')
+  const password = formData.get('password')
+
+  if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+    return { error: 'Email et mot de passe requis' }
+  }
 
   const { data: authData, error } = await supabase.auth.signInWithPassword({
     email,
@@ -36,11 +40,15 @@ export async function login(formData: FormData) {
   redirect('/club/accueil')
 }
 
-export async function signup(formData: FormData) {
+export async function signup(formData: FormData): Promise<{ error: string } | never> {
   const supabase = await createClient()
 
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const email = formData.get('email')
+  const password = formData.get('password')
+
+  if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
+    return { error: 'Email et mot de passe requis' }
+  }
 
   const { data: authData, error } = await supabase.auth.signUp({
     email,
