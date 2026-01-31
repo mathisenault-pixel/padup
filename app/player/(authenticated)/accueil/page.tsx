@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
+import UseMyLocationButton from '@/components/UseMyLocationButton'
 
 type Club = {
   id: number
@@ -20,6 +21,7 @@ type Club = {
 export default function AccueilPage() {
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
 
   const [clubs] = useState<Club[]>([
     {
@@ -139,7 +141,7 @@ export default function AccueilPage() {
       {/* Clubs - CAROUSEL CARDS STYLE */}
       <section className="pt-8 pb-16 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-end justify-between mb-8">
+          <div className="flex items-end justify-between mb-6">
             <div>
               <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs autour de chez moi</h2>
               <p className="text-xl text-gray-600">Découvrez nos meilleures adresses</p>
@@ -153,6 +155,18 @@ export default function AccueilPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
+          </div>
+
+          {/* Bouton de géolocalisation */}
+          <div className="mb-8">
+            <UseMyLocationButton
+              onCoords={(coords) => {
+                setUserCoords(coords);
+                console.log('📍 Position détectée:', coords);
+                // TODO: Trier les clubs par distance réelle
+                alert(`Position détectée !\nLatitude: ${coords.lat}\nLongitude: ${coords.lng}\n\nNous allons bientôt afficher les clubs les plus proches de vous !`);
+              }}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
