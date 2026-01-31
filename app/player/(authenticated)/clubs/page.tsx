@@ -26,6 +26,7 @@ export default function ClubsPage() {
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
 
   const [clubs, setClubs] = useState<Club[]>([
     {
@@ -185,10 +186,23 @@ export default function ClubsPage() {
             <UseMyLocationButton
               onCoords={(coords) => {
                 setUserCoords(coords);
+                setLocationStatus('success');
                 console.log('📍 Position utilisateur:', coords);
                 // TODO: Trier les clubs par distance réelle ou appeler API
               }}
             />
+            
+            {/* ✅ Affichage propre sans popup */}
+            {locationStatus === 'success' && userCoords && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm font-medium text-green-800">
+                  📍 Position détectée ! Les clubs seront bientôt triés par distance.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Filtres Tri */}

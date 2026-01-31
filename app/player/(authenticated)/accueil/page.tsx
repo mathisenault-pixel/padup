@@ -22,6 +22,7 @@ export default function AccueilPage() {
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
 
   const [clubs] = useState<Club[]>([
     {
@@ -162,11 +163,23 @@ export default function AccueilPage() {
             <UseMyLocationButton
               onCoords={(coords) => {
                 setUserCoords(coords);
+                setLocationStatus('success');
                 console.log('📍 Position détectée:', coords);
                 // TODO: Trier les clubs par distance réelle
-                alert(`Position détectée !\nLatitude: ${coords.lat}\nLongitude: ${coords.lng}\n\nNous allons bientôt afficher les clubs les plus proches de vous !`);
               }}
             />
+            
+            {/* ✅ Affichage propre sans popup */}
+            {locationStatus === 'success' && userCoords && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm font-medium text-green-800">
+                  📍 Position détectée ! Nous allons bientôt afficher les clubs les plus proches de vous.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
