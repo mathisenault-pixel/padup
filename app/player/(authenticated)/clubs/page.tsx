@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
+import UseMyLocationButton from '@/components/UseMyLocationButton'
 
 type Club = {
   id: number
@@ -24,6 +25,7 @@ export default function ClubsPage() {
   const [sortBy, setSortBy] = useState<'distance' | 'prix-asc' | 'prix-desc' | 'note'>('distance')
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
 
   const [clubs, setClubs] = useState<Club[]>([
     {
@@ -175,6 +177,17 @@ export default function ClubsPage() {
               ]}
               storageKey="search-history-clubs"
               compact={false}
+            />
+          </div>
+
+          {/* Géolocalisation */}
+          <div className="mb-4">
+            <UseMyLocationButton
+              onCoords={(coords) => {
+                setUserCoords(coords);
+                console.log('📍 Position utilisateur:', coords);
+                // TODO: Trier les clubs par distance réelle ou appeler API
+              }}
             />
           </div>
 
