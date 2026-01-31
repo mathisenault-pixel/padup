@@ -15,13 +15,19 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 export async function POST(req: Request) {
   try {
+    console.log("[API /bookings POST] Start");
+    
     const body = await req.json();
 
     const { clubId, courtId, slotStart, createdBy, status } = body;
 
     if (!clubId || !courtId || !slotStart || !createdBy) {
+      console.log("[API /bookings POST] Validation error - missing fields");
       return NextResponse.json(
-        { error: "Missing required fields: clubId, courtId, slotStart, createdBy" },
+        { 
+          error: "Missing required fields: clubId, courtId, slotStart, createdBy",
+          code: "MISSING_FIELDS"
+        },
         { status: 400 }
       );
     }
@@ -104,6 +110,7 @@ export async function POST(req: Request) {
     }
 
     console.log("[INSERT SUCCESS - reservations]", data);
+    console.log("[API /bookings POST] Success");
 
     return NextResponse.json({ 
       success: true,
@@ -119,8 +126,19 @@ export async function POST(req: Request) {
     });
   } catch (e: any) {
     console.error("[API EXCEPTION - POST /api/bookings]", e);
+    console.error("[API /bookings POST] Unhandled exception", {
+      message: e?.message,
+      stack: e?.stack,
+      name: e?.name,
+    });
+    
+    // ✅ TOUJOURS renvoyer du JSON même en cas d'exception
     return NextResponse.json(
-      { error: e?.message ?? "Unknown error" },
+      { 
+        error: e?.message ?? "Internal server error",
+        code: "INTERNAL_ERROR",
+        details: process.env.NODE_ENV === "development" ? e?.stack : undefined
+      },
       { status: 500 }
     );
   }

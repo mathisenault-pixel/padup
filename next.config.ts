@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Désactiver Strict Mode en production pour éviter les doubles useEffect
+  reactStrictMode: false,
 };
 
 export default nextConfig;

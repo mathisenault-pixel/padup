@@ -223,7 +223,14 @@ export default function AvailabilityPage() {
     // =====================================================
     const slotId = buildSlotId({ courtId, startISO: selectedSlot.start_at });
     
-    console.log("[BOOKING CONFIRMED]", { slotId, tabId });
+    const payload = {
+      clubId,
+      courtId,
+      slotStart: selectedSlot.start_at,
+      createdBy,
+    };
+    
+    console.log("[BOOK] click", { slotId, tabId, payload });
 
     // =====================================================
     // VÉRIFIER SI DÉJÀ LOCKÉ PAR UN AUTRE ONGLET
@@ -258,16 +265,15 @@ export default function AvailabilityPage() {
     // APPEL API RÉEL AVEC ANTI DOUBLE-BOOKING DB
     // =====================================================
     try {
+      console.log("[BOOK] request", { url: "/api/bookings", method: "POST" });
+      
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clubId,
-          courtId,
-          slotStart: selectedSlot.start_at,
-          createdBy,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      console.log("[BOOK] response", { status: res.status, ok: res.ok });
 
       // Conflit (déjà réservé) - Anti double-booking DB
       if (res.status === 409) {
@@ -276,8 +282,6 @@ export default function AvailabilityPage() {
         // Rollback du lock local
         localStorage.removeItem(LOCK_KEY);
         setSlotLock(null);
-        setIsBooking(false);
-        closeBookingModal();
         
         // Refresh pour voir l'état réel
         await loadAvailability();
@@ -288,37 +292,38 @@ export default function AvailabilityPage() {
       if (!res.ok) {
         // Lire le body en texte brut pour voir l'erreur réelle
         const text = await res.text();
-        console.error("[BOOKING ERROR]", {
+        console.error("[BOOK] error", {
           status: res.status,
           body: text,
         });
         
-        showToast(`❌ Booking ${res.status}: ${text}`, "error");
+        showToast(`❌ Erreur ${res.status}: ${text}`, "error");
         
         // Rollback : retirer le lock
         localStorage.removeItem(LOCK_KEY);
         setSlotLock(null);
-        setIsBooking(false);
-        closeBookingModal();
         return;
       }
 
       // Succès
+      const result = await res.json();
+      console.log("[BOOK] success", result);
+      
       showToast("✅ Réservation confirmée !", "success");
-      setIsBooking(false);
-      closeBookingModal();
       
       // Refresh après succès pour synchroniser avec DB
       setTimeout(() => {
         loadAvailability();
       }, 500);
     } catch (e: any) {
-      console.error("[BOOKING FETCH ERROR]", e);
+      console.error("[BOOK] error", e);
       showToast(`❌ Erreur réseau: ${e.message}`, "error");
       
       // Rollback : retirer le lock
       localStorage.removeItem(LOCK_KEY);
       setSlotLock(null);
+    } finally {
+      // ✅ TOUJOURS désactiver le loading
       setIsBooking(false);
       closeBookingModal();
     }
@@ -580,6 +585,7 @@ export default function AvailabilityPage() {
         footer={
           <>
             <button
+              type="button"
               onClick={closeBookingModal}
               disabled={isBooking}
               style={{
@@ -594,6 +600,7 @@ export default function AvailabilityPage() {
               Annuler
             </button>
             <button
+              type="button"
               onClick={confirmBooking}
               disabled={isBooking}
               style={{
@@ -606,7 +613,7 @@ export default function AvailabilityPage() {
                 opacity: isBooking ? 0.6 : 1,
               }}
             >
-              {isBooking ? "Réservation..." : "Confirmer"}
+              {isBooking ? "⏳ Réservation..." : "✅ Confirmer"}
             </button>
           </>
         }

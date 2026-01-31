@@ -45,10 +45,20 @@ export default function MyBookingsPage() {
   // Toast notifications
   const { toast, showToast, hideToast, ToastComponent } = useToast();
 
+  // Protection contre les appels concurrents
+  const [isLoadingRef, setIsLoadingRef] = useState(false);
+
   /**
    * Charger les réservations de l'utilisateur
    */
   async function loadBookings() {
+    // Empêcher les appels concurrents
+    if (isLoadingRef) {
+      console.log("[LOAD BOOKINGS] Déjà en cours, ignoré");
+      return;
+    }
+
+    setIsLoadingRef(true);
     setLoading(true);
 
     console.log("[LOAD BOOKINGS]", {
@@ -115,6 +125,7 @@ export default function MyBookingsPage() {
       showToast(`Erreur réseau: ${e.message}`, "error");
     } finally {
       setLoading(false);
+      setIsLoadingRef(false);
     }
   }
 
@@ -285,6 +296,7 @@ export default function MyBookingsPage() {
             color: filter === "upcoming" ? "white" : "black",
             cursor: loading ? "not-allowed" : "pointer",
             fontWeight: filter === "upcoming" ? 600 : 400,
+            opacity: loading ? 0.6 : 1,
           }}
         >
           À venir
@@ -300,6 +312,7 @@ export default function MyBookingsPage() {
             color: filter === "past" ? "white" : "black",
             cursor: loading ? "not-allowed" : "pointer",
             fontWeight: filter === "past" ? 600 : 400,
+            opacity: loading ? 0.6 : 1,
           }}
         >
           Passées
@@ -315,6 +328,7 @@ export default function MyBookingsPage() {
             color: filter === "cancelled" ? "white" : "black",
             cursor: loading ? "not-allowed" : "pointer",
             fontWeight: filter === "cancelled" ? 600 : 400,
+            opacity: loading ? 0.6 : 1,
           }}
         >
           Annulées
@@ -330,6 +344,7 @@ export default function MyBookingsPage() {
             color: filter === "all" ? "white" : "black",
             cursor: loading ? "not-allowed" : "pointer",
             fontWeight: filter === "all" ? 600 : 400,
+            opacity: loading ? 0.6 : 1,
           }}
         >
           Toutes
@@ -345,18 +360,45 @@ export default function MyBookingsPage() {
             backgroundColor: "white",
             cursor: loading ? "not-allowed" : "pointer",
             marginLeft: "auto",
+            opacity: loading ? 0.6 : 1,
           }}
         >
-          {loading ? "Chargement..." : "Rafraîchir"}
+          {loading ? "⏳ Chargement..." : "🔄 Rafraîchir"}
         </button>
       </div>
 
       {/* Loading */}
       {loading && (
-        <div style={{ padding: 24, textAlign: "center" }}>
-          Chargement des réservations...
+        <div
+          style={{
+            padding: 48,
+            textAlign: "center",
+            border: "1px solid #ddd",
+            borderRadius: 12,
+            backgroundColor: "#f8f9fa",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 48,
+              marginBottom: 16,
+              animation: "pulse 1.5s ease-in-out infinite",
+            }}
+          >
+            ⏳
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 500 }}>
+            Chargement des réservations...
+          </div>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
 
       {/* Empty state */}
       {!loading && bookings.length === 0 && (
