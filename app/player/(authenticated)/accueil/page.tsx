@@ -141,7 +141,7 @@ export default function AccueilPage() {
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs populaires</h2>
+              <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs autour de chez moi</h2>
               <p className="text-xl text-gray-600">Découvrez nos meilleures adresses</p>
             </div>
             <Link
