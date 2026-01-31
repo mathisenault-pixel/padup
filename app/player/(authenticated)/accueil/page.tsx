@@ -2,279 +2,398 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import SmartSearchBar from '../components/SmartSearchBar'
 
-type ReservationRapide = {
+type Club = {
   id: number
-  clubNom: string
-  date: string
-  heure: string
-  terrain: string
-}
-
-type Notification = {
-  id: number
-  type: 'info' | 'warning' | 'success'
-  titre: string
-  message: string
-  heure: string
+  nom: string
+  ville: string
+  distance: string
+  nombreTerrains: number
+  note: number
+  avis: number
+  photo: string
+  imageUrl: string
+  prixMin: number
 }
 
 export default function AccueilPage() {
-  const [prochainesReservations] = useState<ReservationRapide[]>([
+  const [showReservationModal, setShowReservationModal] = useState(false)
+  const [selectedClub, setSelectedClub] = useState<Club | null>(null)
+
+  const [clubs] = useState<Club[]>([
     {
       id: 1,
-      clubNom: 'Le Hangar Sport & Co',
-      date: '2025-01-22',
-      heure: '18:00',
-      terrain: 'Terrain 3'
+      nom: 'Le Hangar Sport & Co',
+      ville: 'Rochefort-du-Gard',
+      distance: '5 min',
+      nombreTerrains: 8,
+      note: 4.8,
+      avis: 245,
+      photo: '🏗️',
+      imageUrl: '/images/clubs/le-hangar.jpg',
+      prixMin: 12,
     },
     {
       id: 2,
-      clubNom: 'Paul & Louis Sport',
-      date: '2025-01-25',
-      heure: '20:00',
-      terrain: 'Terrain 5'
+      nom: 'Paul & Louis Sport',
+      ville: 'Le Pontet',
+      distance: '10 min',
+      nombreTerrains: 8,
+      note: 4.7,
+      avis: 189,
+      photo: '🎾',
+      imageUrl: '/images/clubs/paul-louis.jpg',
+      prixMin: 13,
+    },
+    {
+      id: 3,
+      nom: 'ZE Padel',
+      ville: 'Boulbon',
+      distance: '20 min',
+      nombreTerrains: 6,
+      note: 4.6,
+      avis: 127,
+      photo: '⚡',
+      imageUrl: '/images/clubs/ze-padel.jpg',
+      prixMin: 11,
+    },
+    {
+      id: 4,
+      nom: 'QG Padel Club',
+      ville: 'Saint-Laurent-des-Arbres',
+      distance: '15 min',
+      nombreTerrains: 4,
+      note: 4.7,
+      avis: 98,
+      photo: '🏟️',
+      imageUrl: '/images/clubs/qg-padel.jpg',
+      prixMin: 12,
     },
   ])
 
-  const [notifications] = useState<Notification[]>([
-    {
-      id: 1,
-      type: 'success',
-      titre: 'Réservation confirmée',
-      message: 'Votre réservation au Le Hangar Sport & Co est confirmée',
-      heure: '10:30'
-    },
-    {
-      id: 2,
-      type: 'info',
-      titre: 'Nouveau tournoi',
-      message: 'Tournoi Open ce week-end au Paul & Louis Sport',
-      heure: '09:15'
-    },
-  ])
-
-  const stats = {
-    reservationsActives: 2,
-    prochainMatch: 'Demain à 18h',
-    clubsFavoris: 4,
-    heuresJouees: 63
-  }
-
-  const getNotifColor = (type: string) => {
-    switch (type) {
-      case 'success': return 'border-green-200 bg-green-50'
-      case 'warning': return 'border-yellow-200 bg-yellow-50'
-      case 'info': return 'border-blue-200 bg-blue-50'
-      default: return 'border-slate-200 bg-slate-50'
-    }
-  }
-
-  const getNotifIcon = (type: string) => {
-    switch (type) {
-      case 'success':
-        return (
-          <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-        )
-      case 'warning':
-        return (
-          <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-        )
-      default:
-        return (
-          <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-          </svg>
-        )
-    }
+  const handleReserver = (club: Club) => {
+    setSelectedClub(club)
+    setShowReservationModal(true)
   }
 
   return (
-    <div className="space-y-8">
-      {/* Welcome Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-slate-900">Bienvenue</h1>
-        <p className="text-slate-600 mt-2">
-          {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+      {/* Hero - PREMIUM */}
+      <section className="px-6 pt-32 pb-20">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-6">
+              <span className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
+                #1 Plateforme de réservation padel
+              </span>
+            </div>
+            
+            <h1 className="text-7xl md:text-8xl font-black text-gray-900 mb-6 leading-none">
+              Réservez votre<br />
+              <span className="text-blue-600">terrain de Padel</span>
+            </h1>
+            
+            <p className="text-2xl text-gray-600 mb-10 max-w-3xl mx-auto">
+              Accédez aux meilleurs clubs et réservez votre terrain en quelques secondes
+            </p>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 text-white shadow-md">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-300 text-sm font-medium">Réservations actives</span>
-            <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            {/* BARRE DE RECHERCHE DISCRÈTE */}
+            <div className="max-w-2xl mx-auto">
+              <SmartSearchBar
+                placeholder="Rechercher un club, une ville..."
+                onSearch={(query) => {
+                  console.log('Recherche:', query)
+                  // Logique de recherche ici
+                }}
+                suggestions={[
+                  'Le Hangar Sport & Co',
+                  'Paul & Louis Sport',
+                  'ZE Padel',
+                  'Rochefort-du-Gard',
+                  'Clubs avec restaurant'
+                ]}
+                storageKey="search-history-accueil"
+                compact={true}
+              />
+            </div>
+
+            <div className="flex items-center justify-center gap-8 mt-8 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">Confirmation instantanée</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">100% gratuit</span>
+              </div>
+            </div>
           </div>
-          <p className="text-4xl font-bold">{stats.reservationsActives}</p>
         </div>
+      </section>
 
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600 text-sm font-medium">Prochain match</span>
-            <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-xl font-bold text-slate-900">{stats.prochainMatch}</p>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600 text-sm font-medium">Clubs favoris</span>
-            <svg className="w-6 h-6 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          <p className="text-4xl font-bold text-slate-900">{stats.clubsFavoris}</p>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-slate-600 text-sm font-medium">Heures jouées</span>
-            <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <p className="text-4xl font-bold text-slate-900">{stats.heuresJouees}h</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Prochaines réservations */}
-        <div className="lg:col-span-2 bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900">Prochaines réservations</h2>
-            <Link 
-              href="/player/reservations"
-              className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+      {/* Clubs - CAROUSEL CARDS STYLE */}
+      <section className="pt-8 pb-16 px-6 bg-white">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs populaires</h2>
+              <p className="text-xl text-gray-600">Découvrez nos meilleures adresses</p>
+            </div>
+            <Link
+              href="/player/clubs"
+              className="hidden md:flex items-center gap-2 text-gray-900 font-bold hover:text-blue-600 transition-colors"
             >
               Voir tout
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </Link>
           </div>
 
-          <div className="space-y-3">
-            {prochainesReservations.map((reservation) => (
-              <div
-                key={reservation.id}
-                className="flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-all"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {clubs.map((club, index) => (
+              <Link
+                key={club.id}
+                href={`/player/clubs/${club.id}/reserver`}
+                className="group bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all block"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
-                    {new Date(reservation.date).getDate()}
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900">{reservation.clubNom}</p>
-                    <p className="text-sm text-slate-600">
-                      {new Date(reservation.date).toLocaleDateString('fr-FR', { weekday: 'long' })} à {reservation.heure}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-slate-700">{reservation.terrain}</p>
-                  <span className="inline-block mt-1 px-3 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold border border-green-200">
-                    Confirmée
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <Link
-            href="/player/clubs"
-            className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all shadow-sm"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Nouvelle réservation
-          </Link>
-        </div>
-
-        {/* Notifications */}
-        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-900">Notifications</h2>
-            <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-bold">
-              {notifications.length}
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            {notifications.map((notif) => (
-              <div
-                key={notif.id}
-                className={`p-4 rounded-lg border ${getNotifColor(notif.type)}`}
-              >
-                <div className="flex items-start gap-3">
-                  {getNotifIcon(notif.type)}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-bold text-slate-900 text-sm">{notif.titre}</h3>
-                      <span className="text-xs text-slate-500">{notif.heure}</span>
+                <div className="relative h-64 overflow-hidden">
+                  <img
+                    src={club.imageUrl}
+                    alt={club.nom}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                  
+                  {index === 0 && (
+                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg">
+                      ⭐ Top choix
                     </div>
-                    <p className="text-sm text-slate-700">{notif.message}</p>
+                  )}
+
+                  <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg shadow-lg">
+                    <svg className="w-4 h-4 text-blue-600 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="text-sm font-black text-gray-900">{club.note}</span>
                   </div>
+
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <h3 className="text-xl font-black mb-1">{club.nom}</h3>
+                    <p className="text-sm text-white/90">{club.ville}</p>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="font-medium">{club.distance}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {club.nombreTerrains} terrains
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black text-gray-900">{club.prixMin}€</span>
+                      <span className="text-sm text-gray-600">par personne</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">pour 1h30 de jeu</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center mt-8 md:hidden">
+            <Link
+              href="/player/clubs"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl"
+            >
+              Découvrir tous les clubs
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* POURQUOI PAD'UP - CARDS ÉLÉGANTES */}
+      <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-black text-gray-900 mb-4">Rappels automatiques par e-mail</h2>
+            <p className="text-xl text-gray-600">Ne manquez plus jamais vos réservations</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: '📧',
+                title: 'Confirmation instantanée',
+                description: 'Recevez immédiatement un e-mail de confirmation avec tous les détails de votre réservation',
+              },
+              {
+                icon: '🔔',
+                title: 'Rappel 24h avant',
+                description: 'Un e-mail automatique vous rappelle votre session 24h avant pour ne rien oublier',
+              },
+              {
+                icon: '⏰',
+                title: 'Notification dernière minute',
+                description: 'Recevez un dernier rappel 2h avant votre match pour être prêt à temps',
+              },
+            ].map((feature, i) => (
+              <div key={i} className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-500 rounded-3xl transform group-hover:scale-105 transition-transform opacity-0 group-hover:opacity-100"></div>
+                <div className="relative bg-white rounded-3xl p-8 shadow-xl group-hover:shadow-2xl transition-all">
+                  <div className="text-6xl mb-6">{feature.icon}</div>
+                  <h3 className="text-2xl font-black text-gray-900 mb-4 group-hover:text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700">{feature.description}</p>
                 </div>
               </div>
             ))}
           </div>
-
-          <button className="w-full mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-medium transition-all text-sm">
-            Voir toutes les notifications
-          </button>
         </div>
-      </div>
+      </section>
 
-      {/* Actions rapides */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Link
-          href="/player/clubs"
-          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
-        >
-          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <p className="font-semibold text-slate-900">Trouver un club</p>
-        </Link>
+      {/* CTA - PREMIUM */}
+      <section className="py-16 px-6 bg-white">
+        <div className="container mx-auto max-w-5xl">
+          <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100">
+            <div className="relative px-12 py-16 text-center">
+              <h2 className="text-6xl font-black text-gray-900 mb-6">
+                Prêt à jouer ?
+              </h2>
+              <p className="text-2xl text-gray-600 mb-10">
+                Rejoignez plus de 10 000 joueurs sur Pad'Up
+              </p>
+              <Link
+                href="/player/clubs"
+                className="inline-flex items-center gap-3 px-12 py-5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all text-lg shadow-2xl shadow-blue-600/50"
+              >
+                Commencer maintenant
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <Link
-          href="/player/reservations"
-          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
-        >
-          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p className="font-semibold text-slate-900">Mes réservations</p>
-        </Link>
+      {/* FAQ */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-black text-gray-900 mb-3">Questions fréquentes</h2>
+            <p className="text-lg text-gray-600">Tout ce que vous devez savoir</p>
+          </div>
 
-        <Link
-          href="/player/tournois"
-          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
-        >
-          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-          </svg>
-          <p className="font-semibold text-slate-900">Tournois</p>
-        </Link>
+          <div className="space-y-4">
+            {[
+              {
+                question: "Comment réserver un terrain ?",
+                answer: "Il vous suffit de rechercher un club, de sélectionner le créneau horaire souhaité et de confirmer votre réservation. Vous recevrez une confirmation immédiate par email."
+              },
+              {
+                question: "Le paiement est-il sécurisé ?",
+                answer: "Oui, vous payez directement sur place au club. Aucune carte bancaire n'est requise lors de la réservation en ligne, ce qui garantit une sécurité maximale."
+              },
+              {
+                question: "Puis-je annuler ma réservation ?",
+                answer: "Oui, vous pouvez annuler votre réservation depuis votre espace personnel. Les conditions d'annulation dépendent de chaque club et sont indiquées lors de la réservation."
+              },
+              {
+                question: "Y a-t-il des frais de service ?",
+                answer: "Non, Pad'Up est 100% gratuit pour les joueurs. Vous ne payez que le prix du terrain directement au club."
+              },
+              {
+                question: "Comment recevoir les rappels de mes matchs ?",
+                answer: "Vous recevez automatiquement des notifications par email avant vos réservations. Vous pouvez gérer vos préférences de notification dans votre profil."
+              }
+            ].map((faq, i) => (
+              <details key={i} className="group bg-white rounded-xl overflow-hidden shadow-sm">
+                <summary className="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-gray-50 transition-all">
+                  <span className="text-lg font-semibold text-gray-900">{faq.question}</span>
+                  <svg className="w-5 h-5 text-gray-600 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="px-6 pb-5 text-gray-600 leading-relaxed">
+                  {faq.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        <Link
-          href="/player/profil"
-          className="group p-6 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 shadow-sm transition-all text-center"
-        >
-          <svg className="w-10 h-10 text-slate-600 mx-auto mb-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <p className="font-semibold text-slate-900">Mon profil</p>
-        </Link>
-      </div>
+      {/* Modal */}
+      {showReservationModal && selectedClub && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowReservationModal(false)}>
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-black text-gray-900 mb-1">{selectedClub.nom}</h3>
+                <p className="text-gray-600">{selectedClub.ville}</p>
+              </div>
+              <button
+                onClick={() => setShowReservationModal(false)}
+                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all"
+              >
+                <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-gray-50 rounded-xl p-4 text-center">
+                <p className="text-2xl font-black text-gray-900 mb-1">{selectedClub.nombreTerrains}</p>
+                <p className="text-xs font-bold text-gray-600 uppercase">Terrains</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                <p className="text-2xl font-black text-blue-600 mb-1">{selectedClub.note}★</p>
+                <p className="text-xs font-bold text-blue-700 uppercase">Note</p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4 text-center">
+                <p className="text-2xl font-black text-gray-900 mb-1">{selectedClub.prixMin}€</p>
+                <p className="text-xs font-bold text-gray-600 uppercase">Prix/h</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowReservationModal(false)}
+                className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-full transition-all"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => {
+                  alert(`Réservation confirmée au ${selectedClub.nom} !`)
+                  setShowReservationModal(false)
+                }}
+                className="flex-1 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-full transition-all"
+              >
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-

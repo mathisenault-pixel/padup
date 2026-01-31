@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ReservationProvider } from "@/state/ReservationContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pad'Up",
-  description: "Plateforme de gestion de clubs de padel",
+  title: {
+    default: "Pad'Up - Réservez vos terrains de padel",
+    template: "%s | Pad'Up"
+  },
+  description: "Réservez facilement vos terrains de padel. Trouvez les meilleurs clubs autour de vous et gérez vos réservations en ligne.",
+  keywords: ["padel", "réservation", "terrain", "club", "sport"],
 };
 
 export default function RootLayout({
@@ -23,11 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ReservationProvider>
+          {children}
+        </ReservationProvider>
       </body>
     </html>
   );

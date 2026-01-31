@@ -184,3 +184,15 @@ Avant de push :
 *Guide mis à jour le 17 décembre 2025*
 
 
+
+
+
+
+
+
+
+
+
+
+
+

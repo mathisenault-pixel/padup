@@ -1,0 +1,95 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║                   ✅ CODE CORRIGÉ - ACTION REQUISE                ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+📌 ERREUR : "Could not find table public.reservations (PGST205)"
+✅ STATUS : Code corrigé | Serveur redémarré
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 ACTIONS À FAIRE MAINTENANT (3 étapes, 2 minutes)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ OUVRIR SUPABASE SQL EDITOR
+
+   https://supabase.com/dashboard
+   → Projet: eohioutmqfqdehfxgjgv
+   → Menu: SQL Editor
+   → New query
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2️⃣ COPIER-COLLER LE FICHIER SQL
+
+   📁 Fichier: supabase/fix_reservations_table.sql
+   
+   Copie TOUT le contenu → Colle dans SQL Editor → Clique RUN
+
+   ✅ Résultat attendu:
+   ┌──────────────┬────────────────────┬─────────┐
+   │ table_name   │ total_reservations │ futures │
+   ├──────────────┼────────────────────┼─────────┤
+   │ reservations │ 1                  │ 1       │
+   └──────────────┴────────────────────┴─────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3️⃣ VÉRIFIER SETTINGS > API
+
+   → Menu: Settings ⚙️
+   → Sous-menu: API
+   → Section: Schema (tout en bas)
+   → ☑ La case "public" doit être cochée
+   
+   Si non cochée: cocher → Save → attendre 10 secondes
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧪 TESTER L'APPLICATION
+
+   http://localhost:3000/availability
+
+   Console navigateur (Cmd+Option+J):
+   ✅ [SUPABASE SUCCESS - loadBooked] { count: 1, ... }
+
+   UI:
+   ✅ Créneau 17:00 - 17:30 : "Occupé" (grisé)
+   ✅ Autres créneaux : "Libre" (cliquables)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION COMPLÈTE
+
+   📁 SUPABASE_FIX_GUIDE.md      → Guide étape par étape
+   📁 CORRECTIONS_APPLIQUEES.md  → Détails techniques
+   📁 supabase/fix_reservations_table.sql → SQL à exécuter
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ CE QUI A ÉTÉ CORRIGÉ DANS LE CODE
+
+   ❌ AVANT:
+   .eq("identifiant_du_tribunal", courtId)
+   créé_par: createdBy
+
+   ✅ APRÈS:
+   .eq("court_id", courtId)
+   cree_par: createdBy
+
+   Fichiers modifiés:
+   - app/(public)/availability/page.tsx
+   - app/api/bookings/route.ts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 RÉSULTAT FINAL ATTENDU
+
+   ✅ Plus d'erreur PGST205
+   ✅ Les créneaux réservés s'affichent "Occupé"
+   ✅ On peut réserver de nouveaux créneaux
+   ✅ Console propre avec logs SUCCESS
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ SERVEUR EN LIGNE : http://localhost:3000 ✅

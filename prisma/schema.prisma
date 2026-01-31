@@ -1,0 +1,151 @@
+// Prisma Schema - Pad'up MVP
+// SQLite local pour développement sans coût
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// Utilisateurs (simplifié pour MVP)
+model User {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String?
+  password    String? // Hashed
+  createdAt   DateTime     @default(now())
+  
+  // Relations
+  memberships Membership[]
+  bookings    Booking[]
+}
+
+// Clubs de padel
+model Club {
+  id        String       @id @default(uuid())
+  name      String
+  city      String?
+  address   String?
+  phone     String?
+  email     String?
+  createdAt DateTime     @default(now())
+  
+  // Relations
+  courts      Court[]
+  memberships Membership[]
+  bookings    Booking[]
+  products    Product[]
+  orders      Order[]
+}
+
+// Terrains de padel
+model Court {
+  id        String    @id @default(uuid())
+  clubId    String
+  name      String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  
+  // Relations
+  club     Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+  
+  @@index([clubId])
+}
+
+// Rôles utilisateurs dans les clubs
+model Membership {
+  userId    String
+  clubId    String
+  role      String // "owner" ou "staff"
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, clubId])
+  @@index([userId])
+  @@index([clubId])
+}
+
+// Réservations (créneaux de 30 min)
+model Booking {
+  id          String   @id @default(uuid())
+  clubId      String
+  courtId     String
+  slotStart   DateTime
+  slotEnd     DateTime
+  createdBy   String
+  playerName  String?
+  playerEmail String?
+  playerPhone String?
+  status      String   @default("confirmed") // "confirmed" ou "cancelled"
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  club   Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  court  Court   @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  orders Order[]
+  
+  // CONTRAINTE ANTI DOUBLE-BOOKING
+  @@unique([courtId, slotStart])
+  @@index([clubId])
+  @@index([courtId])
+  @@index([slotStart])
+  @@index([createdBy])
+  @@index([status])
+}
+
+// Produits vendus au club
+model Product {
+  id          String      @id @default(uuid())
+  clubId      String
+  name        String
+  category    String?
+  priceCents  Int
+  isAvailable Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  
+  // Relations
+  club       Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+  
+  @@index([clubId])
+}
+
+// Commandes d'extras
+model Order {
+  id         String      @id @default(uuid())
+  bookingId  String
+  clubId     String
+  totalCents Int         @default(0)
+  createdAt  DateTime    @default(now())
+  
+  // Relations
+  booking    Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  club       Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  items      OrderItem[]
+  
+  @@index([bookingId])
+  @@index([clubId])
+}
+
+// Détail des commandes
+model OrderItem {
+  orderId    String
+  productId  String
+  quantity   Int
+  priceCents Int
+  
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@id([orderId, productId])
+}

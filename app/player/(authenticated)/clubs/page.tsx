@@ -1,407 +1,423 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import Link from 'next/link'
+import SmartSearchBar from '../components/SmartSearchBar'
+import { debug } from '@/lib/debug'
 
 type Club = {
   id: number
   nom: string
-  adresse: string
   ville: string
-  distance: string
+  distance: number
   nombreTerrains: number
-  interieur: number
-  exterieur: number
   note: number
   avis: number
-  photo: string
   imageUrl: string
   prixMin: number
-  prixMax: number
-  horaires: string
   equipements: string[]
   favoris: boolean
+  disponible: boolean
 }
 
 export default function ClubsPage() {
+  // Debug: compteur de renders
+  debug.count('🔄 ClubsPage render')
+  
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedFilter, setSelectedFilter] = useState<'tous' | 'favoris' | 'proches'>('tous')
-  const [showReservationModal, setShowReservationModal] = useState(false)
-  const [selectedClub, setSelectedClub] = useState<Club | null>(null)
+  const [sortBy, setSortBy] = useState<'distance' | 'prix-asc' | 'prix-desc' | 'note'>('distance')
+  const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
+  const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
 
   const [clubs, setClubs] = useState<Club[]>([
     {
       id: 1,
       nom: 'Le Hangar Sport & Co',
-      adresse: '370 Allées des Issards',
-      ville: 'Rochefort-du-Gard (près d\'Avignon)',
-      distance: '5 min d\'Avignon',
+      ville: 'Rochefort-du-Gard',
+      distance: 5,
       nombreTerrains: 8,
-      interieur: 8,
-      exterieur: 0,
       note: 4.8,
       avis: 245,
-      photo: '🏗️',
       imageUrl: '/images/clubs/le-hangar.jpg',
-      prixMin: 35,
-      prixMax: 55,
-      horaires: '9h-00h (9h-20h week-end)',
-      equipements: ['Vestiaires', 'Douches', 'Club House', 'Terrasse', 'Pétanque', 'Ping-pong', 'Baby-foot', 'Badminton', 'Foot à 5'],
-      favoris: true
+      prixMin: 12,
+      equipements: ['Restaurant', 'Vestiaires', 'Douches', 'Parking'],
+      favoris: false,
+      disponible: true
     },
     {
       id: 2,
       nom: 'Paul & Louis Sport',
-      adresse: '255 Rue des Tonneliers',
-      ville: 'Le Pontet (près d\'Avignon)',
-      distance: '10 min d\'Avignon',
+      ville: 'Le Pontet',
+      distance: 10,
       nombreTerrains: 8,
-      interieur: 4,
-      exterieur: 4,
       note: 4.7,
       avis: 189,
-      photo: '🎾',
       imageUrl: '/images/clubs/paul-louis.jpg',
-      prixMin: 40,
-      prixMax: 60,
-      horaires: '9h-23h',
-      equipements: ['Vestiaires', 'Douches', 'Restaurant Italien', 'Salle Fitness', 'Cours Collectifs', 'Coaching', 'Salle de Réunion'],
-      favoris: false
+      prixMin: 13,
+      equipements: ['Restaurant', 'Fitness', 'Coaching'],
+      favoris: false,
+      disponible: true
     },
     {
       id: 3,
       nom: 'ZE Padel',
-      adresse: 'Z.A du Colombier, Rue des Micocouliers',
       ville: 'Boulbon',
-      distance: '20 min d\'Avignon',
+      distance: 20,
       nombreTerrains: 6,
-      interieur: 4,
-      exterieur: 2,
       note: 4.6,
       avis: 127,
-      photo: '⚡',
       imageUrl: '/images/clubs/ze-padel.jpg',
-      prixMin: 9,
-      prixMax: 13,
-      horaires: 'Ouvert toute l\'année',
-      equipements: ['Vestiaires PMR', 'Bar', 'Snack', 'TV', 'Coworking', 'Séminaires', 'Cours de padel'],
-      favoris: true
+      prixMin: 11,
+      equipements: ['Bar', 'Snack', 'WiFi'],
+      favoris: false,
+      disponible: false
     },
     {
       id: 4,
       nom: 'QG Padel Club',
-      adresse: '239 Rue des Entrepreneurs',
       ville: 'Saint-Laurent-des-Arbres',
-      distance: '15 min d\'Avignon',
+      distance: 15,
       nombreTerrains: 4,
-      interieur: 4,
-      exterieur: 0,
       note: 4.7,
       avis: 98,
-      photo: '🏟️',
       imageUrl: '/images/clubs/qg-padel.jpg',
       prixMin: 12,
-      prixMax: 13,
-      horaires: '9h-23h',
-      equipements: ['Vestiaires', 'Douches', 'Snacking local', 'Retransmission sportive', 'Cours avec pro', 'Application dédiée'],
-      favoris: false
+      equipements: ['Snacking', 'Cours pro'],
+      favoris: false,
+      disponible: true
     },
   ])
 
-  const toggleFavoris = (clubId: number) => {
-    setClubs(clubs.map(club => 
-      club.id === clubId ? { ...club, favoris: !club.favoris } : club
-    ))
-    const club = clubs.find(c => c.id === clubId)
-    if (club) {
-      alert(club.favoris ? `${club.nom} retiré des favoris` : `${club.nom} ajouté aux favoris ✨`)
-    }
+  const toggleEquipement = (equipement: string) => {
+    setSelectedEquipements(prev => 
+      prev.includes(equipement) ? prev.filter(e => e !== equipement) : [...prev, equipement]
+    )
   }
 
-  const handleReserver = (club: Club) => {
-    setSelectedClub(club)
-    setShowReservationModal(true)
+  const togglePrixRange = (range: string) => {
+    setSelectedPrixRanges(prev => 
+      prev.includes(range) ? prev.filter(r => r !== range) : [...prev, range]
+    )
   }
 
-  const confirmReservation = () => {
-    if (selectedClub) {
-      alert(`Réservation confirmée au ${selectedClub.nom} ! 🎾\nVous allez recevoir un email de confirmation.`)
-      setShowReservationModal(false)
-      setSelectedClub(null)
-    }
-  }
+  // Mémoïser le toggle favoris (forme fonctionnelle pour éviter boucle)
+  const toggleFavoris = useCallback((clubId: number) => {
+    setClubs(prev => 
+      prev.map(club => 
+        club.id === clubId ? { ...club, favoris: !club.favoris } : club
+      )
+    )
+  }, [])
 
-  const filteredClubs = clubs
-    .filter(club => {
-      const matchSearch = club.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         club.ville.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      if (selectedFilter === 'favoris') return matchSearch && club.favoris
-      if (selectedFilter === 'proches') return matchSearch && parseFloat(club.distance) <= 3
-      return matchSearch
-    })
-    .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
+  // Filtrer et trier avec useMemo (évite recalcul inutile)
+  const filteredAndSortedClubs = useMemo(() => {
+    debug.count('🔄 [FILTER] Recalculating')
+    debug.time('filter-duration')
+    
+    const result = clubs
+      .filter(club => {
+        // Recherche
+        const matchesSearch = club.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          club.ville.toLowerCase().includes(searchTerm.toLowerCase())
+        
+        if (!matchesSearch) return false
+
+        // Filtre équipements (multi-sélection)
+        const matchesEquipements = selectedEquipements.length === 0 || 
+          selectedEquipements.some(eq => club.equipements.some(clubEq => clubEq.toLowerCase().includes(eq.toLowerCase())))
+
+        // Filtre prix (multi-sélection)
+        let matchesPrix = selectedPrixRanges.length === 0
+        if (selectedPrixRanges.length > 0) {
+          matchesPrix = selectedPrixRanges.some(range => {
+            if (range === '0-8') return club.prixMin <= 8
+            if (range === '9-10') return club.prixMin >= 9 && club.prixMin <= 10
+            if (range === '11+') return club.prixMin >= 11
+            return false
+          })
+        }
+
+        return matchesEquipements && matchesPrix
+      })
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'distance':
+            return a.distance - b.distance
+          case 'prix-asc':
+            return a.prixMin - b.prixMin
+          case 'prix-desc':
+            return b.prixMin - a.prixMin
+          case 'note':
+            return b.note - a.note
+          default:
+            return 0
+        }
+      })
+    
+    debug.timeEnd('filter-duration')
+    debug.log('🔄 [FILTER] Results:', result.length, 'clubs')
+    return result
+  }, [clubs, searchTerm, sortBy, selectedEquipements, selectedPrixRanges])
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-slate-900">Clubs Premium</h1>
-          <p className="text-slate-600 mt-2">{filteredClubs.length} établissements disponibles</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        
 
-      {/* Search & Filters */}
-      <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
+        {/* Barre de recherche + Filtres */}
+        <div className="mb-8 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+          {/* Recherche */}
+          <div className="mb-4">
+            <SmartSearchBar
               placeholder="Rechercher un club ou une ville..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-slate-900"
+              onSearch={(query) => setSearchTerm(query)}
+              suggestions={[
+                'Le Hangar Sport & Co',
+                'Paul & Louis Sport',
+                'ZE Padel',
+                'QG Padel Club',
+                'Rochefort-du-Gard',
+                'Le Pontet',
+                'Boulbon',
+                'Clubs avec restaurant',
+                'Clubs avec parking'
+              ]}
+              storageKey="search-history-clubs"
+              compact={false}
             />
           </div>
-          
-          <div className="flex gap-3">
-            <button
-              onClick={() => setSelectedFilter('tous')}
-              className={`px-5 py-3 rounded-lg font-medium transition-all ${
-                selectedFilter === 'tous'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              Tous
-            </button>
-            <button
-              onClick={() => setSelectedFilter('proches')}
-              className={`px-5 py-3 rounded-lg font-medium transition-all ${
-                selectedFilter === 'proches'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              Proximité
-            </button>
-            <button
-              onClick={() => setSelectedFilter('favoris')}
-              className={`px-5 py-3 rounded-lg font-medium transition-all ${
-                selectedFilter === 'favoris'
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              Favoris
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Clubs Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredClubs.map((club) => (
-          <div
-            key={club.id}
-            className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
-          >
-            {/* Image Header */}
-            <div className="relative h-56 overflow-hidden border-b border-slate-200">
-              <img 
-                src={club.imageUrl} 
-                alt={club.nom}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          {/* Filtres Tri */}
+          <div className="mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2">
               <button
-                onClick={() => toggleFavoris(club.id)}
-                className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all hover:scale-110"
+                onClick={() => setSortBy('distance')}
+                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  sortBy === 'distance'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
               >
-                <svg 
-                  className={`w-5 h-5 ${club.favoris ? 'text-amber-500 fill-current' : 'text-slate-400'}`} 
-                  fill={club.favoris ? 'currentColor' : 'none'} 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 </svg>
+                Autour de moi
               </button>
-            </div>
-
-            {/* Content */}
-            <div className="p-6">
-              {/* Title */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-slate-900 mb-1">{club.nom}</h3>
-                  <p className="text-sm text-slate-600">{club.ville}</p>
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center gap-2 text-slate-700">
-                  <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span className="text-sm">{club.adresse}</span>
-                  <span className="ml-auto text-slate-900 font-semibold text-sm">{club.distance}</span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <svg className="w-4 h-4 text-amber-500 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="font-semibold text-slate-900">{club.note}</span>
-                    <span className="text-slate-500 text-xs">({club.avis} avis)</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-slate-700">
-                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                    <span className="font-medium text-sm">{club.nombreTerrains} terrains</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md font-medium border border-blue-200">
-                    {club.interieur} intérieurs
-                  </span>
-                  <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
-                    {club.exterieur} extérieurs
-                  </span>
-                  <span className="px-3 py-1.5 bg-slate-50 text-slate-700 rounded-md font-medium border border-slate-200">
-                    {club.horaires}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {club.equipements.slice(0, 4).map((eq, idx) => (
-                    <span key={idx} className="text-xs px-2.5 py-1 bg-slate-50 text-slate-600 rounded-md font-medium border border-slate-200">
-                      {eq}
-                    </span>
-                  ))}
-                  {club.equipements.length > 4 && (
-                    <span className="text-xs px-2.5 py-1 bg-slate-50 text-slate-600 rounded-md font-medium border border-slate-200">
-                      +{club.equipements.length - 4}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Price & CTA */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                <div>
-                  <p className="text-xs text-slate-500">À partir de</p>
-                  <p className="text-2xl font-bold text-slate-900">{club.prixMin}€<span className="text-sm text-slate-500 font-normal">/heure</span></p>
-                </div>
-                <button 
-                  onClick={() => handleReserver(club)}
-                  className="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-all shadow-sm hover:shadow-md"
-                >
-                  Réserver
-                </button>
-              </div>
+              <button
+                onClick={() => setSortBy('prix-asc')}
+                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  sortBy === 'prix-asc'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                </svg>
+                Prix croissant
+              </button>
+              <button
+                onClick={() => setSortBy('prix-desc')}
+                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  sortBy === 'prix-desc'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                </svg>
+                Prix décroissant
+              </button>
+              <button
+                onClick={() => setSortBy('note')}
+                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  sortBy === 'note'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                Mieux notés
+              </button>
             </div>
           </div>
-        ))}
-      </div>
 
-      {filteredClubs.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
-          <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-xl font-semibold text-slate-700">Aucun club trouvé</p>
-          <p className="text-slate-500 mt-2">Essayez de modifier vos filtres</p>
-        </div>
-      )}
-
-      {/* Modal de réservation */}
-      {showReservationModal && selectedClub && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-slate-900">Réserver un terrain</h3>
-              <button 
-                onClick={() => setShowReservationModal(false)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+          {/* Filtres Équipements (multi-sélection) */}
+          <div className="mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Équipements :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2">
+              {['Restaurant', 'Parking', 'Bar', 'Fitness', 'Coaching'].map((equipement) => (
+                <button
+                  key={equipement}
+                  onClick={() => toggleEquipement(equipement)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    selectedEquipements.includes(equipement)
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {equipement}
+                </button>
+              ))}
             </div>
+          </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-semibold text-slate-700">Club sélectionné</p>
-                <p className="text-lg font-bold text-slate-900">{selectedClub.nom}</p>
-                <p className="text-sm text-slate-600">{selectedClub.ville}</p>
-              </div>
+          {/* Filtres Gamme de prix (multi-sélection) */}
+          <div>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Gamme de prix :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2">
+              {[
+                { label: '≤ 8€', value: '0-8' },
+                { label: '9-10€', value: '9-10' },
+                { label: '≥ 11€', value: '11+' }
+              ].map((range) => (
+                <button
+                  key={range.value}
+                  onClick={() => togglePrixRange(range.value)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    selectedPrixRanges.includes(range.value)
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Date</label>
-                <input 
-                  type="date" 
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-slate-900"
+        {/* Liste des clubs */}
+        <div className="space-y-4">
+          {filteredAndSortedClubs.map((club) => (
+            <Link
+              key={club.id}
+              href={`/player/clubs/${club.id}/reserver`}
+              onClick={() => {
+                debug.log('🔘 [CLICK] Club navigation start:', club.id, club.nom, Date.now())
+                debug.time('club-navigation')
+              }}
+              className="group flex gap-6 bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-500 hover:shadow-lg transition-all"
+            >
+              {/* Image */}
+              <div className="relative w-64 h-44 flex-shrink-0 rounded-lg overflow-hidden">
+                <img
+                  src={club.imageUrl}
+                  alt={club.nom}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+                {/* Distance badge */}
+                <div className="absolute top-3 left-3 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  </svg>
+                  <span className="font-bold text-sm">À {club.distance} min</span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    toggleFavoris(club.id)
+                  }}
+                  className="absolute top-3 right-3 w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+                >
+                  <svg 
+                    className={`w-5 h-5 ${club.favoris ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+                    fill={club.favoris ? 'currentColor' : 'none'}
+                    stroke="currentColor" 
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Heure</label>
-                <select className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-slate-900">
-                  <option>09:00</option>
-                  <option>10:30</option>
-                  <option>12:00</option>
-                  <option>14:00</option>
-                  <option>15:30</option>
-                  <option>17:00</option>
-                  <option>18:30</option>
-                  <option>20:00</option>
-                </select>
-              </div>
+              {/* Contenu */}
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {club.nom}
+                      </h3>
+                      <p className="text-gray-600 flex items-center gap-1.5 mt-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        </svg>
+                        {club.ville}
+                      </p>
+                    </div>
+                    {club.disponible && (
+                      <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                        Disponible
+                      </span>
+                    )}
+                  </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Durée</label>
-                <select className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none text-slate-900">
-                  <option>1h30</option>
-                  <option>2h00</option>
-                  <option>3h00</option>
-                </select>
-              </div>
+                  <div className="flex items-center gap-6 mt-4">
+                    <div className="flex items-center gap-1.5">
+                      <svg className="w-5 h-5 fill-yellow-400" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      <span className="font-semibold text-gray-900">{club.note}</span>
+                      <span className="text-gray-500 text-sm">({club.avis} avis)</span>
+                    </div>
+                    <div className="text-gray-600 text-sm">
+                      {club.nombreTerrains} terrains
+                    </div>
+                  </div>
 
-              <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                <div className="flex justify-between mb-2">
-                  <span className="text-slate-600">Prix estimé</span>
-                  <span className="font-bold text-slate-900">{selectedClub.prixMin}€</span>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {club.equipements.map((eq, i) => (
+                      <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                        {eq}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                  <div>
+                    <p className="text-sm text-gray-500">À partir de</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {club.prixMin}€ <span className="text-base text-gray-500 font-normal">/ pers · 1h30</span>
+                    </p>
+                  </div>
+                  <div className="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-lg group-hover:bg-blue-700 transition-colors">
+                    Réserver
+                  </div>
                 </div>
               </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={() => setShowReservationModal(false)}
-                  className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold transition-all"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={confirmReservation}
-                  className="flex-1 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-semibold transition-all shadow-sm"
-                >
-                  Confirmer
-                </button>
-              </div>
-            </div>
-          </div>
+            </Link>
+          ))}
         </div>
-      )}
+
+        {/* Message si aucun résultat */}
+        {filteredAndSortedClubs.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucun club trouvé</h3>
+            <p className="text-gray-600 mb-6">Essayez de modifier votre recherche</p>
+            <button
+              onClick={() => {
+                setSearchTerm('')
+                setSortBy('distance')
+              }}
+              className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              Réinitialiser
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
