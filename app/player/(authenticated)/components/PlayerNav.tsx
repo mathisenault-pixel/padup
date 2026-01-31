@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function PlayerNav() {
   const pathname = usePathname()
+  const router = useRouter()
 
   // Navigation organisée par groupes logiques
   const mainNavItems = [
@@ -71,9 +71,10 @@ export default function PlayerNav() {
       {/* Navigation principale */}
       <div className="flex items-center gap-2">
         {mainNavItems.map((item) => (
-          <Link
+          <button
             key={item.href}
-            href={item.href}
+            type="button"
+            onClick={() => router.push(item.href)}
             className={`group relative inline-flex items-center px-5 py-3 text-[15px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
               isActive(item.href)
                 ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
@@ -84,16 +85,17 @@ export default function PlayerNav() {
             {isActive(item.href) && (
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl blur-xl opacity-30 -z-10"></div>
             )}
-          </Link>
+          </button>
         ))}
       </div>
 
       {/* Navigation compte */}
       <div className="flex items-center gap-2">
         {accountNavItems.map((item) => (
-          <Link
+          <button
             key={item.href}
-            href={item.href}
+            type="button"
+            onClick={() => router.push(item.href)}
             className={`group relative inline-flex items-center px-5 py-3 text-[15px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
               isActive(item.href)
                 ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
@@ -109,7 +111,7 @@ export default function PlayerNav() {
                 {item.badge}
               </span>
             )}
-          </Link>
+          </button>
         ))}
       </div>
     </nav>

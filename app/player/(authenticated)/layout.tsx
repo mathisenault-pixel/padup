@@ -1,11 +1,15 @@
+'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import PlayerNav from './components/PlayerNav'
 
-export default async function PlayerAuthLayout({
+export default function PlayerAuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter()
 
   return (
     <div className="min-h-screen bg-white">
@@ -15,9 +19,13 @@ export default async function PlayerAuthLayout({
           <div className="flex items-center justify-between h-20">
             
             {/* Logo */}
-            <Link href="/player/accueil" className="group transition-all">
+            <button
+              type="button"
+              onClick={() => router.push('/player/accueil')}
+              className="group transition-all"
+            >
               <span className="text-2xl font-bold text-gray-900 tracking-tight hover:text-blue-600 transition-colors">Pad&apos;Up</span>
-            </Link>
+            </button>
 
             {/* Navigation Center */}
             <div className="hidden lg:flex flex-1 justify-center max-w-3xl mx-12">
@@ -26,14 +34,16 @@ export default async function PlayerAuthLayout({
 
             {/* Auth Section Premium */}
             <div className="flex items-center gap-3">
-              <Link
-                href="/login"
+              <button
+                type="button"
+                onClick={() => router.push('/login')}
                 className="px-5 py-2.5 text-[14px] font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
               >
                 Se connecter
-              </Link>
-              <Link
-                href="/login"
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/login')}
                 className="group relative px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[14px] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
               >
                 <span className="flex items-center gap-2">
@@ -42,7 +52,7 @@ export default async function PlayerAuthLayout({
                   </svg>
                   S&apos;inscrire
                 </span>
-              </Link>
+              </button>
             </div>
 
           </div>

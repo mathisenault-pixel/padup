@@ -358,9 +358,13 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         
         {/* Header */}
         <div className="mb-8">
-          <Link href="/player/clubs" className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block">
+          <button
+            type="button"
+            onClick={() => router.push('/player/clubs')}
+            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
+          >
             ← Retour aux clubs
-          </Link>
+          </button>
           
           {/* Info principale du club */}
           <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-lg mt-4">

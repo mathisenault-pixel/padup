@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 
@@ -19,6 +20,7 @@ type Club = {
 }
 
 export default function AccueilPage() {
+  const router = useRouter()
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
@@ -147,15 +149,16 @@ export default function AccueilPage() {
               <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs autour de chez moi</h2>
               <p className="text-xl text-gray-600">Découvrez nos meilleures adresses</p>
             </div>
-            <Link
-              href="/player/clubs"
+            <button
+              type="button"
+              onClick={() => router.push('/player/clubs')}
               className="hidden md:flex items-center gap-2 text-gray-900 font-bold hover:text-blue-600 transition-colors"
             >
               Voir tout
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </Link>
+            </button>
           </div>
 
           {/* Bouton de géolocalisation */}
@@ -244,15 +247,16 @@ export default function AccueilPage() {
           </div>
 
           <div className="text-center mt-8 md:hidden">
-            <Link
-              href="/player/clubs"
+            <button
+              type="button"
+              onClick={() => router.push('/player/clubs')}
               className="inline-flex items-center gap-2 px-10 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl"
             >
               Découvrir tous les clubs
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </Link>
+            </button>
           </div>
         </div>
       </section>
@@ -307,15 +311,16 @@ export default function AccueilPage() {
               <p className="text-2xl text-gray-600 mb-10">
                 Rejoignez plus de 10 000 joueurs sur Pad'Up
               </p>
-              <Link
-                href="/player/clubs"
+              <button
+                type="button"
+                onClick={() => router.push('/player/clubs')}
                 className="inline-flex items-center gap-3 px-12 py-5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all text-lg shadow-2xl shadow-blue-600/50"
               >
                 Commencer maintenant
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
