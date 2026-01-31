@@ -174,6 +174,7 @@ export default function AccueilPage() {
               <Link
                 key={club.id}
                 href={`/player/clubs/${club.id}/reserver`}
+                onClick={() => console.log('[CLUB CARD] Navigation to:', club.nom)}
                 className="group bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all block"
               >
                 <div className="relative h-64 overflow-hidden">
@@ -364,6 +365,7 @@ export default function AccueilPage() {
                 <p className="text-gray-600">{selectedClub.ville}</p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowReservationModal(false)}
                 className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all"
               >
@@ -390,12 +392,14 @@ export default function AccueilPage() {
 
             <div className="flex gap-3">
               <button
+                type="button"
                 onClick={() => setShowReservationModal(false)}
                 className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-full transition-all"
               >
                 Annuler
               </button>
               <button
+                type="button"
                 onClick={() => {
                   alert(`Réservation confirmée au ${selectedClub.nom} !`)
                   setShowReservationModal(false)
