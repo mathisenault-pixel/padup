@@ -25,12 +25,8 @@ type Booking = {
   fin_de_slot: string;
   statut: string;
   cree_a: string;
-  clubs: {
-    name: string;
-  };
-  courts: {
-    name: string;
-  };
+  clubs: { name: string } | null;
+  courts: { name: string } | null;
 };
 
 export default function MyBookingsPage() {
@@ -107,7 +103,13 @@ export default function MyBookingsPage() {
         count: data?.length || 0,
       });
 
-      setBookings(data as Booking[]);
+      const normalizedBookings: Booking[] = (data ?? []).map((b: any) => ({
+        ...b,
+        clubs: b?.clubs ?? null,
+        courts: b?.courts ?? null,
+      }));
+
+      setBookings(normalizedBookings);
     } catch (e: any) {
       console.error("[FETCH ERROR - bookings]", e);
       showToast(`Erreur réseau: ${e.message}`, "error");
@@ -410,10 +412,10 @@ export default function MyBookingsPage() {
                 >
                   <div>
                     <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>
-                      {(booking.clubs as any)?.name || "Club inconnu"}
+                      {booking.clubs?.name || "Club inconnu"}
                     </h3>
                     <div style={{ fontSize: 14, color: "#666", marginTop: 4 }}>
-                      {(booking.courts as any)?.name || "Terrain inconnu"}
+                      {booking.courts?.name || "Terrain inconnu"}
                     </div>
                   </div>
 
@@ -532,10 +534,10 @@ export default function MyBookingsPage() {
               }}
             >
               <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
-                {(bookingToCancel.clubs as any)?.name || "Club inconnu"}
+                {bookingToCancel.clubs?.name || "Club inconnu"}
               </div>
               <div style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>
-                {(bookingToCancel.courts as any)?.name || "Terrain inconnu"}
+                {bookingToCancel.courts?.name || "Terrain inconnu"}
               </div>
               <div style={{ fontSize: 14, color: "#666" }}>
                 📅 {formatDate(bookingToCancel.slot_start)}
