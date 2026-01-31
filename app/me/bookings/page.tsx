@@ -471,13 +471,13 @@ export default function MyBookingsPage() {
                       backgroundColor: isCancelled
                         ? "#f8d7da"
                         : isPast
-                        ? "#e2e3e5"
-                        : "#d4edda",
+                          ? "#e2e3e5"
+                          : "#d4edda",
                       color: isCancelled
                         ? "#721c24"
                         : isPast
-                        ? "#383d41"
-                        : "#155724",
+                          ? "#383d41"
+                          : "#155724",
                     }}
                   >
                     {isCancelled ? "Annulée" : isPast ? "Passée" : "Confirmée"}

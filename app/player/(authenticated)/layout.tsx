@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import PlayerNav from './components/PlayerNav'
-import QuickBookingButton from './components/QuickBookingButton'
 
 export default async function PlayerAuthLayout({
   children,
@@ -31,21 +30,18 @@ export default async function PlayerAuthLayout({
             {/* Auth Section Premium */}
             <div className="flex items-center gap-4">
               {user ? (
-                <div className="flex items-center gap-3">
-                  <QuickBookingButton />
-                  <Link 
-                    href="/player/compte"
-                    className="group relative px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white text-sm font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 overflow-hidden"
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Mon compte
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </Link>
-                </div>
+                <Link 
+                  href="/player/compte"
+                  className="group relative px-6 py-3 bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white text-sm font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Mon compte
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </Link>
               ) : (
                 <Link
                   href="/login"
