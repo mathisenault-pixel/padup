@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { debug } from '@/lib/debug'
 
 type Player = {
   id: string
@@ -61,14 +60,9 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
   const totalPlayers = 1 + selectedPlayers.length + invitedEmails.length
   
   const handleContinue = () => {
-    if (isProcessing) {
-      debug.warn('⚠️ Double-clic ignoré (PlayerSelectionModal)')
-      return
-    }
+    if (isProcessing) return
     
-    debug.log('🔘 [PLAYERS] Continue clicked')
     setIsProcessing(true)
-    
     onContinue(selectedPlayers, true)
     // Le modal sera fermé par le parent, isProcessing sera reset à la prochaine ouverture
   }
@@ -87,6 +81,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-all"
           >
@@ -130,6 +125,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                       <div className="text-sm text-gray-600">{player.level}</div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => togglePlayer(player.id)}
                       className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm font-bold rounded-lg transition-all"
                     >
@@ -157,6 +153,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                     <div className="text-sm text-gray-600">En attente de confirmation</div>
                   </div>
                   <button
+                    type="button"
                     onClick={() => removeInvited(email)}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm font-bold rounded-lg transition-all"
                   >
@@ -182,6 +179,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                 className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
               />
               <button
+                type="button"
                 onClick={handleInvite}
                 className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition-all"
               >
@@ -210,6 +208,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery('')}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
@@ -227,6 +226,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                 .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
                 .map(player => (
                   <button
+                    type="button"
                     key={player.id}
                     onClick={() => togglePlayer(player.id)}
                     className="bg-white border-2 border-gray-200 hover:border-blue-600 rounded-xl p-4 flex items-center gap-3 transition-all text-left"
@@ -269,6 +269,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
         {/* Actions */}
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={onClose}
             disabled={isProcessing}
             className={`flex-1 px-6 py-3 rounded-xl font-bold transition-all ${
@@ -280,6 +281,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
             Annuler
           </button>
           <button
+            type="button"
             onClick={handleContinue}
             disabled={isProcessing}
             className={`flex-1 px-6 py-3 rounded-xl font-bold transition-all ${

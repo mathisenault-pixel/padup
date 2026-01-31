@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { debug } from '@/lib/debug'
 
 type Props = {
   onClose: () => void
@@ -89,12 +88,8 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
   const totalGeneral = normalPrice + totalRestaurantFinal
   
   const handleFinalConfirmation = () => {
-    if (isProcessing) {
-      debug.warn('⚠️ Double-clic ignoré (PremiumModal)')
-      return
-    }
+    if (isProcessing) return
     
-    debug.log('🔘 [PREMIUM] Confirmation started')
     setIsProcessing(true)
     
     try {
@@ -105,7 +100,6 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
       }
     } finally {
       // Le modal sera fermé par le parent, pas besoin de resetIsProcessing ici
-      debug.log('✅ [PREMIUM] Confirmation done')
     }
   }
   
@@ -234,6 +228,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
           <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
             {categories.map(cat => (
               <button
+                type="button"
                 key={cat}
                 onClick={() => setSelectedCategorie(cat)}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
@@ -282,6 +277,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                       {qty > 0 ? (
                         <>
                           <button
+                            type="button"
                             onClick={() => toggleItem(item.id)}
                             className="w-7 h-7 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center justify-center font-bold"
                           >
@@ -289,6 +285,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                           </button>
                           <span className="w-6 text-center font-bold">{qty}</span>
                           <button
+                            type="button"
                             onClick={() => incrementItem(item.id)}
                             className="w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center font-bold"
                           >
@@ -297,6 +294,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                         </>
                       ) : (
                         <button
+                          type="button"
                           onClick={() => incrementItem(item.id)}
                           className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-xs font-bold"
                         >
@@ -445,6 +443,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
         {/* Actions */}
         <div className="space-y-3">
           <button
+            type="button"
             onClick={handleFinalConfirmation}
             disabled={isProcessing}
             className={`w-full px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${
@@ -457,6 +456,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
           </button>
           
           <button
+            type="button"
             onClick={onClose}
             className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-xl font-semibold transition-all"
           >

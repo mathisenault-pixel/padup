@@ -3,7 +3,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
-import { debug } from '@/lib/debug'
 
 type Club = {
   id: number
@@ -21,9 +20,6 @@ type Club = {
 }
 
 export default function ClubsPage() {
-  // Debug: compteur de renders
-  debug.count('🔄 ClubsPage render')
-  
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'distance' | 'prix-asc' | 'prix-desc' | 'note'>('distance')
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
@@ -111,9 +107,6 @@ export default function ClubsPage() {
 
   // Filtrer et trier avec useMemo (évite recalcul inutile)
   const filteredAndSortedClubs = useMemo(() => {
-    debug.count('🔄 [FILTER] Recalculating')
-    debug.time('filter-duration')
-    
     const result = clubs
       .filter(club => {
         // Recherche
@@ -154,8 +147,6 @@ export default function ClubsPage() {
         }
       })
     
-    debug.timeEnd('filter-duration')
-    debug.log('🔄 [FILTER] Results:', result.length, 'clubs')
     return result
   }, [clubs, searchTerm, sortBy, selectedEquipements, selectedPrixRanges])
 
@@ -297,10 +288,6 @@ export default function ClubsPage() {
             <Link
               key={club.id}
               href={`/player/clubs/${club.id}/reserver`}
-              onClick={() => {
-                debug.log('🔘 [CLICK] Club navigation start:', club.id, club.nom, Date.now())
-                debug.time('club-navigation')
-              }}
               className="group flex gap-6 bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-500 hover:shadow-lg transition-all"
             >
               {/* Image */}

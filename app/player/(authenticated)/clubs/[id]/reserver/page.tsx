@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, use, useMemo, useCallback, useRef, useEffect } from 'react'
+import { useState, use, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import PlayerSelectionModal from './PlayerSelectionModal'
 import PremiumModal from './PremiumModal'
-import { debug } from '@/lib/debug'
 
 type Club = {
   id: string
@@ -171,21 +170,6 @@ const generateUnavailableSlots = (terrainId: number, date: Date) => {
 }
 
 export default function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
-  // ============================================
-  // DIAGNOSTIC: Confirmer version + perf
-  // ============================================
-  debug.log("🚀 RESERVER PAGE VERSION", Date.now())
-  debug.count('🔄 ReservationPage render')
-  
-  // Mesurer temps de navigation depuis le clic
-  try {
-    debug.timeEnd('club-navigation')
-  } catch (e) {
-    // Ignore si timer pas démarré
-  }
-  
-  const renderStart = performance.now()
-  
   const resolvedParams = use(params)
   const router = useRouter()
   
@@ -194,24 +178,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ============================================
   const club = useMemo(() => clubs.find(c => c.id === resolvedParams.id), [resolvedParams.id])
   
-  // ============================================
-  // STABILISATION: Créneaux et dates (constants)
-  // ============================================
-  const timeSlots = useMemo(() => {
-    const start = performance.now()
-    debug.count('🔄 [SLOTS] Generating')
-    const result = generateTimeSlots()
-    debug.log(`⏱️ [SLOTS] Generated in ${(performance.now() - start).toFixed(2)}ms`)
-    return result
-  }, [])
-  
-  const nextDays = useMemo(() => {
-    const start = performance.now()
-    debug.count('🔄 [DAYS] Generating')
-    const result = generateNextDays()
-    debug.log(`⏱️ [DAYS] Generated in ${(performance.now() - start).toFixed(2)}ms`)
-    return result
-  }, [])
+  // Créneaux et dates (constants)
+  const timeSlots = useMemo(() => generateTimeSlots(), [])
+  const nextDays = useMemo(() => generateNextDays(), [])
   
   // ============================================
   // STATE
@@ -223,99 +192,39 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([])
   
-  // ============================================
-  // DIAGNOSTIC: Tracker les changements de deps
-  // ============================================
-  const prevClub = useRef(club)
-  const prevTimeSlots = useRef(timeSlots)
-  const prevNextDays = useRef(nextDays)
-  const prevSelectedDate = useRef(selectedDate)
-  
-  useEffect(() => {
-    if (!Object.is(prevClub.current, club)) {
-      debug.warn('⚠️ [DEPS] club changed reference!', { 
-        wasNbrTerrains: prevClub.current?.nombreTerrains, 
-        nowNbrTerrains: club?.nombreTerrains 
-      })
-      prevClub.current = club
-    }
-    if (!Object.is(prevTimeSlots.current, timeSlots)) {
-      debug.warn('⚠️ [DEPS] timeSlots changed reference!')
-      prevTimeSlots.current = timeSlots
-    }
-    if (!Object.is(prevNextDays.current, nextDays)) {
-      debug.warn('⚠️ [DEPS] nextDays changed reference!')
-      prevNextDays.current = nextDays
-    }
-    if (!Object.is(prevSelectedDate.current, selectedDate)) {
-      debug.log('✅ [DEPS] selectedDate changed (expected):', selectedDate.toDateString())
-      prevSelectedDate.current = selectedDate
-    }
-  })
   
   if (!club) {
     return <div className="p-8">Club introuvable</div>
   }
   
-  // ============================================
-  // STABILISATION: Terrains
-  // ============================================
-  const terrains = useMemo(() => {
-    const start = performance.now()
-    debug.count('🔄 [TERRAINS] Generating')
-    const result = Array.from({ length: club.nombreTerrains }, (_, i) => ({
+  // Terrains
+  const terrains = useMemo(() => 
+    Array.from({ length: club.nombreTerrains }, (_, i) => ({
       id: i + 1,
       nom: `Terrain ${i + 1}`,
       type: i % 2 === 0 ? 'Intérieur' : 'Extérieur'
     }))
-    debug.log(`⏱️ [TERRAINS] Generated ${result.length} in ${(performance.now() - start).toFixed(2)}ms`)
-    return result
-  }, [club.nombreTerrains])
+  , [club.nombreTerrains])
   
-  // ============================================
-  // OPTIMISATION CRITIQUE: Map/Set pour O(1) lookup
-  // ============================================
+  // Map/Set pour O(1) lookup des créneaux indisponibles
   const unavailableSet = useMemo(() => {
-    const start = performance.now()
-    debug.count('🔄 [CACHE] Recalculating')
-    
-    // Map<terrainId, Set<"HH:MM">>
     const map = new Map<number, Set<string>>()
-    
     terrains.forEach(terrain => {
       const unavailableSlots = generateUnavailableSlots(terrain.id, selectedDate)
       map.set(terrain.id, new Set(unavailableSlots))
     })
-    
-    const elapsed = (performance.now() - start).toFixed(2)
-    debug.log(`⏱️ [CACHE] Built for ${terrains.length} terrains in ${elapsed}ms`)
-    
     return map
-  }, [selectedDate, terrains, club.nombreTerrains]) // Explicit deps
+  }, [selectedDate, terrains, club.nombreTerrains])
   
-  // ============================================
-  // O(1) lookup function
-  // ============================================
+  // Vérifier si un créneau est disponible (O(1))
   const isSlotAvailable = useCallback((terrainId: number, slot: { startTime: string }): boolean => {
     const terrainSet = unavailableSet.get(terrainId)
     if (!terrainSet) return true
     return !terrainSet.has(slot.startTime)
   }, [unavailableSet])
   
-  // ============================================
-  // DIAGNOSTIC: Log render cost
-  // ============================================
-  const renderEnd = performance.now()
-  const computeMs = (renderEnd - renderStart).toFixed(2)
-  debug.log(`⏱️ [RENDER] Total compute: ${computeMs}ms`)
-  
-  if (parseFloat(computeMs) > 50) {
-    debug.error(`🔴 [RENDER] SLOW! ${computeMs}ms > 50ms`)
-  }
-  
   // Handler stable pour la confirmation finale
   const handleFinalConfirmation = (withPremium: boolean) => {
-    debug.log('🔘 [FINAL] Confirmation', { withPremium })
     
     // Créer la nouvelle réservation
     const newReservation = {
@@ -348,8 +257,6 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }
   
   const handleSlotClick = useCallback((terrainId: number, slot: { startTime: string; endTime: string }) => {
-    debug.log('🔘 [SLOT] Click:', terrainId, slot.startTime)
-    
     if (isSlotAvailable(terrainId, slot)) {
       setSelectedTerrain(terrainId)
       setSelectedSlot(slot)
@@ -358,7 +265,6 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }, [isSlotAvailable])
   
   const handlePlayersContinue = (players: string[], showPremium: boolean) => {
-    debug.log('🔘 [PLAYERS] Continue:', players.length, 'players')
     setSelectedPlayers(players)
     setShowPlayerModal(false)
     
@@ -370,13 +276,11 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }
   
   const handleSubscribePremium = () => {
-    debug.log('🔘 [PREMIUM] Subscribe')
     alert('Abonnement Pad\'up + souscrit ! 🎉\n\nVous bénéficiez maintenant de -20% sur toutes vos réservations.')
     handleFinalConfirmation(true)
   }
   
   const handleContinueWithout = () => {
-    debug.log('🔘 [PREMIUM] Continue without')
     handleFinalConfirmation(false)
   }
   
@@ -506,6 +410,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
               
               return (
                 <button
+                  type="button"
                   key={idx}
                   onClick={() => setSelectedDate(day)}
                   className={`flex-shrink-0 px-6 py-4 rounded-xl border-2 transition-all ${
@@ -570,6 +475,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                         
                         return (
                           <button
+                            type="button"
                             key={idx}
                             onClick={() => handleSlotClick(terrain.id, slot)}
                             disabled={!available}
