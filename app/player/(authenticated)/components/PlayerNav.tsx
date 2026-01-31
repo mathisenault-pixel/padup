@@ -74,7 +74,7 @@ export default function PlayerNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`group relative inline-flex items-center px-5 py-3 text-[19px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
+            className={`group relative inline-flex items-center px-5 py-3 text-[15px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
               isActive(item.href)
                 ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
                 : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
@@ -94,7 +94,7 @@ export default function PlayerNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`group relative inline-flex items-center px-5 py-3 text-[19px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
+            className={`group relative inline-flex items-center px-5 py-3 text-[15px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
               isActive(item.href)
                 ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
                 : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
