@@ -90,17 +90,23 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
   const handleFinalConfirmation = () => {
     if (isProcessing) return
     
+    console.log('[PREMIUM MODAL] handleFinalConfirmation start')
     setIsProcessing(true)
     
-    try {
-      if (isPadupPlus) {
-        onSubscribe()
-      } else {
-        onContinueWithout()
+    // ✅ Utiliser setTimeout pour éviter le freeze
+    setTimeout(() => {
+      try {
+        if (isPadupPlus) {
+          onSubscribe()
+        } else {
+          onContinueWithout()
+        }
+        console.log('[PREMIUM MODAL] handleFinalConfirmation done')
+      } catch (error) {
+        console.error('[PREMIUM MODAL] Error:', error)
+        setIsProcessing(false)
       }
-    } finally {
-      // Le modal sera fermé par le parent, pas besoin de resetIsProcessing ici
-    }
+    }, 0)
   }
   
   return (

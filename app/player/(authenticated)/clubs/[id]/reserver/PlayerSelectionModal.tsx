@@ -62,9 +62,14 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
   const handleContinue = () => {
     if (isProcessing) return
     
+    console.log('[MODAL] handleContinue start')
     setIsProcessing(true)
-    onContinue(selectedPlayers, true)
-    // Le modal sera fermé par le parent, isProcessing sera reset à la prochaine ouverture
+    
+    // ✅ Utiliser setTimeout pour éviter le freeze
+    setTimeout(() => {
+      onContinue(selectedPlayers, true)
+      console.log('[MODAL] handleContinue done')
+    }, 0)
   }
   
   return (

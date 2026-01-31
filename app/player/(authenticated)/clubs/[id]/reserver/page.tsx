@@ -227,35 +227,48 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   
   // Handler stable pour la confirmation finale
   const handleFinalConfirmation = (withPremium: boolean) => {
+    console.log('[FINAL] handleFinalConfirmation start')
     
-    // Créer la nouvelle réservation
-    const newReservation = {
-      id: `res_${Date.now()}`,
-      date: selectedDate.toISOString().split('T')[0],
-      start_time: selectedSlot?.startTime,
-      end_time: selectedSlot?.endTime,
-      status: 'confirmed',
-      price: club.prix * (selectedPlayers.length + 1), // Prix total
-      created_at: new Date().toISOString(),
-      courts: {
-        name: `Terrain ${selectedTerrain}`,
-        clubs: {
-          id: club.id,
-          name: club.nom,
-          city: club.ville,
-          address: club.adresse,
-          imageUrl: club.imageUrl
+    try {
+      // Créer la nouvelle réservation
+      const newReservation = {
+        id: `res_${Date.now()}`,
+        date: selectedDate.toISOString().split('T')[0],
+        start_time: selectedSlot?.startTime,
+        end_time: selectedSlot?.endTime,
+        status: 'confirmed',
+        price: club.prix * (selectedPlayers.length + 1), // Prix total
+        created_at: new Date().toISOString(),
+        courts: {
+          name: `Terrain ${selectedTerrain}`,
+          clubs: {
+            id: club.id,
+            name: club.nom,
+            city: club.ville,
+            address: club.adresse,
+            imageUrl: club.imageUrl
+          }
         }
       }
+      
+      // Sauvegarder dans localStorage
+      const existingReservations = JSON.parse(localStorage.getItem('demoReservations') || '[]')
+      existingReservations.unshift(newReservation) // Ajouter au début
+      localStorage.setItem('demoReservations', JSON.stringify(existingReservations))
+      
+      console.log('[FINAL] Reservation saved to localStorage')
+      
+      alert(`✅ Réservation confirmée !\n\n${club.nom}\n${formatDate(selectedDate).full}\n${selectedSlot?.startTime} - ${selectedSlot?.endTime}\n\nPrix : ${club.prix}€ / pers\n${selectedPlayers.length + 1} joueur(s)${withPremium ? '\n\n💎 Vous êtes membre Pad\'up + !\nProfitez de -20% sur la restauration au club.' : ''}`)
+      
+      // ✅ Utiliser setTimeout pour éviter le freeze lors de la navigation
+      setTimeout(() => {
+        console.log('[FINAL] Navigating to /player/reservations')
+        router.push('/player/reservations')
+      }, 100)
+    } catch (error) {
+      console.error('[FINAL] Error:', error)
+      alert('❌ Erreur lors de la réservation. Veuillez réessayer.')
     }
-    
-    // Sauvegarder dans localStorage
-    const existingReservations = JSON.parse(localStorage.getItem('demoReservations') || '[]')
-    existingReservations.unshift(newReservation) // Ajouter au début
-    localStorage.setItem('demoReservations', JSON.stringify(existingReservations))
-    
-    alert(`✅ Réservation confirmée !\n\n${club.nom}\n${formatDate(selectedDate).full}\n${selectedSlot?.startTime} - ${selectedSlot?.endTime}\n\nPrix : ${club.prix}€ / pers\n${selectedPlayers.length + 1} joueur(s)${withPremium ? '\n\n💎 Vous êtes membre Pad\'up + !\nProfitez de -20% sur la restauration au club.' : ''}`)
-    router.push('/player/reservations')
   }
   
   const handleSlotClick = useCallback((terrainId: number, slot: { startTime: string; endTime: string }) => {
