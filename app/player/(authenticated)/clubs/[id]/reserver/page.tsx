@@ -193,6 +193,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const [showPlayerModal, setShowPlayerModal] = useState(false)
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Guard anti double-clic global
   
   
   if (!club) {
@@ -226,10 +227,21 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }, [unavailableSet])
   
   // Handler stable pour la confirmation finale
-  const handleFinalConfirmation = (withPremium: boolean) => {
-    console.log('[FINAL] handleFinalConfirmation start')
+  const handleFinalConfirmation = useCallback((withPremium: boolean) => {
+    console.time('reserve')
+    console.log('[RESERVE] START - handleFinalConfirmation', { withPremium, isSubmitting })
+    
+    // ✅ Guard anti double-clic
+    if (isSubmitting) {
+      console.log('[RESERVE] BLOCKED - Already submitting')
+      return
+    }
+    
+    setIsSubmitting(true)
     
     try {
+      console.log('[RESERVE] Creating reservation object...')
+      
       // Créer la nouvelle réservation
       const newReservation = {
         id: `res_${Date.now()}`,
@@ -251,53 +263,83 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         }
       }
       
+      console.log('[RESERVE] Saving to localStorage...')
+      
       // Sauvegarder dans localStorage
       const existingReservations = JSON.parse(localStorage.getItem('demoReservations') || '[]')
       existingReservations.unshift(newReservation) // Ajouter au début
       localStorage.setItem('demoReservations', JSON.stringify(existingReservations))
       
-      console.log('[FINAL] Reservation saved to localStorage')
+      console.log('[RESERVE] Saved successfully')
+      console.timeEnd('reserve')
       
-      alert(`✅ Réservation confirmée !\n\n${club.nom}\n${formatDate(selectedDate).full}\n${selectedSlot?.startTime} - ${selectedSlot?.endTime}\n\nPrix : ${club.prix}€ / pers\n${selectedPlayers.length + 1} joueur(s)${withPremium ? '\n\n💎 Vous êtes membre Pad\'up + !\nProfitez de -20% sur la restauration au club.' : ''}`)
+      // ✅ Pas d'alert() qui bloque - feedback dans la page
+      console.log('[RESERVE] Navigating to /player/reservations')
       
-      // ✅ Utiliser setTimeout pour éviter le freeze lors de la navigation
-      setTimeout(() => {
-        console.log('[FINAL] Navigating to /player/reservations')
-        router.push('/player/reservations')
-      }, 100)
+      // ✅ Navigation immédiate sans alert
+      router.push('/player/reservations')
+      
     } catch (error) {
-      console.error('[FINAL] Error:', error)
-      alert('❌ Erreur lors de la réservation. Veuillez réessayer.')
+      console.error('[RESERVE] ERROR:', error)
+      console.timeEnd('reserve')
+      setIsSubmitting(false)
+      // ✅ Toast au lieu d'alert si besoin
     }
-  }
+  }, [isSubmitting, selectedDate, selectedSlot, selectedPlayers, selectedTerrain, club, router])
   
   const handleSlotClick = useCallback((terrainId: number, slot: { startTime: string; endTime: string }) => {
+    console.log('[SLOT CLICK]', { terrainId, slot, isSubmitting })
+    
+    // ✅ Guard: Ne pas ouvrir de modal si en cours de soumission
+    if (isSubmitting) {
+      console.log('[SLOT CLICK] BLOCKED - Already submitting')
+      return
+    }
+    
     if (isSlotAvailable(terrainId, slot)) {
+      console.log('[SLOT CLICK] Opening player modal')
       setSelectedTerrain(terrainId)
       setSelectedSlot(slot)
       setShowPlayerModal(true)
+    } else {
+      console.log('[SLOT CLICK] Slot not available')
     }
-  }, [isSlotAvailable])
+  }, [isSlotAvailable, isSubmitting])
   
-  const handlePlayersContinue = (players: string[], showPremium: boolean) => {
+  const handlePlayersContinue = useCallback((players: string[], showPremium: boolean) => {
+    console.log('[PLAYERS CONTINUE]', { players, showPremium, isSubmitting })
+    
+    if (isSubmitting) {
+      console.log('[PLAYERS CONTINUE] BLOCKED - Already submitting')
+      return
+    }
+    
     setSelectedPlayers(players)
     setShowPlayerModal(false)
     
     if (showPremium) {
       setShowPremiumModal(true)
     } else {
-      handleFinalConfirmation(false)
+      // ✅ Appel async pour éviter le freeze
+      requestAnimationFrame(() => {
+        handleFinalConfirmation(false)
+      })
     }
-  }
+  }, [isSubmitting, handleFinalConfirmation])
   
-  const handleSubscribePremium = () => {
-    alert('Abonnement Pad\'up + souscrit ! 🎉\n\nVous bénéficiez maintenant de -20% sur toutes vos réservations.')
-    handleFinalConfirmation(true)
-  }
+  const handleSubscribePremium = useCallback(() => {
+    console.log('[PREMIUM] Subscribe')
+    requestAnimationFrame(() => {
+      handleFinalConfirmation(true)
+    })
+  }, [handleFinalConfirmation])
   
-  const handleContinueWithout = () => {
-    handleFinalConfirmation(false)
-  }
+  const handleContinueWithout = useCallback(() => {
+    console.log('[PREMIUM] Continue without')
+    requestAnimationFrame(() => {
+      handleFinalConfirmation(false)
+    })
+  }, [handleFinalConfirmation])
   
   const formatDate = (date: Date) => {
     const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
@@ -493,9 +535,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                             type="button"
                             key={idx}
                             onClick={() => handleSlotClick(terrain.id, slot)}
-                            disabled={!available}
+                            disabled={!available || isSubmitting}
                             className={`p-3 rounded-xl border-2 font-bold transition-all ${
-                              available
+                              available && !isSubmitting
                                 ? 'bg-white text-gray-900 border-gray-200 hover:border-blue-600 hover:bg-blue-50 hover:scale-105'
                                 : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
                             }`}
@@ -507,6 +549,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                             </div>
                             {!available && (
                               <div className="text-xs mt-1 text-red-500 font-semibold">Réservé</div>
+                            )}
+                            {isSubmitting && available && (
+                              <div className="text-xs mt-1 text-blue-500 font-semibold">...</div>
                             )}
                           </button>
                         )

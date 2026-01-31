@@ -88,25 +88,29 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
   const totalGeneral = normalPrice + totalRestaurantFinal
   
   const handleFinalConfirmation = () => {
-    if (isProcessing) return
+    if (isProcessing) {
+      console.log('[PREMIUM MODAL] handleFinalConfirmation BLOCKED - already processing')
+      return
+    }
     
-    console.log('[PREMIUM MODAL] handleFinalConfirmation start')
+    console.log('[PREMIUM MODAL] handleFinalConfirmation START')
     setIsProcessing(true)
     
-    // ✅ Utiliser setTimeout pour éviter le freeze
-    setTimeout(() => {
+    // ✅ requestAnimationFrame plus performant que setTimeout
+    requestAnimationFrame(() => {
       try {
+        console.log('[PREMIUM MODAL] handleFinalConfirmation EXECUTING callback')
         if (isPadupPlus) {
           onSubscribe()
         } else {
           onContinueWithout()
         }
-        console.log('[PREMIUM MODAL] handleFinalConfirmation done')
+        console.log('[PREMIUM MODAL] handleFinalConfirmation DONE')
       } catch (error) {
-        console.error('[PREMIUM MODAL] Error:', error)
+        console.error('[PREMIUM MODAL] ERROR:', error)
         setIsProcessing(false)
       }
-    }, 0)
+    })
   }
   
   return (

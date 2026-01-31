@@ -60,16 +60,20 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
   const totalPlayers = 1 + selectedPlayers.length + invitedEmails.length
   
   const handleContinue = () => {
-    if (isProcessing) return
+    if (isProcessing) {
+      console.log('[MODAL] handleContinue BLOCKED - already processing')
+      return
+    }
     
-    console.log('[MODAL] handleContinue start')
+    console.log('[MODAL] handleContinue START')
     setIsProcessing(true)
     
-    // ✅ Utiliser setTimeout pour éviter le freeze
-    setTimeout(() => {
+    // ✅ requestAnimationFrame plus performant que setTimeout
+    requestAnimationFrame(() => {
+      console.log('[MODAL] handleContinue EXECUTING callback')
       onContinue(selectedPlayers, true)
-      console.log('[MODAL] handleContinue done')
-    }, 0)
+      console.log('[MODAL] handleContinue DONE')
+    })
   }
   
   return (
