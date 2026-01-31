@@ -193,6 +193,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const [showPlayerModal, setShowPlayerModal] = useState(false)
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([])
+  const [invitedEmails, setInvitedEmails] = useState<string[]>([]) // ✅ Stocker les emails invités
   const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Guard anti double-clic global
   
   
@@ -226,10 +227,53 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     return !terrainSet.has(slot.startTime)
   }, [unavailableSet])
   
+  // ✅ Fonction pour envoyer les invitations automatiquement
+  const sendInvitations = useCallback(async (reservationId: string) => {
+    // Vérifier s'il y a des emails à envoyer
+    if (invitedEmails.length === 0) {
+      console.log('[INVITE] No emails to send')
+      return
+    }
+
+    console.log('[INVITE] Sending invitations to:', invitedEmails)
+
+    try {
+      const dateFormatted = `${formatDate(selectedDate).day} ${formatDate(selectedDate).date} ${formatDate(selectedDate).month} à ${selectedSlot?.startTime}`
+      const bookingUrl = `${window.location.origin}/player/reservations`
+
+      const response = await fetch('/api/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: invitedEmails, // ✅ Envoyer la liste d'emails
+          clubName: club.nom,
+          dateText: dateFormatted,
+          message: 'Vous avez été invité à rejoindre cette partie de padel !',
+          bookingUrl: bookingUrl
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('[INVITE] API error:', data)
+      } else {
+        console.log('[INVITE] Success:', data)
+      }
+    } catch (error) {
+      console.error('[INVITE] Network error:', error)
+      // ✅ Ne pas bloquer l'UI - l'utilisateur a déjà sa réservation
+    }
+  }, [invitedEmails, club, selectedDate, selectedSlot])
+
   // Handler stable pour la confirmation finale
-  const handleFinalConfirmation = useCallback((withPremium: boolean) => {
+  const handleFinalConfirmation = useCallback(async (withPremium: boolean) => {
     console.time('reserve')
-    console.log('[RESERVE] START - handleFinalConfirmation', { withPremium, isSubmitting })
+    console.log('[RESERVE] START - handleFinalConfirmation', { 
+      withPremium, 
+      isSubmitting,
+      invitedEmails: invitedEmails.length 
+    })
     
     // ✅ Guard anti double-clic
     if (isSubmitting) {
@@ -243,8 +287,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('[RESERVE] Creating reservation object...')
       
       // Créer la nouvelle réservation
+      const reservationId = `res_${Date.now()}`
       const newReservation = {
-        id: `res_${Date.now()}`,
+        id: reservationId,
         date: selectedDate.toISOString().split('T')[0],
         start_time: selectedSlot?.startTime,
         end_time: selectedSlot?.endTime,
@@ -273,10 +318,13 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('[RESERVE] Saved successfully')
       console.timeEnd('reserve')
       
-      // ✅ Pas d'alert() qui bloque - feedback dans la page
-      console.log('[RESERVE] Navigating to /player/reservations')
+      // ✅ Envoyer les invitations automatiquement (async, non bloquant)
+      sendInvitations(reservationId).catch(err => {
+        console.error('[RESERVE] Invitation sending failed (non-blocking):', err)
+      })
       
-      // ✅ Navigation immédiate sans alert
+      // ✅ Navigation immédiate sans attendre les invitations
+      console.log('[RESERVE] Navigating to /player/reservations')
       router.push('/player/reservations')
       
     } catch (error) {
@@ -285,7 +333,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       setIsSubmitting(false)
       // ✅ Toast au lieu d'alert si besoin
     }
-  }, [isSubmitting, selectedDate, selectedSlot, selectedPlayers, selectedTerrain, club, router])
+  }, [isSubmitting, selectedDate, selectedSlot, selectedPlayers, selectedTerrain, club, router, invitedEmails, sendInvitations])
   
   const handleSlotClick = useCallback((terrainId: number, slot: { startTime: string; endTime: string }) => {
     console.log('[SLOT CLICK]', { terrainId, slot, isSubmitting })
@@ -306,8 +354,13 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     }
   }, [isSlotAvailable, isSubmitting])
   
-  const handlePlayersContinue = useCallback((players: string[], showPremium: boolean) => {
-    console.log('[PLAYERS CONTINUE]', { players, showPremium, isSubmitting })
+  const handlePlayersContinue = useCallback((players: string[], emails: string[], showPremium: boolean) => {
+    console.log('[PLAYERS CONTINUE]', { 
+      players, 
+      emails: emails.length,
+      showPremium, 
+      isSubmitting 
+    })
     
     if (isSubmitting) {
       console.log('[PLAYERS CONTINUE] BLOCKED - Already submitting')
@@ -315,6 +368,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     }
     
     setSelectedPlayers(players)
+    setInvitedEmails(emails) // ✅ Stocker les emails pour l'envoi automatique
     setShowPlayerModal(false)
     
     if (showPremium) {

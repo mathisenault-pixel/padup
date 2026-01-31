@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 // ✅ Type pour la validation des données d'entrée
 type InviteEmailData = {
-  to: string
+  to: string | string[]  // ✅ Accepte un email ou une liste d'emails
   clubName: string
   dateText: string
   message?: string
@@ -14,9 +14,9 @@ type InviteEmailData = {
 }
 
 // ✅ Fonction de validation des données
-function validateInviteData(data: any): { valid: boolean; error?: string; data?: InviteEmailData } {
+function validateInviteData(data: any): { valid: boolean; error?: string; data?: InviteEmailData; emails?: string[] } {
   // Vérifier les champs requis
-  if (!data.to || typeof data.to !== 'string') {
+  if (!data.to) {
     return { valid: false, error: 'Le champ "to" (email destinataire) est requis' }
   }
 
@@ -30,14 +30,30 @@ function validateInviteData(data: any): { valid: boolean; error?: string; data?:
 
   // Valider le format email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(data.to)) {
-    return { valid: false, error: 'Format email invalide' }
+  
+  // Supporter à la fois string et string[]
+  const emails = Array.isArray(data.to) ? data.to : [data.to]
+  
+  // Filtrer les emails vides et valider le format
+  const validEmails = emails
+    .filter((email: any) => email && typeof email === 'string' && email.trim())
+    .map((email: string) => email.trim())
+  
+  if (validEmails.length === 0) {
+    return { valid: false, error: 'Aucun email valide fourni' }
+  }
+
+  // Vérifier que tous les emails ont un format valide
+  const invalidEmails = validEmails.filter((email: string) => !emailRegex.test(email))
+  if (invalidEmails.length > 0) {
+    return { valid: false, error: `Format email invalide: ${invalidEmails.join(', ')}` }
   }
 
   return {
     valid: true,
+    emails: validEmails,
     data: {
-      to: data.to,
+      to: validEmails,
       clubName: data.clubName,
       dateText: data.dateText,
       message: data.message || '',
@@ -208,21 +224,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { to, clubName, dateText, message, bookingUrl } = validation.data!
+    const { clubName, dateText, message, bookingUrl } = validation.data!
+    const emails = validation.emails!
+
+    console.log('[API /invite POST] Validated emails:', emails)
 
     // Générer le HTML de l'email
     const emailHTML = generateEmailHTML(clubName, dateText, message || '', bookingUrl || '')
-
-    // Envoyer l'email via Resend
-    console.log('[API /invite POST] Sending email via Resend to:', to)
-    
-    const { data, error } = await resend.emails.send({
-      from: "Pad'up <onboarding@resend.dev>",
-      to: to,
-      subject: `🎾 Invitation à une partie de padel - ${clubName}`,
-      html: emailHTML,
-      // Version texte pour les clients email qui ne supportent pas HTML
-      text: `
+    const emailText = `
 Vous avez été invité à une partie de padel !
 
 Club: ${clubName}
@@ -232,32 +241,97 @@ ${bookingUrl ? `\nLien: ${bookingUrl}` : ''}
 
 ---
 Pad'Up - La plateforme de réservation de terrains de padel
-      `.trim()
+    `.trim()
+
+    // ✅ Envoyer à tous les emails en parallèle avec Promise.allSettled
+    console.log('[API /invite POST] Sending emails to:', emails.length, 'recipients')
+    
+    const sendPromises = emails.map(async (email) => {
+      console.log('[API /invite POST] Sending to:', email)
+      try {
+        const result = await resend.emails.send({
+          from: "Pad'up <onboarding@resend.dev>",
+          to: email,
+          subject: `🎾 Invitation à une partie de padel - ${clubName}`,
+          html: emailHTML,
+          text: emailText
+        })
+        
+        if (result.error) {
+          console.error('[API /invite POST] Error sending to', email, ':', result.error)
+          return { email, success: false, error: result.error }
+        }
+        
+        console.log('[API /invite POST] Successfully sent to:', email, 'ID:', result.data?.id)
+        return { email, success: true, emailId: result.data?.id }
+      } catch (err: any) {
+        console.error('[API /invite POST] Exception sending to', email, ':', err)
+        return { email, success: false, error: err.message }
+      }
     })
 
-    // Gérer les erreurs Resend
-    if (error) {
-      console.error('[API /invite POST] Resend error:', error)
+    const results = await Promise.allSettled(sendPromises)
+
+    // ✅ Analyser les résultats
+    const successful: any[] = []
+    const failed: any[] = []
+
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        const value = result.value
+        if (value.success) {
+          successful.push(value)
+        } else {
+          failed.push(value)
+        }
+      } else {
+        failed.push({ 
+          email: emails[index], 
+          success: false, 
+          error: result.reason?.message || 'Unknown error' 
+        })
+      }
+    })
+
+    console.log('[API /invite POST] Results:', {
+      total: emails.length,
+      successful: successful.length,
+      failed: failed.length
+    })
+
+    // ✅ Retourner un statut selon les résultats
+    if (successful.length === emails.length) {
+      // Tous réussis
       return NextResponse.json(
         { 
-          error: 'Erreur lors de l\'envoi de l\'email',
-          code: 'RESEND_ERROR',
-          details: process.env.NODE_ENV === 'development' ? error : undefined
+          success: true,
+          message: `${successful.length} invitation(s) envoyée(s) avec succès`,
+          results: { successful, failed }
+        },
+        { status: 200 }
+      )
+    } else if (successful.length > 0) {
+      // Partiellement réussi
+      return NextResponse.json(
+        { 
+          success: true,
+          message: `${successful.length}/${emails.length} invitation(s) envoyée(s)`,
+          warning: `${failed.length} email(s) en échec`,
+          results: { successful, failed }
+        },
+        { status: 207 } // Multi-Status
+      )
+    } else {
+      // Tous échoués
+      return NextResponse.json(
+        { 
+          error: 'Échec de l\'envoi de toutes les invitations',
+          code: 'ALL_FAILED',
+          results: { successful, failed }
         },
         { status: 500 }
       )
     }
-
-    console.log('[API /invite POST] Email sent successfully:', data)
-
-    return NextResponse.json(
-      { 
-        success: true,
-        message: 'Invitation envoyée avec succès',
-        emailId: data?.id
-      },
-      { status: 200 }
-    )
 
   } catch (e: any) {
     console.error('[API /invite POST] Unhandled exception:', e)

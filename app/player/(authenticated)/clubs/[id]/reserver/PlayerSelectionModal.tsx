@@ -21,7 +21,7 @@ const availablePlayers: Player[] = [
 
 type Props = {
   onClose: () => void
-  onContinue: (players: string[], showPremium: boolean) => void
+  onContinue: (players: string[], invitedEmails: string[], showPremium: boolean) => void
   clubName: string
   timeSlot: string
 }
@@ -65,13 +65,16 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
       return
     }
     
-    console.log('[MODAL] handleContinue START')
+    console.log('[MODAL] handleContinue START', { 
+      selectedPlayers: selectedPlayers.length,
+      invitedEmails: invitedEmails.length 
+    })
     setIsProcessing(true)
     
     // ✅ requestAnimationFrame plus performant que setTimeout
     requestAnimationFrame(() => {
-      console.log('[MODAL] handleContinue EXECUTING callback')
-      onContinue(selectedPlayers, true)
+      console.log('[MODAL] handleContinue EXECUTING callback with emails:', invitedEmails)
+      onContinue(selectedPlayers, invitedEmails, true)
       console.log('[MODAL] handleContinue DONE')
     })
   }
