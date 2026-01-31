@@ -148,25 +148,27 @@ const generateNextDays = () => {
 const generateUnavailableSlots = (terrainId: number, date: Date) => {
   const slots = generateTimeSlots()
   const unavailableCount = Math.floor(slots.length * 0.3) // 30% des créneaux
-  const unavailable: string[] = []
+  const unavailableSet = new Set<string>()
   
   // Utiliser une seed basée sur le terrain et la date pour avoir des résultats cohérents
   const seed = terrainId * 1000 + date.getDate() * 100 + date.getMonth()
-  const random = (max: number) => {
-    const x = Math.sin(seed + unavailable.length) * 10000
-    return Math.floor((x - Math.floor(x)) * max)
-  }
   
-  // Sélectionner aléatoirement des créneaux à rendre indisponibles
-  while (unavailable.length < unavailableCount) {
-    const randomIndex = random(slots.length)
+  // ✅ OPTIMISATION: Éviter la boucle infinie avec un compteur max
+  let attempts = 0
+  const maxAttempts = slots.length * 3 // Protection contre boucle infinie
+  
+  while (unavailableSet.size < unavailableCount && attempts < maxAttempts) {
+    // Utiliser seed + attempts pour varier les résultats
+    const x = Math.sin(seed + attempts) * 10000
+    const randomIndex = Math.floor((x - Math.floor(x)) * slots.length)
     const slot = slots[randomIndex].startTime
-    if (!unavailable.includes(slot)) {
-      unavailable.push(slot)
-    }
+    
+    // ✅ Set.add() est O(1) vs array.includes() qui est O(n)
+    unavailableSet.add(slot)
+    attempts++
   }
   
-  return unavailable
+  return Array.from(unavailableSet)
 }
 
 export default function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
@@ -214,7 +216,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       map.set(terrain.id, new Set(unavailableSlots))
     })
     return map
-  }, [selectedDate, terrains, club.nombreTerrains])
+  }, [selectedDate, club.nombreTerrains]) // ✅ Retirer 'terrains' pour éviter recalculs inutiles
   
   // Vérifier si un créneau est disponible (O(1))
   const isSlotAvailable = useCallback((terrainId: number, slot: { startTime: string }): boolean => {
