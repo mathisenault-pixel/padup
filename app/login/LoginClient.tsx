@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { signInAction, signUpAction } from './actions'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
 interface LoginClientProps {
   callbackUrl?: string
@@ -10,36 +10,89 @@ interface LoginClientProps {
 
 export default function LoginClient({ callbackUrl }: LoginClientProps) {
   const [error, setError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [isPending, setIsPending] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    setIsPending(true)
 
     const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
     const action = (e.nativeEvent as SubmitEvent).submitter?.getAttribute('data-action')
 
-    console.log('[CLIENT] Form submitted, action:', action)
+    console.log('[LOGIN] Form submitted, action:', action)
+    console.log('[LOGIN] Email:', email)
 
-    startTransition(async () => {
-      try {
-        const result = action === 'signup'
-          ? await signUpAction(formData)
-          : await signInAction(formData)
+    try {
+      if (action === 'signup') {
+        // ✅ INSCRIPTION avec Supabase
+        console.log('[LOGIN] Calling signUp...')
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        })
 
-        if (result?.error) {
-          console.log('[CLIENT] Action returned error:', result.error)
-          setError(result.error)
-        } else {
-          console.log('[CLIENT] Action succeeded, should redirect...')
+        if (signUpError) {
+          console.error('[LOGIN] ❌ Sign up error:', signUpError)
+          setError(signUpError.message)
+          setIsPending(false)
+          return
         }
-      } catch (err) {
-        console.error('[CLIENT] Action threw error:', err)
-        // Si c'est une redirection, c'est normal (Next.js throw pour redirect)
-        // Ne pas afficher d'erreur dans ce cas
+
+        console.log('[LOGIN] ✅ Sign up successful')
+        console.log('[LOGIN OK]', data.user?.id)
+        
+        // Vérifier la session
+        const sessionResult = await supabase.auth.getSession()
+        console.log('[SESSION]', sessionResult)
+        
+        // Si l'email confirmation est requise
+        if (data.user && !data.session) {
+          setError('Veuillez vérifier votre email pour confirmer votre inscription')
+          setIsPending(false)
+          return
+        }
+
+        // Redirection vers la page clubs
+        router.push('/player/clubs')
+      } else {
+        // ✅ CONNEXION avec Supabase
+        console.log('[LOGIN] Calling signInWithPassword...')
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (signInError) {
+          console.error('[LOGIN] ❌ Sign in error:', signInError)
+          setError(signInError.message)
+          setIsPending(false)
+          return
+        }
+
+        console.log('[LOGIN] ✅ Sign in successful')
+        console.log('[LOGIN OK]', data.user?.id)
+        console.log('[LOGIN] User email:', data.user?.email)
+        
+        // Vérifier la session
+        const sessionResult = await supabase.auth.getSession()
+        console.log('[SESSION]', sessionResult)
+        console.log('[SESSION] Access token:', sessionResult.data.session?.access_token?.substring(0, 20) + '...')
+
+        // Redirection vers la page clubs
+        router.push('/player/clubs')
       }
-    })
+    } catch (err) {
+      console.error('[LOGIN] ❌ Unexpected error:', err)
+      setError('Une erreur inattendue est survenue')
+      setIsPending(false)
+    }
   }
 
   const isRedirected = callbackUrl && callbackUrl !== '/player/accueil'
