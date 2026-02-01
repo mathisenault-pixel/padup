@@ -38,7 +38,7 @@ type Booking = {
   court_id: string
   booking_date: string // DATE YYYY-MM-DD
   slot_id: number // référence vers time_slots.id
-  status: string // 'confirmed' | 'pending' | 'cancelled'
+  status: string // 'confirmed' | 'cancelled' (enum booking_status ne supporte pas 'pending')
   slot_start?: string // timestamp ISO (optionnel)
   slot_end?: string // timestamp ISO (optionnel)
 }
@@ -59,10 +59,13 @@ function combineDateAndTime(dateStr: string, timeStr: string): string {
 // CLUB & COURTS — VRAIS UUIDs depuis Supabase
 // ============================================
 
+// ✅ UUID du club démo (MVP: un seul club)
+const DEMO_CLUB_UUID = 'ba43c579-e522-4b51-8542-737c2c6452bb'
+
 // Club réel depuis la base de données
 const clubs: Club[] = [
   {
-    id: 'ba43c579-e522-4b51-8542-737c2c6452bb', // ✅ UUID réel depuis public.clubs
+    id: DEMO_CLUB_UUID, // ✅ UUID réel depuis public.clubs
     nom: 'Club Démo Pad\'up',
     ville: 'Avignon',
     imageUrl: '/images/clubs/demo-padup.jpg',
@@ -105,9 +108,23 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const router = useRouter()
   
   // ============================================
+  // MVP: Redirection vers le club démo si ID invalide
+  // ============================================
+  useEffect(() => {
+    // Si l'ID dans l'URL n'est pas le bon UUID (ex: anciens IDs '1', '2', etc.)
+    if (resolvedParams.id !== DEMO_CLUB_UUID) {
+      console.log('[CLUB REDIRECT] Invalid club ID:', resolvedParams.id, '→ redirecting to', DEMO_CLUB_UUID)
+      router.replace(`/player/clubs/${DEMO_CLUB_UUID}/reserver`)
+    }
+  }, [resolvedParams.id, router])
+  
+  // ============================================
   // STABILISATION: Club en dehors du render
   // ============================================
-  const club = useMemo(() => clubs.find(c => c.id === resolvedParams.id), [resolvedParams.id])
+  const club = useMemo(() => {
+    // Toujours retourner le club démo (MVP: un seul club)
+    return clubs[0]
+  }, [])
   
   // Dates (constant)
   const nextDays = useMemo(() => generateNextDays(), [])
@@ -188,7 +205,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         .select('id, court_id, booking_date, slot_id, status')
         .in('court_id', courtIds)
         .eq('booking_date', bookingDate)
-        .in('status', ['confirmed', 'pending'])
+        .eq('status', 'confirmed') // ✅ Uniquement 'confirmed' (enum booking_status ne supporte pas 'pending')
       
       if (error) {
         console.error('[BOOKINGS] Error object:', error)
@@ -261,9 +278,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             return
           }
           
-          // ✅ INSERT: ajouter si status = 'confirmed' ou 'pending'
+          // ✅ INSERT: ajouter si status = 'confirmed'
           if (payload.eventType === 'INSERT' && payloadNew) {
-            if (payloadNew.status === 'confirmed' || payloadNew.status === 'pending') {
+            if (payloadNew.status === 'confirmed') {
               setBookedByCourt(prev => {
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
@@ -278,8 +295,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           else if (payload.eventType === 'UPDATE' && payloadNew && payloadOld) {
             // Cas 1: changement de status
             if (payloadOld.status !== payloadNew.status) {
-              // old → confirmed/pending: ajouter
-              if (payloadNew.status === 'confirmed' || payloadNew.status === 'pending') {
+              // old → confirmed: ajouter
+              if (payloadNew.status === 'confirmed') {
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (!newMap[courtKey]) newMap[courtKey] = new Set()
@@ -288,8 +305,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 })
                 console.log('[REALTIME] ✅ Slot booked (UPDATE):', { courtKey, slotId: payloadNew.slot_id })
               }
-              // confirmed/pending → cancelled: retirer
-              else if (payloadNew.status === 'cancelled' && (payloadOld.status === 'confirmed' || payloadOld.status === 'pending')) {
+              // confirmed → cancelled: retirer
+              else if (payloadNew.status === 'cancelled' && payloadOld.status === 'confirmed') {
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (newMap[courtKey]) {
@@ -308,12 +325,12 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
                 const newSet = new Set(newMap[courtKey])
-                // Retirer ancien slot si c'était confirmed/pending
-                if (payloadOld.status === 'confirmed' || payloadOld.status === 'pending') {
+                // Retirer ancien slot si c'était confirmed
+                if (payloadOld.status === 'confirmed') {
                   newSet.delete(payloadOld.slot_id)
                 }
-                // Ajouter nouveau slot si c'est confirmed/pending
-                if (payloadNew.status === 'confirmed' || payloadNew.status === 'pending') {
+                // Ajouter nouveau slot si c'est confirmed
+                if (payloadNew.status === 'confirmed') {
                   newSet.add(payloadNew.slot_id)
                 }
                 newMap[courtKey] = newSet
@@ -476,7 +493,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         slot_id: selectedSlot.id,               // ✅ INTEGER NOT NULL (snake_case) référence time_slots.id
         slot_start: slotStartTimestamp,         // timestamptz (snake_case)
         slot_end: slotEndTimestamp,             // timestamptz (snake_case)
-        status: 'confirmed' as const,           // 'confirmed' | 'pending' | 'cancelled'
+        status: 'confirmed' as const,           // 'confirmed' | 'cancelled' (enum booking_status)
         created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (OBLIGATOIRE pour RLS)
         created_at: new Date().toISOString()    // timestamptz (snake_case)
       }
