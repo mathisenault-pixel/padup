@@ -242,39 +242,57 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ============================================
   useEffect(() => {
     const loadCourts = async () => {
-      if (!club?.id) return
-      
-      console.log('[COURTS] Loading courts from Supabase for club:', club.id)
-      
-      const { data, error } = await supabase
-        .from('courts')
-        .select('id, name, court_type')
-        .eq('club_id', club.id)
-        .order('name', { ascending: true })
-      
-      if (error) {
-        console.error('[COURTS] Error loading courts:', error)
-        console.error('[COURTS] Error details:', JSON.stringify(error, null, 2))
+      if (!club?.id) {
+        console.warn('[COURTS] No club.id, skipping courts load')
         setIsLoadingCourts(false)
         return
       }
       
-      console.log('[COURTS] ✅ Loaded:', data?.length || 0, 'courts')
-      console.log('[COURTS] Data:', data)
+      console.log('🔍 [DEBUG COURTS] START Loading courts from Supabase')
+      console.log('🔍 [DEBUG COURTS] Club ID:', club.id)
+      console.log('🔍 [DEBUG COURTS] Query: from("courts").select("*").eq("club_id", club.id)')
+      
+      // ✅ Charger TOUS les courts du club (sans filtre is_active pour MVP)
+      const { data, error } = await supabase
+        .from('courts')
+        .select('*')
+        .eq('club_id', club.id)
+        .order('name', { ascending: true })
+      
+      if (error) {
+        console.error('❌ [DEBUG COURTS] Error loading courts:', error)
+        console.error('❌ [DEBUG COURTS] Error message:', error.message)
+        console.error('❌ [DEBUG COURTS] Error details:', JSON.stringify(error, null, 2))
+        setIsLoadingCourts(false)
+        return
+      }
+      
+      console.log('✅ [DEBUG COURTS] Query successful')
+      console.log('✅ [DEBUG COURTS] Courts count:', data?.length || 0)
+      console.log('✅ [DEBUG COURTS] Raw data:', JSON.stringify(data, null, 2))
       
       // Transform DB data to UI format
-      const courtsFormatted = (data || []).map(court => ({
-        id: court.id, // UUID
-        name: court.name || 'Terrain',
-        type: court.court_type || 'Indoor'
-      }))
+      const courtsFormatted = (data || []).map((court, index) => {
+        console.log(`✅ [DEBUG COURTS] Court ${index + 1}:`, {
+          id: court.id,
+          name: court.name,
+          court_type: court.court_type
+        })
+        return {
+          id: court.id, // UUID
+          name: court.name || 'Terrain',
+          type: court.court_type || 'Indoor'
+        }
+      })
+      
+      console.log('✅ [DEBUG COURTS] Formatted courts:', courtsFormatted.length, 'courts')
       
       setCourts(courtsFormatted)
       setIsLoadingCourts(false)
       
       // ✅ Sélectionner le premier terrain par défaut si aucun n'est sélectionné
       if (!selectedTerrain && courtsFormatted.length > 0) {
-        // On garde selectedTerrain comme number pour compatibilité UI, mais on utilise l'UUID pour les requêtes
+        console.log('✅ [DEBUG COURTS] Auto-selecting first court (terrain id: 1)')
         setSelectedTerrain(1)
       }
     }
@@ -297,18 +315,27 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ============================================
   useEffect(() => {
     const loadTimeSlots = async () => {
-      console.log('[SLOTS] Loading time_slots from Supabase...')
+      console.log('🔍 [DEBUG SLOTS] START Loading time_slots from Supabase')
+      console.log('🔍 [DEBUG SLOTS] Query: from("time_slots").select("*").order("start_time")')
+      
       const { data, error } = await supabase
         .from('time_slots')
         .select('*')
         .order('start_time', { ascending: true })
       
       if (error) {
-        console.error('[SLOTS] Error loading time_slots:', error)
+        console.error('❌ [DEBUG SLOTS] Error loading time_slots:', error)
+        console.error('❌ [DEBUG SLOTS] Error message:', error.message)
+        console.error('❌ [DEBUG SLOTS] Error details:', JSON.stringify(error, null, 2))
+        setIsLoadingSlots(false)
         return
       }
       
-      console.log('[SLOTS] Loaded:', data)
+      console.log('✅ [DEBUG SLOTS] Query successful')
+      console.log('✅ [DEBUG SLOTS] Time slots count:', data?.length || 0)
+      console.log('✅ [DEBUG SLOTS] Raw data (first 3):', data?.slice(0, 3))
+      console.log('✅ [DEBUG SLOTS] Full data:', JSON.stringify(data, null, 2))
+      
       setTimeSlots(data || [])
       setIsLoadingSlots(false)
     }
@@ -320,7 +347,10 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ÉTAPE 2 — Charger les bookings confirmés pour TOUS les courts du club
   // ============================================
   useEffect(() => {
-    if (!club) return
+    if (!club) {
+      console.warn('🔍 [DEBUG BOOKINGS] No club, skipping')
+      return
+    }
     
     const loadBookings = async () => {
       // ✅ Construire la liste de tous les court_id (UUIDs réels depuis Supabase)
@@ -329,36 +359,35 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         .filter(Boolean) as string[]
       
       if (courtIds.length === 0) {
-        console.warn('[BOOKINGS] No courts loaded yet, skipping booking fetch')
+        console.warn('🔍 [DEBUG BOOKINGS] No courts loaded yet, skipping booking fetch')
+        console.warn('🔍 [DEBUG BOOKINGS] terrains:', terrains)
         return
       }
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
-      console.log('[BOOKINGS] Loading for all courts:', { courtIds, bookingDate })
+      console.log('🔍 [DEBUG BOOKINGS] START Loading bookings')
+      console.log('🔍 [DEBUG BOOKINGS] Court IDs:', courtIds)
+      console.log('🔍 [DEBUG BOOKINGS] Booking date:', bookingDate)
+      console.log('🔍 [DEBUG BOOKINGS] Query: from("bookings").select(...).in("court_id", courtIds).eq("booking_date", date).eq("status", "confirmed")')
       
       const { data, error } = await supabase
         .from('bookings')
         .select('id, court_id, booking_date, slot_id, status')
         .in('court_id', courtIds)
         .eq('booking_date', bookingDate)
-        .eq('status', 'confirmed') // ✅ Uniquement 'confirmed' (enum booking_status ne supporte pas 'pending')
+        .eq('status', 'confirmed')
       
       if (error) {
-        console.error('[BOOKINGS] Error object:', error)
-        console.error('[BOOKINGS] Error JSON:', JSON.stringify(error, null, 2))
-        console.error('[BOOKINGS] Error details:', {
-          table: 'bookings',
-          query: 'SELECT with in() filters',
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint
-        })
+        console.error('❌ [DEBUG BOOKINGS] Error loading bookings:', error)
+        console.error('❌ [DEBUG BOOKINGS] Error message:', error.message)
+        console.error('❌ [DEBUG BOOKINGS] Error JSON:', JSON.stringify(error, null, 2))
         return
       }
       
-      console.log('[BOOKINGS] fetched count', data?.length)
+      console.log('✅ [DEBUG BOOKINGS] Query successful')
+      console.log('✅ [DEBUG BOOKINGS] Bookings count:', data?.length || 0)
+      console.log('✅ [DEBUG BOOKINGS] Raw data:', JSON.stringify(data, null, 2))
       
       // ✅ Construire bookedByCourt : court_id → Set<slot_id>
       const map: Record<string, Set<number>> = {}
@@ -366,9 +395,17 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         const courtKey = String(row.court_id)
         if (!map[courtKey]) map[courtKey] = new Set()
         map[courtKey].add(row.slot_id)
+        
+        // Log exemple de clé générée
+        console.log(`✅ [DEBUG BOOKINGS] Key example: court_id=${courtKey}, slot_id=${row.slot_id}`)
       }
       
-      console.log('[BOOKINGS] bookedSlots size', Object.values(map).reduce((sum, set) => sum + set.size, 0))
+      const totalBookedSlots = Object.values(map).reduce((sum, set) => sum + set.size, 0)
+      console.log('✅ [DEBUG BOOKINGS] Total booked slots:', totalBookedSlots)
+      console.log('✅ [DEBUG BOOKINGS] Booked by court:', Object.fromEntries(
+        Object.entries(map).map(([courtId, set]) => [courtId, Array.from(set)])
+      ))
+      
       setBookedByCourt(map)
     }
     
@@ -1244,7 +1281,16 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <p className="text-red-900 font-bold text-lg mb-2">Aucun terrain disponible</p>
-              <p className="text-red-700">Les réservations ne sont pas disponibles pour ce club actuellement.</p>
+              <p className="text-red-700 mb-4">Aucun terrain n'a été trouvé pour ce club dans la base de données.</p>
+              <div className="text-left max-w-md mx-auto bg-white p-4 rounded-lg border border-red-200 text-sm">
+                <p className="font-semibold text-gray-900 mb-2">🔍 Debug Info:</p>
+                <ul className="space-y-1 text-gray-700">
+                  <li>• Club ID: <code className="bg-gray-100 px-1 rounded">{club.id}</code></li>
+                  <li>• Query: <code className="bg-gray-100 px-1 rounded text-xs">from("courts").eq("club_id", ...)</code></li>
+                  <li>• Résultat: <strong>0 terrains</strong></li>
+                  <li className="mt-2 text-xs text-gray-500">→ Vérifier que les courts existent en DB pour ce club</li>
+                </ul>
+              </div>
             </div>
           ) : isLoadingSlots ? (
             <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center">
