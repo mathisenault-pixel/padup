@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
+import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
@@ -65,14 +66,18 @@ export default function ClubsPage() {
         nombreTerrains: 2, // TODO: Compter depuis public.courts
         note: 4.5,
         avis: 0,
-        imageUrl: '/images/clubs/demo-padup.jpg', // TODO: Utiliser logo_url depuis DB
+        imageUrl: getClubImage(club.id), // ✅ Image par clubId
         prixMin: 12,
         equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'], // TODO: Depuis DB
         favoris: false,
         disponible: true
       }))
       
-      setClubs(clubsWithUI)
+      // ✅ Filtrer pour exclure le Club Démo
+      const filteredClubs = filterOutDemoClub(clubsWithUI)
+      console.log('[CLUBS] ✅ Filtered clubs (without demo):', filteredClubs.length, 'clubs')
+      
+      setClubs(filteredClubs)
       setIsLoading(false)
     }
     

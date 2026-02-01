@@ -6,6 +6,7 @@ import Link from 'next/link'
 import PlayerSelectionModal from './PlayerSelectionModal'
 import PremiumModal from './PremiumModal'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import { getClubImage } from '@/lib/clubImages'
 
 type Club = {
   id: string
@@ -91,29 +92,8 @@ function validateSlotDuration(slotStart: string, slotEnd: string): { valid: bool
 // CLUB & COURTS — VRAIS UUIDs depuis Supabase
 // ============================================
 
-// ✅ UUID du club démo (MVP: un seul club)
+// ✅ UUID du club démo (historique, maintenant exclu des listes)
 const DEMO_CLUB_UUID = 'ba43c579-e522-4b51-8542-737c2c6452bb'
-
-// Club réel depuis la base de données
-const clubs: Club[] = [
-  {
-    id: DEMO_CLUB_UUID, // ✅ UUID réel depuis public.clubs
-    name: 'Club Démo Pad\'up', // ✅ Correspond à public.clubs.name
-    city: 'Avignon', // ✅ Correspond à public.clubs.city
-    imageUrl: '/images/clubs/demo-padup.jpg',
-    prix: 12,
-    adresse: '123 Avenue du Padel, 84000 Avignon',
-    telephone: '+33 4 90 00 00 00',
-    email: 'contact@padup.fr',
-    horaires: {
-      semaine: '08h00 - 23h00',
-      weekend: '08h00 - 23h00'
-    },
-    description: 'Club de padel moderne avec terrains de qualité professionnelle.',
-    equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
-    nombreTerrains: 2
-  }
-]
 
 // ============================================
 // ⚠️ OBSOLETE: COURT_UUIDS hardcodé
@@ -146,31 +126,64 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   
   // ✅ LOGS DÉTAILLÉS POUR DEBUG
   console.log('[CLUB] params.id=', resolvedParams.id, 'type=', typeof resolvedParams.id)
-  console.log('[CLUB] DEMO_CLUB_UUID=', DEMO_CLUB_UUID)
-  console.log('[CLUB] clubs array length=', clubs.length)
-  console.log('[CLUB] clubs[0]=', clubs[0])
   
   // ============================================
-  // MVP: Redirection vers le club démo si ID invalide
+  // CHARGEMENT DU CLUB DEPUIS SUPABASE
   // ============================================
+  const [clubData, setClubData] = useState<Club | null>(null)
+  const [isLoadingClub, setIsLoadingClub] = useState(true)
+  
   useEffect(() => {
-    // Si l'ID dans l'URL n'est pas le bon UUID (ex: anciens IDs '1', '2', etc.)
-    if (resolvedParams.id !== DEMO_CLUB_UUID) {
-      console.log('[CLUB REDIRECT] Invalid club ID:', resolvedParams.id, '→ redirecting to', DEMO_CLUB_UUID)
-      router.replace(`/player/clubs/${DEMO_CLUB_UUID}/reserver`)
+    const loadClub = async () => {
+      console.log('[CLUB] Loading club from Supabase:', resolvedParams.id)
+      
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('id, name, city')
+        .eq('id', resolvedParams.id)
+        .single()
+      
+      if (error || !data) {
+        console.error('[CLUB] ❌ Error loading club:', error)
+        setIsLoadingClub(false)
+        return
+      }
+      
+      console.log('[CLUB] ✅ Club loaded:', data)
+      
+      // Transformer les données Supabase en format UI avec image mappée
+      const club: Club = {
+        id: data.id,
+        name: data.name || 'Club sans nom',
+        city: data.city || 'Ville non spécifiée',
+        imageUrl: getClubImage(data.id), // ✅ Image par clubId
+        prix: 12, // TODO: Depuis DB
+        adresse: '123 Avenue du Padel', // TODO: Depuis DB
+        telephone: '+33 4 90 00 00 00', // TODO: Depuis DB
+        email: 'contact@club.fr', // TODO: Depuis DB
+        horaires: {
+          semaine: '08h00 - 23h00',
+          weekend: '08h00 - 23h00'
+        },
+        description: 'Club de padel moderne avec terrains de qualité professionnelle.',
+        equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
+        nombreTerrains: 2 // TODO: Compter depuis public.courts
+      }
+      
+      setClubData(club)
+      setIsLoadingClub(false)
     }
-  }, [resolvedParams.id, router])
+    
+    loadClub()
+  }, [resolvedParams.id])
   
   // ============================================
   // STABILISATION: Club en dehors du render
   // ============================================
   const club = useMemo(() => {
-    // ✅ Pour MVP: toujours retourner le club démo
-    // La redirection ci-dessus s'occupe de corriger l'URL si besoin
-    const foundClub = clubs[0]
-    console.log('[CLUB] Selected club:', foundClub)
-    return foundClub
-  }, [])
+    console.log('[CLUB] Selected club:', clubData)
+    return clubData
+  }, [clubData])
   
   // Dates (constant)
   const nextDays = useMemo(() => generateNextDays(), [])
@@ -222,17 +235,30 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }, [])
   
   
-  // ✅ Vérification du club (ne devrait jamais arriver en pratique)
+  // ✅ Vérification du club (chargement en cours ou erreur)
+  if (isLoadingClub) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+          <p className="text-gray-600 font-semibold">Chargement du club...</p>
+        </div>
+      </div>
+    )
+  }
+  
   if (!club) {
-    console.error('[CLUB] ❌ CRITICAL: No club found! This should never happen.')
+    console.error('[CLUB] ❌ CRITICAL: No club found!')
     console.error('[CLUB] params.id:', resolvedParams.id)
-    console.error('[CLUB] clubs array:', clubs)
     return (
       <div className="p-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h2 className="text-lg font-bold text-red-900 mb-2">Erreur de configuration</h2>
-          <p className="text-red-700">Aucun club disponible. Redirection en cours...</p>
+          <h2 className="text-lg font-bold text-red-900 mb-2">Club introuvable</h2>
+          <p className="text-red-700">Le club demandé n'existe pas ou n'est plus disponible.</p>
           <p className="text-sm text-red-600 mt-2">ID reçu: {resolvedParams.id}</p>
+          <Link href="/player/clubs" className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Retour aux clubs
+          </Link>
         </div>
       </div>
     )

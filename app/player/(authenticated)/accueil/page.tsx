@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
+import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
@@ -64,11 +65,15 @@ export default function AccueilPage() {
         note: 4.6 + (index * 0.1),
         avis: 100 + index * 50,
         photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
-        imageUrl: `/images/clubs/demo-padup.jpg`, // TODO: Utiliser logo_url depuis DB
+        imageUrl: getClubImage(club.id), // ✅ Image par clubId
         prixMin: 11 + index,
       }))
       
-      setClubs(clubsWithUI)
+      // ✅ Filtrer pour exclure le Club Démo
+      const filteredClubs = filterOutDemoClub(clubsWithUI)
+      console.log('[ACCUEIL] ✅ Filtered clubs (without demo):', filteredClubs.length, 'clubs')
+      
+      setClubs(filteredClubs)
       setIsLoading(false)
     }
     
