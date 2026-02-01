@@ -27,92 +27,44 @@ export const demoProfile = {
 // Clubs démo
 export const demoClubs = [
   {
-    id: '1',
-    name: 'Le Hangar Sport & Co',
-    address: '370 Allées des Issards',
-    city: 'Rochefort-du-Gard',
-    email: 'contact@lehangar.com',
+    id: 'ba43c579-e522-4b51-8542-737c2c6452bb', // ✅ UUID réel depuis public.clubs
+    name: 'Club Démo Pad\'up',
+    address: '123 Avenue du Padel',
+    city: 'Avignon',
+    email: 'contact@padup.fr',
     is_active: true,
-    owner_id: 'club-owner-1',
+    owner_id: 'demo-owner-1',
     created_at: '2024-01-01T10:00:00.000Z',
-  },
-  {
-    id: '2',
-    name: 'Paul & Louis Sport',
-    address: '255 Rue des Tonneliers',
-    city: 'Le Pontet',
-    email: 'contact@paullouis.com',
-    is_active: true,
-    owner_id: 'club-owner-2',
-    created_at: '2024-01-01T10:00:00.000Z',
-  },
-  {
-    id: '3',
-    name: 'ZE Padel',
-    address: 'Z.A du Colombier',
-    city: 'Boulbon',
-    email: 'contact@zepadel.com',
-    is_active: true,
-    owner_id: 'club-owner-3',
-    created_at: '2024-01-01T10:00:00.000Z',
-  },
-  {
-    id: '4',
-    name: 'QG Padel Club',
-    address: '239 Rue des Entrepreneurs',
-    city: 'Saint-Laurent-des-Arbres',
-    email: 'contact@qgpadel.com',
-    is_active: true,
-    owner_id: 'club-owner-4',
-    created_at: '2024-01-01T10:00:00.000Z',
-  },
+  }
 ]
 
 // Terrains démo
 export const demoCourts = [
   {
-    id: '1',
-    club_id: '1',
-    name: 'Court Central 1',
+    id: '21d9a066-b7db-4966-abf1-cc210f7476c1', // ✅ UUID réel Terrain 1
+    club_id: 'ba43c579-e522-4b51-8542-737c2c6452bb',
+    name: 'Terrain 1',
     type: 'indoor' as const,
     is_active: true,
     price_per_hour: 45,
     created_at: '2024-01-01T10:00:00.000Z',
   },
   {
-    id: '2',
-    club_id: '1',
-    name: 'Court Central 2',
+    id: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // ✅ UUID réel Terrain 2
+    club_id: 'ba43c579-e522-4b51-8542-737c2c6452bb',
+    name: 'Terrain 2',
     type: 'indoor' as const,
     is_active: true,
     price_per_hour: 45,
     created_at: '2024-01-01T10:00:00.000Z',
-  },
-  {
-    id: '3',
-    club_id: '2',
-    name: 'Court Extérieur 1',
-    type: 'outdoor' as const,
-    is_active: true,
-    price_per_hour: 40,
-    created_at: '2024-01-01T10:00:00.000Z',
-  },
-  {
-    id: '4',
-    club_id: '3',
-    name: 'Court Premium',
-    type: 'indoor' as const,
-    is_active: true,
-    price_per_hour: 55,
-    created_at: '2024-01-01T10:00:00.000Z',
-  },
+  }
 ]
 
 // Réservations démo
 export const demoReservations = [
   {
-    id: '1',
-    court_id: '1',
+    id: 'demo-reservation-1',
+    court_id: '21d9a066-b7db-4966-abf1-cc210f7476c1', // Terrain 1
     player_id: 'demo-user-123',
     date: '2026-01-25',
     start_time: '14:00:00',
@@ -124,20 +76,20 @@ export const demoReservations = [
     cancelled_at: null,
     paid_at: null,
     courts: {
-      id: '1',
-      name: 'Court Central 1',
+      id: '21d9a066-b7db-4966-abf1-cc210f7476c1',
+      name: 'Terrain 1',
       type: 'indoor' as const,
       price_per_hour: 45,
       clubs: {
-        id: '1',
-        name: 'Le Hangar Sport & Co',
-        city: 'Rochefort-du-Gard',
+        id: 'ba43c579-e522-4b51-8542-737c2c6452bb',
+        name: 'Club Démo Pad\'up',
+        city: 'Avignon',
       },
     },
   },
   {
-    id: '2',
-    court_id: '3',
+    id: 'demo-reservation-2',
+    court_id: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // Terrain 2
     player_id: 'demo-user-123',
     date: '2026-01-27',
     start_time: '10:00:00',
@@ -149,42 +101,17 @@ export const demoReservations = [
     cancelled_at: null,
     paid_at: null,
     courts: {
-      id: '3',
-      name: 'Court Extérieur 1',
-      type: 'outdoor' as const,
+      id: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
+      name: 'Terrain 2',
+      type: 'indoor' as const,
       price_per_hour: 40,
       clubs: {
-        id: '2',
-        name: 'Paul & Louis Sport',
-        city: 'Le Pontet',
+        id: 'ba43c579-e522-4b51-8542-737c2c6452bb',
+        name: 'Club Démo Pad\'up',
+        city: 'Avignon',
       },
     },
-  },
-  {
-    id: '3',
-    court_id: '4',
-    player_id: 'demo-user-123',
-    date: '2026-01-15',
-    start_time: '18:00:00',
-    end_time: '19:30:00',
-    status: 'confirmed' as const,
-    payment_status: 'paid_on_site' as const,
-    price: 55,
-    created_at: '2026-01-10T10:00:00.000Z',
-    cancelled_at: null,
-    paid_at: '2026-01-15T18:00:00.000Z',
-    courts: {
-      id: '4',
-      name: 'Court Premium',
-      type: 'indoor' as const,
-      price_per_hour: 55,
-      clubs: {
-        id: '3',
-        name: 'ZE Padel',
-        city: 'Boulbon',
-      },
-    },
-  },
+  }
 ]
 
 // Fonction helper pour récupérer les réservations démo

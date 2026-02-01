@@ -55,126 +55,35 @@ function combineDateAndTime(dateStr: string, timeStr: string): string {
   return `${dateStr}T${timeStr}`
 }
 
-// Clubs en dur (même que dans la page clubs)
+// ============================================
+// CLUB & COURTS — VRAIS UUIDs depuis Supabase
+// ============================================
+
+// Club réel depuis la base de données
 const clubs: Club[] = [
   {
-    id: '1',
-    nom: 'Le Hangar Sport & Co',
-    ville: 'Rochefort-du-Gard',
-    imageUrl: '/images/clubs/le-hangar.jpg',
+    id: 'ba43c579-e522-4b51-8542-737c2c6452bb', // ✅ UUID réel depuis public.clubs
+    nom: 'Club Démo Pad\'up',
+    ville: 'Avignon',
+    imageUrl: '/images/clubs/demo-padup.jpg',
     prix: 12,
-    adresse: '123 Route de Nîmes, 30650 Rochefort-du-Gard',
-    telephone: '+33 4 66 82 45 12',
-    email: 'contact@lehangar-sport.fr',
+    adresse: '123 Avenue du Padel, 84000 Avignon',
+    telephone: '+33 4 90 00 00 00',
+    email: 'contact@padup.fr',
     horaires: {
       semaine: '08h00 - 23h00',
-      weekend: '08h00 - 23h30'
-    },
-    description: 'Le Hangar Sport & Co est un complexe sportif moderne avec 8 terrains de padel de haute qualité. Profitez de notre restaurant et de nos vestiaires équipés.',
-    equipements: ['Restaurant', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
-    nombreTerrains: 8
-  },
-  {
-    id: '2',
-    nom: 'Paul & Louis Sport',
-    ville: 'Le Pontet',
-    imageUrl: '/images/clubs/paul-louis.jpg',
-    prix: 13,
-    adresse: '45 Avenue de la République, 84130 Le Pontet',
-    telephone: '+33 4 90 32 78 90',
-    email: 'info@pauletlouis.com',
-    horaires: {
-      semaine: '07h00 - 23h00',
-      weekend: '08h00 - 00h00'
-    },
-    description: 'Centre sportif premium avec 8 terrains de padel professionnels. Salle de fitness et coaching personnalisé disponibles.',
-    equipements: ['Restaurant', 'Fitness', 'Coaching', 'Bar', 'Parking'],
-    nombreTerrains: 8
-  },
-  {
-    id: '3',
-    nom: 'ZE Padel',
-    ville: 'Boulbon',
-    imageUrl: '/images/clubs/ze-padel.jpg',
-    prix: 11,
-    adresse: '78 Chemin du Stade, 13150 Boulbon',
-    telephone: '+33 4 90 95 12 34',
-    email: 'contact@zepadel.fr',
-    horaires: {
-      semaine: '09h00 - 22h00',
-      weekend: '09h00 - 23h00'
-    },
-    description: 'Club convivial avec 6 terrains de padel en plein air. Ambiance détendue avec bar et snack sur place.',
-    equipements: ['Bar', 'Snack', 'WiFi', 'Parking'],
-    nombreTerrains: 6
-  },
-  {
-    id: '4',
-    nom: 'QG Padel Club',
-    ville: 'Saint-Laurent-des-Arbres',
-    imageUrl: '/images/clubs/qg-padel.jpg',
-    prix: 12,
-    adresse: '12 Route de Roquemaure, 30126 Saint-Laurent-des-Arbres',
-    telephone: '+33 4 66 50 23 45',
-    email: 'reservation@qgpadel.fr',
-    horaires: {
-      semaine: '08h00 - 22h00',
       weekend: '08h00 - 23h00'
     },
-    description: 'Club familial avec 4 terrains de padel. Cours professionnels et snacking disponibles. Idéal pour tous niveaux.',
-    equipements: ['Snacking', 'Cours pro', 'Vestiaires', 'Parking'],
-    nombreTerrains: 4
-  },
+    description: 'Club de padel moderne avec terrains de qualité professionnelle.',
+    equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
+    nombreTerrains: 2
+  }
 ]
 
-// ============================================
-// MOCK DATA POUR DEMO (sera remplacé par vraies tables courts)
-// ============================================
-
-// ⚠️ MAPPING des IDs de clubs en dur vers les vrais UUIDs en DB
-// Ces UUIDs doivent correspondre aux IDs dans public.clubs
-const CLUB_ID_MAP: Record<string, string> = {
-  '1': 'a1b2c3d4-e5f6-4789-a012-3456789abcde', // Le Hangar Sport & Co
-  '2': 'b2c3d4e5-f6a7-4890-b123-456789abcdef', // Paul & Louis Sport
-  '3': 'c3d4e5f6-a7b8-4901-c234-56789abcdef0', // ZE Padel
-  '4': 'd4e5f6a7-b8c9-4012-d345-6789abcdef01', // QG Padel Club
-}
-
-const COURT_ID_MAP: Record<string, Record<number, string>> = {
-  '1': { // Le Hangar
-    1: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // Terrain 1
-    2: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9f', // Terrain 2
-    3: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea0', // Terrain 3
-    4: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea1', // Terrain 4
-    5: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea2', // Terrain 5
-    6: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea3', // Terrain 6
-    7: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea4', // Terrain 7
-    8: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea5', // Terrain 8
-  },
-  '2': { // Paul & Louis
-    1: '7dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
-    2: '7dceaf95-80dd-4fcf-b401-7d4c937f6e9f',
-    3: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea0',
-    4: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea1',
-    5: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea2',
-    6: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea3',
-    7: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea4',
-    8: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea5',
-  },
-  '3': { // ZE Padel
-    1: '8dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
-    2: '8dceaf95-80dd-4fcf-b401-7d4c937f6e9f',
-    3: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea0',
-    4: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea1',
-    5: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea2',
-    6: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea3',
-  },
-  '4': { // QG Padel
-    1: '9dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
-    2: '9dceaf95-80dd-4fcf-b401-7d4c937f6e9f',
-    3: '9dceaf95-80dd-4fcf-b401-7d4c937f6ea0',
-    4: '9dceaf95-80dd-4fcf-b401-7d4c937f6ea1',
-  }
+// UUIDs réels des terrains depuis public.courts
+const COURT_UUIDS: Record<number, string> = {
+  1: '21d9a066-b7db-4966-abf1-cc210f7476c1', // ✅ Terrain 1
+  2: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // ✅ Terrain 2
 }
 
 // Générer les 7 prochains jours
@@ -265,15 +174,10 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     if (!club) return
     
     const loadBookings = async () => {
-      // ✅ Construire la liste de tous les court_id pour ce club
+      // ✅ Construire la liste de tous les court_id (UUIDs réels)
       const courtIds = terrains
-        .map(t => COURT_ID_MAP[club.id]?.[t.id])
+        .map(t => COURT_UUIDS[t.id])
         .filter(Boolean) as string[]
-      
-      if (courtIds.length === 0) {
-        console.warn('[BOOKINGS] No court_id mapping for club', club.id)
-        return
-      }
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
@@ -289,12 +193,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       if (error) {
         console.error('[BOOKINGS] Error:', {
           table: 'bookings',
-          query: 'select id, court_id, booking_date, slot_id, status',
-          error,
           message: error.message,
           code: error.code,
-          details: error.details,
-          hint: error.hint
+          details: error.details
         })
         return
       }
@@ -324,14 +225,14 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     
     const bookingDate = selectedDate.toISOString().split('T')[0]
     
-    console.log('[REALTIME] Subscribing to bookings for club:', { 
+    console.log('[REALTIME] Subscribing to bookings:', { 
       clubId: club.id, 
       bookingDate
     })
     
-    // ✅ Construire la liste des court_id pour filtrer manuellement
+    // ✅ Construire la liste des court_id (UUIDs réels)
     const courtIds = terrains
-      .map(t => COURT_ID_MAP[club.id]?.[t.id])
+      .map(t => COURT_UUIDS[t.id])
       .filter(Boolean) as string[]
     
     const channel = supabase
@@ -339,10 +240,10 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       .on(
         'postgres_changes',
         {
-          event: '*', // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'bookings',
-          filter: `booking_date=eq.${bookingDate}` // ✅ Filtre sur la date
+          filter: `booking_date=eq.${bookingDate}`
         },
         (payload) => {
           console.log('[REALTIME bookings] payload', payload)
@@ -353,7 +254,6 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           const courtKey = String((payloadNew ?? payloadOld)?.court_id)
           
           if (!courtKey || !courtIds.includes(courtKey)) {
-            // Ignorer si pas un court de ce club
             return
           }
           
@@ -509,74 +409,41 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     setIsSubmitting(true)
     
     try {
-      // ✅ Récupérer le court_id
-      const courtId = COURT_ID_MAP[club.id]?.[selectedTerrain]
+      // ✅ Récupérer le court_id (UUID réel)
+      const courtId = COURT_UUIDS[selectedTerrain]
       if (!courtId) {
-        console.error('[RESERVE] No court_id for terrain', selectedTerrain)
+        console.error('[RESERVE] No court UUID for terrain', selectedTerrain)
+        alert('Erreur: Terrain invalide')
         setIsSubmitting(false)
         return
       }
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
-      // ✅ Obtenir le vrai UUID du club depuis le mapping
-      const clubUuid = CLUB_ID_MAP[club.id]
-      if (!clubUuid) {
-        console.error('[RESERVE] No club UUID mapping for club.id', club.id)
-        alert(`Erreur: Club UUID non trouvé pour l'ID ${club.id}`)
-        setIsSubmitting(false)
-        return
-      }
-      
       // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
-      // Calculer slot_start et slot_end en timezone locale
       const slotStartTimestamp = combineDateAndTime(bookingDate, selectedSlot.start_time)
       const slotEndTimestamp = combineDateAndTime(bookingDate, selectedSlot.end_time)
       
       const bookingPayload = {
-        club_id: clubUuid,                      // ✅ club_id (UUID) - vrai UUID depuis mapping
-        court_id: courtId,                      // ✅ court_id (UUID) - vrai UUID depuis mapping
-        booking_date: bookingDate,              // booking_date (DATE) YYYY-MM-DD NOT NULL
-        slot_id: selectedSlot.id,               // slot_id (INTEGER) NOT NULL
-        slot_start: slotStartTimestamp,         // slot_start (timestamptz)
-        slot_end: slotEndTimestamp,             // slot_end (timestamptz)
-        status: 'confirmed' as const,           // status ('confirmed' | 'pending' | 'cancelled')
-        created_by: null,                       // TODO: remplacer par auth.uid() quand auth sera en place
+        club_id: club.id,                       // ✅ UUID réel depuis public.clubs
+        court_id: courtId,                      // ✅ UUID réel depuis public.courts
+        booking_date: bookingDate,              // DATE YYYY-MM-DD NOT NULL
+        slot_id: selectedSlot.id,               // INTEGER NOT NULL (référence time_slots.id)
+        slot_start: slotStartTimestamp,         // timestamptz
+        slot_end: slotEndTimestamp,             // timestamptz
+        status: 'confirmed' as const,           // 'confirmed' | 'pending' | 'cancelled'
+        created_by: null,                       // TODO: remplacer par auth.uid()
         created_at: new Date().toISOString()
       }
       
-      // ✅ LOGGING COMPLET DU PAYLOAD + VALIDATION UUID
-      console.log('[BOOKING INSERT PAYLOAD - BEFORE INSERT]', JSON.stringify(bookingPayload, null, 2))
-      console.log('[BOOKING INSERT PAYLOAD - Types & Validation]', {
-        club_id: { 
-          type: typeof bookingPayload.club_id,
-          value: bookingPayload.club_id,
-          isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookingPayload.club_id)
-        },
-        court_id: {
-          type: typeof bookingPayload.court_id,
-          value: bookingPayload.court_id,
-          isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookingPayload.court_id)
-        },
-        booking_date: { type: typeof bookingPayload.booking_date, value: bookingPayload.booking_date },
-        slot_id: { type: typeof bookingPayload.slot_id, value: bookingPayload.slot_id },
-        status: { type: typeof bookingPayload.status, value: bookingPayload.status }
+      // ✅ LOGGING DU PAYLOAD
+      console.log('[BOOKING INSERT]', {
+        club_id: bookingPayload.club_id,
+        court_id: bookingPayload.court_id,
+        booking_date: bookingPayload.booking_date,
+        slot_id: bookingPayload.slot_id,
+        status: bookingPayload.status
       })
-      
-      // ⚠️ VALIDATION CRITIQUE: Vérifier que les UUIDs sont valides
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-      if (!uuidRegex.test(bookingPayload.club_id)) {
-        console.error('[BOOKING INSERT] ❌ INVALID club_id UUID:', bookingPayload.club_id)
-        alert(`Erreur critique: club_id invalide (${bookingPayload.club_id})`)
-        setIsSubmitting(false)
-        return
-      }
-      if (!uuidRegex.test(bookingPayload.court_id)) {
-        console.error('[BOOKING INSERT] ❌ INVALID court_id UUID:', bookingPayload.court_id)
-        alert(`Erreur critique: court_id invalide (${bookingPayload.court_id})`)
-        setIsSubmitting(false)
-        return
-      }
       
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
@@ -676,9 +543,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
-    const courtId = COURT_ID_MAP[club.id]?.[terrainId]
+    const courtId = COURT_UUIDS[terrainId]
     if (!courtId) {
-      console.warn('[SLOT CLICK] No court_id for terrain', terrainId)
+      console.warn('[SLOT CLICK] No court UUID for terrain', terrainId)
       return
     }
     
@@ -902,8 +769,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           ) : (
             <div className="space-y-6">
               {terrains.map((terrain) => {
-                // ✅ Récupérer le court_id pour ce terrain
-                const courtId = COURT_ID_MAP[club.id]?.[terrain.id]
+                // ✅ Récupérer le court_id (UUID réel)
+                const courtId = COURT_UUIDS[terrain.id]
                 const courtKey = courtId ? String(courtId) : null
                 
                 // Calculer le nombre de créneaux disponibles pour ce terrain

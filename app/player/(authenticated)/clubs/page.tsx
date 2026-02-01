@@ -6,7 +6,7 @@ import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 
 type Club = {
-  id: number
+  id: string // ✅ UUID depuis public.clubs
   nom: string
   ville: string
   distance: number
@@ -30,61 +30,19 @@ export default function ClubsPage() {
 
   const [clubs, setClubs] = useState<Club[]>([
     {
-      id: 1,
-      nom: 'Le Hangar Sport & Co',
-      ville: 'Rochefort-du-Gard',
+      id: 'ba43c579-e522-4b51-8542-737c2c6452bb', // ✅ UUID réel depuis public.clubs
+      nom: 'Club Démo Pad\'up',
+      ville: 'Avignon',
       distance: 5,
-      nombreTerrains: 8,
-      note: 4.8,
-      avis: 245,
-      imageUrl: '/images/clubs/le-hangar.jpg',
+      nombreTerrains: 2,
+      note: 4.9,
+      avis: 42,
+      imageUrl: '/images/clubs/demo-padup.jpg',
       prixMin: 12,
-      equipements: ['Restaurant', 'Vestiaires', 'Douches', 'Parking'],
+      equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
       favoris: false,
       disponible: true
-    },
-    {
-      id: 2,
-      nom: 'Paul & Louis Sport',
-      ville: 'Le Pontet',
-      distance: 10,
-      nombreTerrains: 8,
-      note: 4.7,
-      avis: 189,
-      imageUrl: '/images/clubs/paul-louis.jpg',
-      prixMin: 13,
-      equipements: ['Restaurant', 'Fitness', 'Coaching'],
-      favoris: false,
-      disponible: true
-    },
-    {
-      id: 3,
-      nom: 'ZE Padel',
-      ville: 'Boulbon',
-      distance: 20,
-      nombreTerrains: 6,
-      note: 4.6,
-      avis: 127,
-      imageUrl: '/images/clubs/ze-padel.jpg',
-      prixMin: 11,
-      equipements: ['Bar', 'Snack', 'WiFi'],
-      favoris: false,
-      disponible: false
-    },
-    {
-      id: 4,
-      nom: 'QG Padel Club',
-      ville: 'Saint-Laurent-des-Arbres',
-      distance: 15,
-      nombreTerrains: 4,
-      note: 4.7,
-      avis: 98,
-      imageUrl: '/images/clubs/qg-padel.jpg',
-      prixMin: 12,
-      equipements: ['Snacking', 'Cours pro'],
-      favoris: false,
-      disponible: true
-    },
+    }
   ])
 
   const toggleEquipement = (equipement: string) => {
@@ -100,7 +58,7 @@ export default function ClubsPage() {
   }
 
   // Mémoïser le toggle favoris (forme fonctionnelle pour éviter boucle)
-  const toggleFavoris = useCallback((clubId: number) => {
+  const toggleFavoris = useCallback((clubId: string) => {
     setClubs(prev => 
       prev.map(club => 
         club.id === clubId ? { ...club, favoris: !club.favoris } : club
