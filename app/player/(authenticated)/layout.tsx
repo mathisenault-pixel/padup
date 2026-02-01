@@ -23,9 +23,12 @@ export default function PlayerAuthLayout({
             <button
               type="button"
               onClick={() => router.push('/player/accueil')}
-              className="group transition-all"
+              className="group flex items-center gap-2 transition-all"
             >
-              <span className="text-2xl font-bold text-gray-900 tracking-tight hover:text-blue-600 transition-colors">Pad&apos;Up</span>
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                <span className="text-white font-bold text-lg md:text-xl">P</span>
+              </div>
+              <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">Pad&apos;Up</span>
             </button>
 
             {/* Navigation Center */}
