@@ -16,8 +16,12 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
     const checkAuth = () => {
       const currentSession = getClubSession()
 
-      // Si pas de session et qu'on n'est pas sur la page login
-      if (!currentSession && pathname !== '/club/login') {
+      // Pages publiques (pas de protection)
+      const publicPages = ['/club/login', '/club/signup']
+      const isPublicPage = publicPages.includes(pathname)
+
+      // Si pas de session et qu'on n'est pas sur une page publique
+      if (!currentSession && !isPublicPage) {
         console.log('[Club Layout] No session, redirecting to login')
         router.replace('/club/login')
         return
@@ -35,8 +39,9 @@ export default function ClubLayout({ children }: { children: React.ReactNode }) 
     router.push('/club/login')
   }
 
-  // Page de login: pas de layout
-  if (pathname === '/club/login') {
+  // Pages publiques: pas de layout avec header
+  const publicPages = ['/club/login', '/club/signup']
+  if (publicPages.includes(pathname)) {
     return <>{children}</>
   }
 
