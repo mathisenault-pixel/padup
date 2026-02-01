@@ -780,6 +780,43 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('  • created_by:', bookingPayload.created_by)
       console.log('═══════════════════════════════════════════════════════════')
       
+      // ============================================
+      // 🚨 DEBUG: PAYLOAD EXACT ENVOYÉ À SUPABASE
+      // ============================================
+      console.log('[BOOKING_PAYLOAD]', {
+        club_id: bookingPayload.club_id,
+        court_id: bookingPayload.court_id,
+        booking_date: bookingPayload.booking_date,
+        slot_id: bookingPayload.slot_id,
+        slot_start: bookingPayload.slot_start,
+        slot_end: bookingPayload.slot_end,
+        status: bookingPayload.status,
+        created_by: bookingPayload.created_by,
+        durationMinutes: (new Date(bookingPayload.slot_end).getTime() - new Date(bookingPayload.slot_start).getTime()) / 60000,
+      })
+      
+      // ✅ VALIDATION COURT_ID (CRITIQUE POUR FOREIGN KEY)
+      if (!bookingPayload.court_id) {
+        console.error('[BOOKING] ❌❌❌ CRITICAL: court_id is NULL/UNDEFINED')
+        console.error('[BOOKING] This will cause foreign key error: bookings_court_id_fkey')
+        alert('Erreur critique: court_id manquant. La réservation ne peut pas être créée.')
+        setIsSubmitting(false)
+        return
+      }
+      
+      // Vérifier que court_id est un UUID valide (format basique)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (!uuidRegex.test(bookingPayload.court_id)) {
+        console.error('[BOOKING] ❌❌❌ CRITICAL: court_id is not a valid UUID format')
+        console.error('[BOOKING] court_id received:', bookingPayload.court_id)
+        console.error('[BOOKING] Expected format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx')
+        alert(`Erreur critique: court_id invalide (${bookingPayload.court_id}).\nFormat UUID attendu.`)
+        setIsSubmitting(false)
+        return
+      }
+      
+      console.log('[BOOKING] ✅ court_id validation passed:', bookingPayload.court_id)
+      console.log('[BOOKING] ✅ court_id is valid UUID format')
       console.log('[BOOKING INSERT] Calling Supabase insert...')
       
       const { data: bookingData, error: bookingError } = await supabase
