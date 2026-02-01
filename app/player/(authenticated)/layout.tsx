@@ -16,8 +16,8 @@ export default function PlayerAuthLayout({
     <div className="min-h-screen bg-white">
       {/* Header Premium avec Glassmorphism */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+        <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 md:h-20">
             
             {/* Logo */}
             <button
@@ -38,13 +38,12 @@ export default function PlayerAuthLayout({
               {/* Espace club - Visible desktop et mobile */}
               <Link
                 href="/club-access"
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                className="flex items-center gap-2 px-2 md:px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span className="hidden sm:inline">Espace club</span>
-                <span className="sm:hidden">Club</span>
+                <span className="hidden md:inline">Espace club</span>
               </Link>
 
               <AuthStatus />
@@ -54,7 +53,7 @@ export default function PlayerAuthLayout({
         </div>
 
         {/* Mobile Navigation Premium */}
-        <div className="lg:hidden border-t border-gray-100 px-4 py-3 bg-white/50 backdrop-blur-xl overflow-x-auto">
+        <div className="lg:hidden border-t border-gray-100 px-2 py-2 bg-white/50 backdrop-blur-xl overflow-x-auto">
           <div className="min-w-max">
             <PlayerNav />
           </div>
@@ -62,7 +61,7 @@ export default function PlayerAuthLayout({
       </header>
 
       {/* Main Content avec espacement premium */}
-      <main className="min-h-[calc(100vh-80px)]">
+      <main className="min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)]">
         {children}
       </main>
 

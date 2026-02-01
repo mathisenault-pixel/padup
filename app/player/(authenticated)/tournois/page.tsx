@@ -34,6 +34,7 @@ export default function TournoisPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [tournoiToConfirm, setTournoiToConfirm] = useState<Tournoi | null>(null)
+  const [showFilters, setShowFilters] = useState(false)
 
   const [tournois, setTournois] = useState<Tournoi[]>([
     {
@@ -210,13 +211,13 @@ export default function TournoisPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">
         
 
         {/* Barre de recherche + Filtres */}
-        <div className="mb-8 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+        <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200">
           {/* Recherche */}
-          <div className="mb-4">
+          <div className="mb-3 md:mb-4">
             <SmartSearchBar
               placeholder="Rechercher un tournoi ou un club..."
               onSearch={(query) => setSearchTerm(query)}
@@ -237,7 +238,7 @@ export default function TournoisPage() {
           </div>
 
           {/* Filtres statut */}
-          <div className="flex items-center gap-2 flex-wrap mb-3">
+          <div className="flex items-center gap-2 flex-wrap mb-3 md:mb-3">
             <button
               onClick={() => setSelectedFilter('ouverts')}
               className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
@@ -279,8 +280,90 @@ export default function TournoisPage() {
             </button>
           </div>
 
-          {/* Filtres niveau (multi-sélection) */}
-          <div className="flex items-center gap-2 flex-wrap mb-3">
+          {/* Accordion Filtres (mobile) */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-all"
+            >
+              <span className="flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filtrer les tournois
+              </span>
+              <svg className={`w-5 h-5 transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {showFilters && (
+              <div className="mt-3 space-y-3">
+                {/* Filtres niveau (scroll horizontal) */}
+                <div>
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Niveau</span>
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 px-1">
+                    <button
+                      onClick={() => setSelectedCategories([])}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                        selectedCategories.length === 0
+                          ? 'bg-gray-900 text-white'
+                          : 'bg-white text-gray-700 border border-gray-200'
+                      }`}
+                    >
+                      Tous
+                    </button>
+                    {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => toggleCategorie(cat)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                          selectedCategories.includes(cat)
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-gray-700 border border-gray-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Filtres genre (compacts) */}
+                <div>
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Genre</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setSelectedGenres([])}
+                      className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        selectedGenres.length === 0
+                          ? 'bg-gray-900 text-white'
+                          : 'bg-white text-gray-700 border border-gray-200'
+                      }`}
+                    >
+                      Tous
+                    </button>
+                    {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
+                      <button
+                        key={genre}
+                        onClick={() => toggleGenre(genre)}
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                          selectedGenres.includes(genre)
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-gray-700 border border-gray-200'
+                        }`}
+                      >
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Filtres niveau (desktop) */}
+          <div className="hidden md:flex items-center gap-2 flex-wrap mb-3">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Niveau :</span>
             <button
               onClick={() => setSelectedCategories([])}
@@ -307,8 +390,8 @@ export default function TournoisPage() {
             ))}
           </div>
 
-          {/* Filtres genre (multi-sélection) */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Filtres genre (desktop) */}
+          <div className="hidden md:flex items-center gap-2 flex-wrap">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Genre :</span>
             <button
               onClick={() => setSelectedGenres([])}
@@ -338,7 +421,7 @@ export default function TournoisPage() {
 
         {/* Liste des tournois */}
         {filteredTournois.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4 mb-16 md:mb-8">
             {filteredTournois.map((tournoi) => {
               const dateObj = new Date(tournoi.date)
               const isComplet = tournoi.statut === 'Complet'
@@ -354,7 +437,7 @@ export default function TournoisPage() {
                     setSelectedTournoi(tournoi)
                     setShowDetailsModal(true)
                   }}
-                  className={`group flex gap-6 bg-white border-2 rounded-xl p-5 transition-all cursor-pointer ${
+                  className={`group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border-2 rounded-xl p-3 md:p-5 transition-all cursor-pointer ${
                     tournoi.inscrit
                       ? 'border-blue-200 bg-blue-50'
                       : isComplet
@@ -362,8 +445,8 @@ export default function TournoisPage() {
                       : 'border-gray-200 hover:border-blue-500 hover:shadow-lg'
                   }`}
                 >
-                  {/* Image */}
-                  <div className="relative w-48 h-36 flex-shrink-0 rounded-lg overflow-hidden">
+                  {/* Image - Full width mobile, fixed width desktop */}
+                  <div className="relative w-full md:w-48 h-40 md:h-36 flex-shrink-0 rounded-lg overflow-hidden">
                     <img
                       src={tournoi.image}
                       alt={tournoi.nom}
@@ -386,67 +469,75 @@ export default function TournoisPage() {
                     </div>
                   </div>
 
-                  {/* Contenu */}
-                  <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">
-                            {tournoi.nom}
-                          </h3>
-                          <p className="text-gray-600 flex items-center gap-1.5 mt-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            {tournoi.club} · {tournoi.clubAdresse}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">{tournoi.prixInscription}€</p>
-                          <p className="text-xs text-gray-500">inscription</p>
-                        </div>
+                  {/* Contenu - Structure verticale claire */}
+                  <div className="flex-1 flex flex-col gap-3">
+                    {/* Nom + Prix */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg md:text-xl font-bold text-gray-900 line-clamp-2 leading-tight">
+                        {tournoi.nom}
+                      </h3>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-xl md:text-2xl font-bold text-gray-900">{tournoi.prixInscription}€</p>
+                        <p className="text-xs text-gray-500">inscription</p>
                       </div>
+                    </div>
 
-                      <div className="flex items-center gap-6 mt-4">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          <span className="text-sm font-medium">
-                            {dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} à {tournoi.heureDebut}
+                    {/* Club + Ville */}
+                    <p className="text-sm md:text-base text-gray-600 flex items-center gap-1.5 -mt-1">
+                      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                      <span className="line-clamp-1">{tournoi.club} · {tournoi.clubAdresse}</span>
+                    </p>
+
+                    {/* Date + Heure + Genre */}
+                    <div className="flex items-center gap-3 md:gap-6 flex-wrap">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-sm font-medium">
+                          {dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} · {tournoi.heureDebut}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span className="text-sm font-medium">{tournoi.genre}</span>
+                      </div>
+                    </div>
+
+                    {/* Barre de remplissage */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-gray-500 font-medium">
+                            {tournoi.nombreEquipes}/{tournoi.nombreEquipesMax} équipes
+                          </span>
+                          <span className="text-xs text-gray-500 font-medium">
+                            {placesRestantes} {placesRestantes > 1 ? 'places' : 'place'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          <span className="text-sm font-medium">{tournoi.genre}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex flex-col">
-                            <span className="text-xs text-gray-500">
-                              {tournoi.nombreEquipes}/{tournoi.nombreEquipesMax} équipes
-                            </span>
-                            <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden mt-1">
-                              <div 
-                                className="h-full bg-blue-600 rounded-full transition-all"
-                                style={{ width: `${pourcentageRempli}%` }}
-                              ></div>
-                            </div>
-                          </div>
+                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-blue-600 rounded-full transition-all"
+                            style={{ width: `${pourcentageRempli}%` }}
+                          ></div>
                         </div>
                       </div>
                     </div>
 
+                    {/* CTA - Pleine largeur sur mobile */}
                     {tournoi.statut === 'Ouvert' && (
-                      <div className="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                      <div className="mt-auto pt-3 md:pt-4 border-t border-gray-100">
                         {tournoi.inscrit ? (
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
                               handleDesinscrire(tournoi)
                             }}
-                            className="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-colors"
+                            className="w-full md:w-auto px-5 py-3 md:py-2 bg-gray-900 hover:bg-gray-800 text-white text-base md:text-sm font-semibold rounded-lg transition-colors"
                           >
                             Se désinscrire
                           </button>
@@ -456,7 +547,7 @@ export default function TournoisPage() {
                               e.stopPropagation()
                               handleInscrire(tournoi)
                             }}
-                            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                            className="w-full md:w-auto px-5 py-3 md:py-2 bg-blue-600 hover:bg-blue-700 text-white text-base md:text-sm font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
                           >
                             S'inscrire
                           </button>
