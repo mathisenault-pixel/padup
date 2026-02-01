@@ -130,6 +130,16 @@ const clubs: Club[] = [
 // ============================================
 // MOCK DATA POUR DEMO (sera remplacé par vraies tables courts)
 // ============================================
+
+// ⚠️ MAPPING des IDs de clubs en dur vers les vrais UUIDs en DB
+// Ces UUIDs doivent correspondre aux IDs dans public.clubs
+const CLUB_ID_MAP: Record<string, string> = {
+  '1': 'a1b2c3d4-e5f6-4789-a012-3456789abcde', // Le Hangar Sport & Co
+  '2': 'b2c3d4e5-f6a7-4890-b123-456789abcdef', // Paul & Louis Sport
+  '3': 'c3d4e5f6-a7b8-4901-c234-56789abcdef0', // ZE Padel
+  '4': 'd4e5f6a7-b8c9-4012-d345-6789abcdef01', // QG Padel Club
+}
+
 const COURT_ID_MAP: Record<string, Record<number, string>> = {
   '1': { // Le Hangar
     1: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // Terrain 1
@@ -509,14 +519,23 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
+      // ✅ Obtenir le vrai UUID du club depuis le mapping
+      const clubUuid = CLUB_ID_MAP[club.id]
+      if (!clubUuid) {
+        console.error('[RESERVE] No club UUID mapping for club.id', club.id)
+        alert(`Erreur: Club UUID non trouvé pour l'ID ${club.id}`)
+        setIsSubmitting(false)
+        return
+      }
+      
       // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
       // Calculer slot_start et slot_end en timezone locale
       const slotStartTimestamp = combineDateAndTime(bookingDate, selectedSlot.start_time)
       const slotEndTimestamp = combineDateAndTime(bookingDate, selectedSlot.end_time)
       
       const bookingPayload = {
-        club_id: club.id,                       // club_id (UUID)
-        court_id: courtId,                      // court_id (UUID)
+        club_id: clubUuid,                      // ✅ club_id (UUID) - vrai UUID depuis mapping
+        court_id: courtId,                      // ✅ court_id (UUID) - vrai UUID depuis mapping
         booking_date: bookingDate,              // booking_date (DATE) YYYY-MM-DD NOT NULL
         slot_id: selectedSlot.id,               // slot_id (INTEGER) NOT NULL
         slot_start: slotStartTimestamp,         // slot_start (timestamptz)
@@ -526,15 +545,38 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         created_at: new Date().toISOString()
       }
       
-      // ✅ LOGGING COMPLET DU PAYLOAD
-      console.log('[BOOKING INSERT PAYLOAD]', JSON.stringify(bookingPayload, null, 2))
-      console.log('[BOOKING INSERT PAYLOAD - Types]', {
-        club_id: typeof bookingPayload.club_id,
-        court_id: typeof bookingPayload.court_id,
-        booking_date: typeof bookingPayload.booking_date,
-        slot_id: typeof bookingPayload.slot_id,
-        status: typeof bookingPayload.status
+      // ✅ LOGGING COMPLET DU PAYLOAD + VALIDATION UUID
+      console.log('[BOOKING INSERT PAYLOAD - BEFORE INSERT]', JSON.stringify(bookingPayload, null, 2))
+      console.log('[BOOKING INSERT PAYLOAD - Types & Validation]', {
+        club_id: { 
+          type: typeof bookingPayload.club_id,
+          value: bookingPayload.club_id,
+          isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookingPayload.club_id)
+        },
+        court_id: {
+          type: typeof bookingPayload.court_id,
+          value: bookingPayload.court_id,
+          isUUID: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookingPayload.court_id)
+        },
+        booking_date: { type: typeof bookingPayload.booking_date, value: bookingPayload.booking_date },
+        slot_id: { type: typeof bookingPayload.slot_id, value: bookingPayload.slot_id },
+        status: { type: typeof bookingPayload.status, value: bookingPayload.status }
       })
+      
+      // ⚠️ VALIDATION CRITIQUE: Vérifier que les UUIDs sont valides
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (!uuidRegex.test(bookingPayload.club_id)) {
+        console.error('[BOOKING INSERT] ❌ INVALID club_id UUID:', bookingPayload.club_id)
+        alert(`Erreur critique: club_id invalide (${bookingPayload.club_id})`)
+        setIsSubmitting(false)
+        return
+      }
+      if (!uuidRegex.test(bookingPayload.court_id)) {
+        console.error('[BOOKING INSERT] ❌ INVALID court_id UUID:', bookingPayload.court_id)
+        alert(`Erreur critique: court_id invalide (${bookingPayload.court_id})`)
+        setIsSubmitting(false)
+        return
+      }
       
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
