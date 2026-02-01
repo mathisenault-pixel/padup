@@ -577,118 +577,100 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
-      // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
-      // ⚠️ CRITIQUE: slot_start et slot_end doivent être dans le MÊME FORMAT (ISO UTC avec Z)
+      // ============================================
+      // ✅ CALCUL STRICT ET UNIQUE DE LA DURÉE 90 MINUTES
+      // ============================================
+      // Ne dépend d'AUCUNE source externe (pas de time_slots.end_time, pas de slot_id, etc.)
+      // Calcul unique et strict: end = start + 90 minutes EXACTEMENT
       
-      // Étape 1: Créer slot_start depuis date + heure (format ISO UTC)
-      const slotStartTimestamp = combineDateAndTime(bookingDate, selectedSlot.start_time)
+      // Étape 1: Construire slot_start depuis date + heure du slot sélectionné
+      const slotStartString = `${bookingDate}T${selectedSlot.start_time}Z` // Force UTC avec Z
+      const start = new Date(slotStartString)
       
-      // Étape 2: Calculer slot_end = slot_start + 90 minutes EXACT (format ISO UTC)
-      const slotEndTimestamp = calculateSlotEnd(slotStartTimestamp)
+      // Étape 2: Calculer slot_end = start + 90 minutes EXACT
+      const end = new Date(start.getTime() + 90 * 60 * 1000)
       
-      // Étape 3: Valider la durée en millisecondes (pas d'arrondi)
-      const durationCheck = validateSlotDuration(slotStartTimestamp, slotEndTimestamp)
+      // Étape 3: Convertir en ISO UTC pour Supabase
+      const slot_start = start.toISOString()
+      const slot_end = end.toISOString()
       
-      // ✅ LOGS DÉTAILLÉS POUR DEBUG FORMAT
-      console.log('[BOOKING DURATION CHECK] ===== FORMAT & DURÉE =====')
-      console.log('slot_start:', slotStartTimestamp)
-      console.log('slot_end:', slotEndTimestamp)
-      console.log('Format slot_start ends with Z?', slotStartTimestamp.endsWith('Z'))
-      console.log('Format slot_end ends with Z?', slotEndTimestamp.endsWith('Z'))
-      console.log('Duration (ms):', durationCheck.durationMs, '← MUST BE', 90 * 60 * 1000)
-      console.log('Duration (minutes):', durationCheck.durationMinutes, '← MUST BE 90')
-      console.log('Is valid?', durationCheck.valid)
+      // ✅ LOG DE DEBUG OBLIGATOIRE
+      const diffMin = (end.getTime() - start.getTime()) / 60000
+      console.log('BOOKING_DEBUG', {
+        start: slot_start,
+        end: slot_end,
+        diffMin: diffMin,
+      })
       
-      // Conversion en Date objects pour calcul de différence
-      const startDate = new Date(slotStartTimestamp)
-      const endDate = new Date(slotEndTimestamp)
-      const diffMs = endDate.getTime() - startDate.getTime()
-      const diffMinutes = diffMs / (60 * 1000)
-      
-      console.log('[BOOKING DURATION CHECK] ===== VERIFICATION FINALE =====')
-      console.log('startDate.toISOString():', startDate.toISOString())
-      console.log('endDate.toISOString():', endDate.toISOString())
-      console.log('Diff (getTime):', diffMs, 'ms =', diffMinutes, 'minutes')
-      console.log('Expected:', 90 * 60 * 1000, 'ms = 90 minutes')
-      
-      // ✅ GUARD: Bloquer si durée !== 90 minutes EXACT (comparaison en ms)
-      if (diffMs !== 90 * 60 * 1000) {
-        console.error('[BOOKING DURATION ERROR] ❌ Duration is not EXACTLY 90 minutes')
-        console.error('  Expected (ms):', 90 * 60 * 1000)
-        console.error('  Actual (ms):', diffMs)
-        console.error('  Difference:', diffMs - (90 * 60 * 1000), 'ms')
-        alert(`Erreur critique: La durée du créneau doit être exactement 90 minutes.\nDurée calculée: ${diffMinutes} minutes (${diffMs} ms).\nAttendu: 90 minutes (${90 * 60 * 1000} ms).\n\nVeuillez contacter le support.`)
+      // ✅ GUARD: Vérifier que la durée est EXACTEMENT 90 minutes
+      if (diffMin !== 90) {
+        console.error('[BOOKING] ❌ CRITICAL: Duration is not 90 minutes:', diffMin)
+        alert(`Erreur critique: Durée calculée = ${diffMin} minutes (attendu: 90 minutes exactement).\n\nVeuillez contacter le support.`)
         setIsSubmitting(false)
         return
       }
       
-      console.log('[BOOKING DURATION CHECK] ✅ Duration is EXACTLY 90 minutes')
+      console.log('[BOOKING] ✅ Duration verified: EXACTLY 90 minutes')
       
       const bookingPayload = {
         club_id: club.id,                       // ✅ UUID réel depuis public.clubs
         court_id: courtId,                      // ✅ UUID réel depuis public.courts
         booking_date: bookingDate,              // ✅ DATE YYYY-MM-DD NOT NULL (snake_case)
         slot_id: selectedSlot.id,               // ✅ INTEGER NOT NULL (snake_case) référence time_slots.id
-        slot_start: slotStartTimestamp,         // timestamptz (snake_case) - calculé depuis date + start_time
-        slot_end: slotEndTimestamp,             // timestamptz (snake_case) - calculé = slot_start + 90 min
-        status: 'confirmed' as const,           // 'confirmed' | 'cancelled' (enum booking_status)
+        slot_start: slot_start,                 // ✅ ISO UTC - calculé strictement = date + start_time
+        slot_end: slot_end,                     // ✅ ISO UTC - calculé strictement = slot_start + 90 min EXACT
+        status: 'confirmed' as const,           // ✅ 'confirmed' (enum booking_status validé)
         created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (OBLIGATOIRE pour RLS)
         created_at: new Date().toISOString()    // timestamptz (snake_case)
       }
       
       // ✅ LOGGING COMPLET DU PAYLOAD AVANT INSERT
-      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== FULL PAYLOAD =====')
+      console.log('[BOOKING PAYLOAD] ===== FULL PAYLOAD =====')
       console.log(JSON.stringify(bookingPayload, null, 2))
-      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== CRITICAL FIELDS =====')
-      console.log('created_by:', bookingPayload.created_by, '(type:', typeof bookingPayload.created_by, ') ← REQUIRED FOR RLS')
-      console.log('booking_date:', bookingPayload.booking_date, '(type:', typeof bookingPayload.booking_date, ')')
-      console.log('slot_id:', bookingPayload.slot_id, '(type:', typeof bookingPayload.slot_id, ')')
-      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== TIMESTAMPS FORMAT =====')
-      console.log('slot_start:', bookingPayload.slot_start)
-      console.log('  - Has Z suffix?', bookingPayload.slot_start.endsWith('Z'))
-      console.log('  - Length:', bookingPayload.slot_start.length, '(expected: 24 for ISO with Z)')
-      console.log('slot_end:', bookingPayload.slot_end)
-      console.log('  - Has Z suffix?', bookingPayload.slot_end.endsWith('Z'))
-      console.log('  - Length:', bookingPayload.slot_end.length, '(expected: 24 for ISO with Z)')
-      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== DURATION VERIFICATION =====')
-      console.log('Duration (ms):', diffMs, '← MUST BE', 90 * 60 * 1000)
-      console.log('Duration (minutes):', diffMinutes, '← MUST BE 90')
-      console.log('Formats match?', bookingPayload.slot_start.endsWith('Z') && bookingPayload.slot_end.endsWith('Z'))
-      console.log('club_id:', bookingPayload.club_id, '(type:', typeof bookingPayload.club_id, ')')
-      console.log('court_id:', bookingPayload.court_id, '(type:', typeof bookingPayload.court_id, ')')
-      console.log('status:', bookingPayload.status, '(type:', typeof bookingPayload.status, ')')
+      console.log('[BOOKING PAYLOAD] ===== CRITICAL FIELDS =====')
+      console.log('club_id:', bookingPayload.club_id)
+      console.log('court_id:', bookingPayload.court_id)
+      console.log('booking_date:', bookingPayload.booking_date)
+      console.log('slot_id:', bookingPayload.slot_id)
+      console.log('slot_start:', bookingPayload.slot_start, '← ISO UTC')
+      console.log('slot_end:', bookingPayload.slot_end, '← ISO UTC')
+      console.log('status:', bookingPayload.status, '← enum: confirmed')
+      console.log('created_by:', bookingPayload.created_by, '← REQUIRED FOR RLS')
+      console.log('created_at:', bookingPayload.created_at)
       
       // ✅ VALIDATION FINALE : S'assurer qu'aucun champ critique n'est null/undefined
       if (!bookingPayload.booking_date) {
-        console.error('[RESERVE] ❌ CRITICAL: bookingPayload.booking_date is falsy:', bookingPayload.booking_date)
+        console.error('[BOOKING] ❌ CRITICAL: booking_date is falsy:', bookingPayload.booking_date)
         alert('Erreur critique: booking_date est vide')
         setIsSubmitting(false)
         return
       }
       
       if (!bookingPayload.slot_id && bookingPayload.slot_id !== 0) {
-        console.error('[RESERVE] ❌ CRITICAL: bookingPayload.slot_id is falsy:', bookingPayload.slot_id)
+        console.error('[BOOKING] ❌ CRITICAL: slot_id is falsy:', bookingPayload.slot_id)
         alert('Erreur critique: slot_id est vide')
         setIsSubmitting(false)
         return
       }
       
-      // ✅ VALIDATION FORMAT: S'assurer que slot_start et slot_end sont au format ISO UTC (avec Z)
-      if (!bookingPayload.slot_start.endsWith('Z')) {
-        console.error('[RESERVE] ❌ CRITICAL: slot_start does not end with Z:', bookingPayload.slot_start)
-        alert(`Erreur critique: slot_start n'est pas au format UTC.\nFormat actuel: ${bookingPayload.slot_start}\nFormat attendu: ISO avec suffixe Z`)
+      if (!bookingPayload.slot_start || !bookingPayload.slot_end) {
+        console.error('[BOOKING] ❌ CRITICAL: slot_start or slot_end is falsy')
+        alert('Erreur critique: Timestamps manquants')
         setIsSubmitting(false)
         return
       }
       
-      if (!bookingPayload.slot_end.endsWith('Z')) {
-        console.error('[RESERVE] ❌ CRITICAL: slot_end does not end with Z:', bookingPayload.slot_end)
-        alert(`Erreur critique: slot_end n'est pas au format UTC.\nFormat actuel: ${bookingPayload.slot_end}\nFormat attendu: ISO avec suffixe Z`)
+      // ✅ VALIDATION FORMAT ISO UTC
+      if (!bookingPayload.slot_start.endsWith('Z') || !bookingPayload.slot_end.endsWith('Z')) {
+        console.error('[BOOKING] ❌ CRITICAL: Timestamps not in UTC format')
+        console.error('  slot_start:', bookingPayload.slot_start, 'has Z?', bookingPayload.slot_start.endsWith('Z'))
+        console.error('  slot_end:', bookingPayload.slot_end, 'has Z?', bookingPayload.slot_end.endsWith('Z'))
+        alert('Erreur critique: Format timestamp invalide (doit être ISO UTC avec Z)')
         setIsSubmitting(false)
         return
       }
       
-      console.log('[RESERVE] ✅ All format validations passed')
+      console.log('[BOOKING] ✅ All validations passed')
       
       console.log('[BOOKING INSERT] Calling Supabase insert...')
       
@@ -723,8 +705,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `❌ Erreur de contrainte: La durée du créneau doit être exactement 90 minutes`,
             ``,
             `ANALYSE DU PROBLÈME:`,
-            `Durée calculée (frontend): ${diffMinutes} minutes (${diffMs} ms)`,
-            `Durée attendue: 90 minutes (${90 * 60 * 1000} ms)`,
+            `Durée calculée (frontend): ${diffMin} minutes`,
+            `Durée attendue: 90 minutes exactement`,
             ``,
             `FORMATS DES TIMESTAMPS:`,
             `slot_start: ${bookingPayload.slot_start}`,
