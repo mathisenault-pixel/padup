@@ -33,11 +33,56 @@ type TimeSlot = {
   label: string
 }
 
-type BookedSlot = {
-  slot_id: number
+type Reservation = {
+  id: string
   court_id: string
-  booking_date: string
-  status: string
+  slot_start: string // timestamp ISO
+  fin_de_slot: string // timestamp ISO
+  statut: string // 'confirmé' | 'annulé' | ...
+}
+
+// ============================================
+// HELPER FUNCTIONS pour comparaison par heure
+// ============================================
+
+/**
+ * Convertir un timestamp ISO en HH:MM:SS (timezone locale)
+ */
+function formatHHMMSS(timestamp: string): string {
+  const date = new Date(timestamp)
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${hours}:${minutes}:${seconds}`
+}
+
+/**
+ * Créer une clé unique pour un créneau basée sur start_time et end_time
+ * Ex: "14:00:00-15:30:00"
+ */
+function createSlotKey(startTime: string, endTime: string): string {
+  return `${startTime}-${endTime}`
+}
+
+/**
+ * Obtenir dayStart (00:00:00) et dayEnd (23:59:59.999) pour une date
+ */
+function getDateBounds(date: Date): { dayStart: Date; dayEnd: Date } {
+  const dayStart = new Date(date)
+  dayStart.setHours(0, 0, 0, 0)
+  
+  const dayEnd = new Date(date)
+  dayEnd.setHours(23, 59, 59, 999)
+  
+  return { dayStart, dayEnd }
+}
+
+/**
+ * Combiner une date (YYYY-MM-DD) et une heure (HH:MM:SS) en timestamp ISO
+ */
+function combineDateAndTime(dateStr: string, timeStr: string): string {
+  // dateStr: "2026-01-23", timeStr: "14:00:00"
+  return `${dateStr}T${timeStr}`
 }
 
 // Clubs en dur (même que dans la page clubs)
@@ -192,7 +237,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   
   // ✅ NOUVEAUX STATES POUR SUPABASE
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
-  const [bookedByCourt, setBookedByCourt] = useState<Record<string, Set<number>>>({}) // Map de court_id → Set<slot_id>
+  const [bookedByCourt, setBookedByCourt] = useState<Record<string, Set<string>>>({}) // Map de court_id → Set<slotKey> ex: "14:00:00-15:30:00"
   const [isLoadingSlots, setIsLoadingSlots] = useState(true)
   
   
@@ -234,51 +279,64 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }, [])
   
   // ============================================
-  // ÉTAPE 2 — Charger les bookings confirmés pour TOUS les courts du club
+  // ÉTAPE 2 — Charger les reservations confirmées pour TOUS les courts du club
   // ============================================
   useEffect(() => {
     if (!club) return
     
-    const loadBookings = async () => {
+    const loadReservations = async () => {
       // ✅ Construire la liste de tous les court_id pour ce club
       const courtIds = terrains
         .map(t => COURT_ID_MAP[club.id]?.[t.id])
         .filter(Boolean) as string[]
       
       if (courtIds.length === 0) {
-        console.warn('[BOOKINGS] No court_id mapping for club', club.id)
+        console.warn('[RESERVATIONS] No court_id mapping for club', club.id)
         return
       }
       
-      const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
+      // ✅ Calculer dayStart et dayEnd pour filtrer par jour
+      const { dayStart, dayEnd } = getDateBounds(selectedDate)
       
-      console.log('[BOOKINGS] Loading for all courts:', { courtIds, bookingDate })
+      console.log('[RESERVATIONS] Loading for all courts:', { 
+        courtIds, 
+        dayStart: dayStart.toISOString(), 
+        dayEnd: dayEnd.toISOString() 
+      })
       
       const { data, error } = await supabase
-        .from('bookings')
-        .select('court_id, slot_id, booking_date, status')
+        .from('reservations')
+        .select('id, court_id, slot_start, fin_de_slot, statut')
         .in('court_id', courtIds)
-        .eq('booking_date', bookingDate)
-        .eq('status', 'confirmed')
+        .gte('slot_start', dayStart.toISOString())
+        .lt('slot_start', dayEnd.toISOString())
+        .eq('statut', 'confirmé')
       
       if (error) {
-        console.error('[BOOKINGS] Error:', error)
+        console.error('[RESERVATIONS] Error:', error)
         return
       }
       
-      console.log('[BOOKINGS] Loaded:', data)
+      console.log('[RESERVATIONS] fetched count', data?.length)
       
-      // ✅ Construire bookedByCourt : court_id → Set<slot_id>
-      const map: Record<string, Set<number>> = {}
+      // ✅ Construire bookedByCourt : court_id → Set<slotKey>
+      // slotKey = "HH:MM:SS-HH:MM:SS"
+      const map: Record<string, Set<string>> = {}
       for (const row of data ?? []) {
-        const key = String(row.court_id)
-        if (!map[key]) map[key] = new Set()
-        map[key].add(row.slot_id)
+        const courtKey = String(row.court_id)
+        const startTime = formatHHMMSS(row.slot_start)
+        const endTime = formatHHMMSS(row.fin_de_slot)
+        const slotKey = createSlotKey(startTime, endTime)
+        
+        if (!map[courtKey]) map[courtKey] = new Set()
+        map[courtKey].add(slotKey)
       }
+      
+      console.log('[RESERVATIONS] bookedKeys size', Object.values(map).reduce((sum, set) => sum + set.size, 0))
       setBookedByCourt(map)
     }
     
-    loadBookings()
+    loadReservations()
   }, [selectedDate, club, terrains])
   
   // ============================================
@@ -287,113 +345,130 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     if (!club) return
     
-    const bookingDate = selectedDate.toISOString().split('T')[0]
+    // ✅ Calculer les bornes du jour pour filtrer les events
+    const { dayStart, dayEnd } = getDateBounds(selectedDate)
     
-    console.log('[REALTIME] Subscribing to bookings for club:', { clubId: club.id, bookingDate })
+    console.log('[REALTIME] Subscribing to reservations for club:', { 
+      clubId: club.id, 
+      dayStart: dayStart.toISOString(),
+      dayEnd: dayEnd.toISOString()
+    })
+    
+    // ✅ Construire la liste des court_id pour filtrer manuellement
+    const courtIds = terrains
+      .map(t => COURT_ID_MAP[club.id]?.[t.id])
+      .filter(Boolean) as string[]
     
     const channel = supabase
-      .channel(`bookings-${club.id}-${bookingDate}`)
+      .channel(`reservations-${club.id}-${selectedDate.toISOString().split('T')[0]}`)
       .on(
         'postgres_changes',
         {
           event: '*', // INSERT, UPDATE, DELETE
           schema: 'public',
-          table: 'bookings',
-          filter: `booking_date=eq.${bookingDate}`, // ✅ Filtre sur la date uniquement
+          table: 'reservations',
+          // ⚠️ Pas de filtre ici car Supabase ne supporte pas AND complexe
+          // On filtre manuellement dans le callback
         },
         (payload) => {
-          console.log('[REALTIME] Change detected:', payload)
+          console.log('[REALTIME reservations] payload', payload)
           
-          const payloadNew = payload.new as BookedSlot | null
-          const payloadOld = payload.old as BookedSlot | null
+          const payloadNew = payload.new as Reservation | null
+          const payloadOld = payload.old as Reservation | null
           
-          // Déterminer le court_id concerné
           const courtKey = String((payloadNew ?? payloadOld)?.court_id)
           
-          if (!courtKey) {
-            console.warn('[REALTIME] No court_id in payload')
+          if (!courtKey || !courtIds.includes(courtKey)) {
+            // Ignorer si pas un court de ce club
             return
           }
           
-          // ✅ INSERT: ajouter si status = 'confirmed'
-          if (payload.eventType === 'INSERT') {
-            if (payloadNew?.status === 'confirmed') {
+          // ✅ Vérifier que slot_start est dans le jour selectedDate
+          const slotStartNew = payloadNew?.slot_start ? new Date(payloadNew.slot_start) : null
+          const slotStartOld = payloadOld?.slot_start ? new Date(payloadOld.slot_start) : null
+          const slotStart = slotStartNew || slotStartOld
+          
+          if (!slotStart || slotStart < dayStart || slotStart >= dayEnd) {
+            // Ignorer si pas dans le jour sélectionné
+            return
+          }
+          
+          // ✅ INSERT: ajouter si statut = 'confirmé'
+          if (payload.eventType === 'INSERT' && payloadNew) {
+            if (payloadNew.statut === 'confirmé') {
+              const startTime = formatHHMMSS(payloadNew.slot_start)
+              const endTime = formatHHMMSS(payloadNew.fin_de_slot)
+              const slotKey = createSlotKey(startTime, endTime)
+              
               setBookedByCourt(prev => {
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
-                newMap[courtKey] = new Set([...newMap[courtKey], payloadNew.slot_id])
+                newMap[courtKey] = new Set([...newMap[courtKey], slotKey])
                 return newMap
               })
-              console.log('[REALTIME] ✅ Slot booked (INSERT):', { courtKey, slotId: payloadNew.slot_id })
+              console.log('[REALTIME] ✅ Slot booked (INSERT):', { courtKey, slotKey })
             }
           }
           
-          // ✅ UPDATE: gérer changement de status ou slot_id
-          else if (payload.eventType === 'UPDATE') {
-            if (!payloadOld || !payloadNew) return
+          // ✅ UPDATE: gérer changement de statut
+          else if (payload.eventType === 'UPDATE' && payloadNew && payloadOld) {
+            const oldKey = createSlotKey(formatHHMMSS(payloadOld.slot_start), formatHHMMSS(payloadOld.fin_de_slot))
+            const newKey = createSlotKey(formatHHMMSS(payloadNew.slot_start), formatHHMMSS(payloadNew.fin_de_slot))
             
-            // Cas 1: changement de status
-            if (payloadOld.status !== payloadNew.status) {
-              // old: cancelled → new: confirmed => ajouter
-              if (payloadNew.status === 'confirmed') {
+            // Cas 1: changement de statut
+            if (payloadOld.statut !== payloadNew.statut) {
+              if (payloadNew.statut === 'confirmé') {
+                // Passe à confirmé => ajouter
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (!newMap[courtKey]) newMap[courtKey] = new Set()
-                  newMap[courtKey] = new Set([...newMap[courtKey], payloadNew.slot_id])
+                  newMap[courtKey] = new Set([...newMap[courtKey], newKey])
                   return newMap
                 })
-                console.log('[REALTIME] ✅ Slot booked (UPDATE confirmed):', { courtKey, slotId: payloadNew.slot_id })
-              }
-              // old: confirmed → new: cancelled => retirer
-              else if (payloadNew.status === 'cancelled' && payloadOld.status === 'confirmed') {
+                console.log('[REALTIME] ✅ Slot booked (UPDATE confirmé):', { courtKey, slotKey: newKey })
+              } else if (payloadOld.statut === 'confirmé') {
+                // Était confirmé, plus maintenant => retirer
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (newMap[courtKey]) {
                     const newSet = new Set(newMap[courtKey])
-                    newSet.delete(payloadOld.slot_id)
+                    newSet.delete(oldKey)
                     newMap[courtKey] = newSet
                   }
                   return newMap
                 })
-                console.log('[REALTIME] ✅ Slot freed (UPDATE cancelled):', { courtKey, slotId: payloadOld.slot_id })
+                console.log('[REALTIME] ✅ Slot freed (UPDATE annulé):', { courtKey, slotKey: oldKey })
               }
             }
-            
-            // Cas 2: changement de slot_id (rare)
-            else if (payloadOld.slot_id !== payloadNew.slot_id) {
+            // Cas 2: changement de créneau (rare)
+            else if (oldKey !== newKey && payloadNew.statut === 'confirmé') {
               setBookedByCourt(prev => {
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
                 const newSet = new Set(newMap[courtKey])
-                // Retirer l'ancien slot si c'était confirmed
-                if (payloadOld.status === 'confirmed') {
-                  newSet.delete(payloadOld.slot_id)
-                }
-                // Ajouter le nouveau slot si c'est confirmed
-                if (payloadNew.status === 'confirmed') {
-                  newSet.add(payloadNew.slot_id)
-                }
+                newSet.delete(oldKey)
+                newSet.add(newKey)
                 newMap[courtKey] = newSet
                 return newMap
               })
-              console.log('[REALTIME] ✅ Slot changed:', { courtKey, old: payloadOld.slot_id, new: payloadNew.slot_id })
+              console.log('[REALTIME] ✅ Slot changed:', { courtKey, oldKey, newKey })
             }
           }
           
-          // ✅ DELETE: retirer le slot
-          else if (payload.eventType === 'DELETE') {
-            if (payloadOld?.slot_id) {
-              setBookedByCourt(prev => {
-                const newMap = { ...prev }
-                if (newMap[courtKey]) {
-                  const newSet = new Set(newMap[courtKey])
-                  newSet.delete(payloadOld.slot_id)
-                  newMap[courtKey] = newSet
-                }
-                return newMap
-              })
-              console.log('[REALTIME] ✅ Slot freed (DELETE):', { courtKey, slotId: payloadOld.slot_id })
-            }
+          // ✅ DELETE: retirer le créneau
+          else if (payload.eventType === 'DELETE' && payloadOld) {
+            const oldKey = createSlotKey(formatHHMMSS(payloadOld.slot_start), formatHHMMSS(payloadOld.fin_de_slot))
+            
+            setBookedByCourt(prev => {
+              const newMap = { ...prev }
+              if (newMap[courtKey]) {
+                const newSet = new Set(newMap[courtKey])
+                newSet.delete(oldKey)
+                newMap[courtKey] = newSet
+              }
+              return newMap
+            })
+            console.log('[REALTIME] ✅ Slot freed (DELETE):', { courtKey, slotKey: oldKey })
           }
         }
       )
@@ -403,11 +478,12 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('[REALTIME] Unsubscribing')
       supabase.removeChannel(channel)
     }
-  }, [selectedDate, club])
+  }, [selectedDate, club, terrains])
   
-  // Vérifier si un créneau est disponible (O(1))
-  const isSlotAvailable = useCallback((courtId: string, slotId: number): boolean => {
-    return !(bookedByCourt[courtId]?.has(slotId))
+  // Vérifier si un créneau est disponible (O(1)) - Compare par heure
+  const isSlotAvailable = useCallback((courtId: string, slot: TimeSlot): boolean => {
+    const slotKey = createSlotKey(slot.start_time, slot.end_time)
+    return !(bookedByCourt[courtId]?.has(slotKey))
   }, [bookedByCourt])
   
   // ✅ Fonction pour envoyer les invitations automatiquement
@@ -482,49 +558,53 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
-      // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
-      const bookingPayload = {
-        club_id: club.id,                    // club_id (string)
-        court_id: courtId,                   // court_id (UUID)
-        booking_date: bookingDate,           // booking_date (DATE)
-        slot_id: selectedSlot.id,            // slot_id (INTEGER)
-        status: 'confirmed' as const,        // status ('confirmed' | 'cancelled')
-        created_by: 'player-demo-user',      // TODO: remplacer par auth.uid() quand auth sera en place
+      // ✅ INSERTION DANS public.reservations (SOURCE DE VÉRITÉ)
+      // Combiner date + heure pour créer les timestamps
+      const slotStartTimestamp = combineDateAndTime(bookingDate, selectedSlot.start_time)
+      const finDeSlotTimestamp = combineDateAndTime(bookingDate, selectedSlot.end_time)
+      
+      const reservationPayload = {
+        club_id: club.id,                       // club_id (string)
+        court_id: courtId,                      // court_id (UUID)
+        slot_start: slotStartTimestamp,         // slot_start (timestamptz) ex: "2026-01-23T14:00:00"
+        fin_de_slot: finDeSlotTimestamp,        // fin_de_slot (timestamptz) ex: "2026-01-23T15:30:00"
+        statut: 'confirmé' as const,            // statut ('confirmé' | 'annulé' | ...)
+        cree_par: null,                         // TODO: remplacer par auth.uid() quand auth sera en place (nullable pour l'instant)
         created_at: new Date().toISOString()
       }
       
       // ✅ LOGGING COMPLET DU PAYLOAD
-      console.log('[BOOKING INSERT PAYLOAD]', JSON.stringify(bookingPayload, null, 2))
-      console.log('[BOOKING INSERT PAYLOAD - Types]', {
-        club_id: typeof bookingPayload.club_id,
-        court_id: typeof bookingPayload.court_id,
-        booking_date: typeof bookingPayload.booking_date,
-        slot_id: typeof bookingPayload.slot_id,
-        status: typeof bookingPayload.status
+      console.log('[RESERVATION INSERT PAYLOAD]', JSON.stringify(reservationPayload, null, 2))
+      console.log('[RESERVATION INSERT PAYLOAD - Types]', {
+        club_id: typeof reservationPayload.club_id,
+        court_id: typeof reservationPayload.court_id,
+        slot_start: typeof reservationPayload.slot_start,
+        fin_de_slot: typeof reservationPayload.fin_de_slot,
+        statut: typeof reservationPayload.statut
       })
       
-      const { data: bookingData, error: bookingError } = await supabase
-        .from('bookings')
-        .insert([bookingPayload])
+      const { data: reservationData, error: reservationError } = await supabase
+        .from('reservations')
+        .insert([reservationPayload])
         .select()
         .single()
       
-      if (bookingError) {
+      if (reservationError) {
         // ✅ LOGGING COMPLET DE L'ERREUR
-        console.error('[BOOKING INSERT ERROR]', bookingError)
-        console.error('[BOOKING INSERT ERROR - Full details]', {
-          message: bookingError.message,
-          details: bookingError.details,
-          hint: bookingError.hint,
-          code: bookingError.code
+        console.error('[RESERVATION INSERT ERROR]', reservationError)
+        console.error('[RESERVATION INSERT ERROR - Full details]', {
+          message: reservationError.message,
+          details: reservationError.details,
+          hint: reservationError.hint,
+          code: reservationError.code
         })
         
         // ✅ AFFICHAGE DÉTAILLÉ DE L'ERREUR
         const errorMessage = [
-          `Erreur réservation: ${bookingError.message}`,
-          bookingError.details ? `Détails: ${bookingError.details}` : '',
-          bookingError.hint ? `Conseil: ${bookingError.hint}` : '',
-          bookingError.code ? `Code: ${bookingError.code}` : ''
+          `Erreur réservation: ${reservationError.message}`,
+          reservationError.details ? `Détails: ${reservationError.details}` : '',
+          reservationError.hint ? `Conseil: ${reservationError.hint}` : '',
+          reservationError.code ? `Code: ${reservationError.code}` : ''
         ].filter(Boolean).join('\n')
         
         alert(errorMessage)
@@ -533,11 +613,11 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       }
       
       // ✅ LOGGING SUCCÈS AVEC DONNÉES COMPLÈTES
-      console.log('[BOOKING INSERT] ✅ Success:', bookingData)
-      console.log('[BOOKING INSERT] ✅ Success - ID:', bookingData.id)
+      console.log('[RESERVATION INSERT] ✅ Success:', reservationData)
+      console.log('[RESERVATION INSERT] ✅ Success - ID:', reservationData.id)
       
       // ✅ Sauvegarder aussi dans localStorage pour affichage "Mes réservations"
-      const reservationId = bookingData.id
+      const reservationId = reservationData.id
       const newReservation = {
         id: reservationId,
         date: bookingDate,
@@ -605,7 +685,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
-    if (isSlotAvailable(String(courtId), slot.id)) {
+    if (isSlotAvailable(String(courtId), slot)) {
       console.log('[SLOT CLICK] Opening player modal')
       setSelectedTerrain(terrainId)
       setSelectedSlot(slot)
@@ -831,7 +911,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 
                 // Calculer le nombre de créneaux disponibles pour ce terrain
                 const availableCount = courtKey 
-                  ? timeSlots.filter(slot => isSlotAvailable(courtKey, slot.id)).length
+                  ? timeSlots.filter(slot => isSlotAvailable(courtKey, slot)).length
                   : timeSlots.length // Si pas de court_id, tous sont disponibles (fallback)
                 const totalCount = timeSlots.length
                 const availabilityPercent = Math.round((availableCount / totalCount) * 100)
@@ -864,8 +944,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                     <div className="p-5">
                       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                         {timeSlots.map((slot) => {
-                          // ✅ Vérifier disponibilité par court_id
-                          const available = courtKey ? isSlotAvailable(courtKey, slot.id) : true
+                          // ✅ Vérifier disponibilité par clé temporelle
+                          const available = courtKey ? isSlotAvailable(courtKey, slot) : true
                           
                           return (
                             <button
