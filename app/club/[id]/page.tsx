@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import { supabase } from '@/lib/supabaseClient' // ✅ Client serveur, pas browser
 
 type Club = {
   id: string
@@ -12,13 +12,18 @@ type Club = {
 }
 
 export default async function ClubDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  // ✅ LOG SERVEUR AU TOUT DÉBUT
+  console.log('[SERVER] /club/[id]/page.tsx - ROUTE HIT, params:', params)
+  
   // ============================================
   // SÉCURISATION: Vérifier que params.id existe
   // ============================================
   const resolvedParams = await params
+  console.log('[SERVER] /club/[id]/page.tsx - resolvedParams:', resolvedParams)
+  
   const clubId = resolvedParams?.id
   
-  console.log('[CLUB DETAIL] clubId:', clubId)
+  console.log('[SERVER] /club/[id]/page.tsx - clubId:', clubId, 'type:', typeof clubId)
   
   // ✅ Si pas d'ID, afficher 404
   if (!clubId) {
