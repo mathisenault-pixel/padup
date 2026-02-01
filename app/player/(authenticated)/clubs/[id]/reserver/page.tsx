@@ -286,6 +286,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     )
   }
   
+  // ✅ GUARD STRICT: Vérifier que club existe ET a toutes les propriétés nécessaires
   if (!club) {
     console.error('[CLUB] ❌ CRITICAL: No club found!')
     console.error('[CLUB] clubId:', clubId)
@@ -297,6 +298,26 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             <h2 className="text-xl font-bold text-red-900 mb-2">Club introuvable</h2>
             <p className="text-red-700 mb-4">Le club demandé n'existe pas ou n'est plus disponible.</p>
             <p className="text-sm text-red-600 mb-6 font-mono">ID: {clubId}</p>
+            <Link href="/player/clubs" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
+              ← Retour aux clubs
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
+  // ✅ GUARD STRICT: Vérifier que club.id existe (propriété critique)
+  if (!club.id) {
+    console.error('[CLUB] ❌ CRITICAL: Club has no id!')
+    console.error('[CLUB] club object:', club)
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="max-w-md mx-auto p-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-xl font-bold text-red-900 mb-2">Données invalides</h2>
+            <p className="text-red-700 mb-4">Les données du club sont incomplètes.</p>
             <Link href="/player/clubs" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
               ← Retour aux clubs
             </Link>
@@ -416,8 +437,13 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ÉTAPE 2 — Charger les bookings confirmés pour TOUS les courts du club
   // ============================================
   useEffect(() => {
+    // ✅ GUARD: Vérifier que club est complètement prêt
     if (!club) {
       console.warn('🔍 [DEBUG BOOKINGS] No club, skipping')
+      return
+    }
+    if (!club.id) {
+      console.warn('🔍 [DEBUG BOOKINGS] No club.id, skipping')
       return
     }
     
@@ -493,7 +519,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ÉTAPE 3 — SYNCHRONISATION TEMPS RÉEL (tous les courts du club)
   // ============================================
   useEffect(() => {
-    if (!club) return
+    // ✅ GUARD: Vérifier que club est complètement prêt
+    if (!club) {
+      console.warn('[REALTIME] No club, skipping')
+      return
+    }
+    if (!club.id) {
+      console.warn('[REALTIME] No club.id, skipping')
+      return
+    }
     
     const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
     
@@ -628,6 +662,12 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   
   // ✅ Fonction pour envoyer les invitations automatiquement
   const sendInvitations = useCallback(async (reservationId: string) => {
+    // ✅ GUARD: Vérifier que club est prêt
+    if (!club || !club.id || !club.name) {
+      console.error('[INVITE] ❌ Club not ready:', { club })
+      return
+    }
+    
     // Vérifier s'il y a des emails à envoyer
     if (invitedEmails.length === 0) {
       console.log('[INVITE] No emails to send')
@@ -681,6 +721,12 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     }
     
     // ✅ GUARDS CRITIQUES : Vérifier TOUS les champs obligatoires
+    if (!club || !club.id) {
+      console.error('[RESERVE] ❌ CRITICAL: club or club.id is null/undefined', { club })
+      alert('Erreur critique: Données du club manquantes')
+      return
+    }
+    
     if (!selectedDate) {
       console.error('[RESERVE] ❌ CRITICAL: selectedDate is null/undefined')
       alert('Erreur critique: Date non sélectionnée')
