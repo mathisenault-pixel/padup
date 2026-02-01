@@ -108,6 +108,36 @@ BEGIN
   END IF;
 END $$;
 
+-- Rendre les colonnes NOT NULL (propre pour production)
+DO $$
+BEGIN
+  -- booking_date NOT NULL
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'bookings'
+      AND column_name = 'booking_date'
+      AND is_nullable = 'YES'
+  ) THEN
+    ALTER TABLE public.bookings
+      ALTER COLUMN booking_date SET NOT NULL;
+    RAISE NOTICE '✅ Colonne booking_date définie comme NOT NULL';
+  END IF;
+
+  -- slot_id NOT NULL
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'bookings'
+      AND column_name = 'slot_id'
+      AND is_nullable = 'YES'
+  ) THEN
+    ALTER TABLE public.bookings
+      ALTER COLUMN slot_id SET NOT NULL;
+    RAISE NOTICE '✅ Colonne slot_id définie comme NOT NULL';
+  END IF;
+END $$;
+
 
 -- =====================================================
 -- 4. CONTRAINTE UNIQUE anti double-booking
@@ -137,25 +167,31 @@ BEGIN
   END IF;
 END $$;
 
--- Créer la NOUVELLE contrainte unique (modèle A)
+-- 1) Supprimer la contrainte si elle existe (pour passer à un index partiel)
 DO $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint 
-    WHERE conname = 'unique_court_booking_slot' 
+  IF EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'unique_court_booking_slot'
       AND conrelid = 'public.bookings'::regclass
   ) THEN
-    ALTER TABLE public.bookings 
-      ADD CONSTRAINT unique_court_booking_slot 
-      UNIQUE (court_id, booking_date, slot_id);
-    RAISE NOTICE '✅ Contrainte UNIQUE (court_id, booking_date, slot_id) créée';
-  ELSE
-    RAISE NOTICE 'ℹ️ Contrainte unique_court_booking_slot existe déjà';
+    ALTER TABLE public.bookings DROP CONSTRAINT unique_court_booking_slot;
+    RAISE NOTICE '✅ Contrainte unique_court_booking_slot supprimée (passage à index partiel)';
   END IF;
 END $$;
 
-COMMENT ON CONSTRAINT unique_court_booking_slot ON public.bookings IS
-  'Anti double-booking: un terrain ne peut être réservé qu''une fois par (date, créneau)';
+-- 2) Créer un index UNIQUE partiel : bloque seulement pending/confirmed
+-- ✅ AVANTAGE: Les réservations cancelled ne bloquent plus le slot
+DROP INDEX IF EXISTS public.unique_court_booking_slot_active;
+
+CREATE UNIQUE INDEX unique_court_booking_slot_active
+ON public.bookings (court_id, booking_date, slot_id)
+WHERE status IN ('confirmed', 'pending');
+
+COMMENT ON INDEX public.unique_court_booking_slot_active IS
+  'Anti double-booking: bloque uniquement confirmed/pending (cancelled libère le slot)';
+
+RAISE NOTICE '✅ Index UNIQUE partiel créé (status IN confirmed/pending)';
 
 
 -- =====================================================
@@ -199,9 +235,15 @@ DECLARE
   v_slot_end TIMESTAMPTZ;
   v_slot_record RECORD;
   v_result JSON;
+  v_today_fr DATE;
+  v_now_fr TIMESTAMPTZ;
 BEGIN
-  -- Validation 1: booking_date doit être dans le futur ou aujourd'hui
-  IF p_booking_date < CURRENT_DATE THEN
+  -- ✅ MVP France: base temporelle en Europe/Paris
+  v_now_fr := now() AT TIME ZONE 'Europe/Paris';
+  v_today_fr := (v_now_fr)::date;
+
+  -- Validation 1: booking_date doit être dans le futur ou aujourd'hui (timezone France)
+  IF p_booking_date < v_today_fr THEN
     RAISE EXCEPTION 'booking_date doit être aujourd''hui ou dans le futur'
       USING HINT = 'Impossible de réserver dans le passé';
   END IF;
@@ -230,19 +272,23 @@ BEGIN
     RAISE EXCEPTION 'Terrain introuvable, inactif ou ne fait pas partie du club';
   END IF;
 
-  -- Calcul de slot_start et slot_end (timestamptz)
-  -- Combine booking_date (DATE) + start_time/end_time (TIME)
-  v_slot_start := p_booking_date::TIMESTAMP + v_slot_record.start_time;
-  v_slot_end := p_booking_date::TIMESTAMP + v_slot_record.end_time;
+  -- ✅ Calcul de slot_start et slot_end en timezone Europe/Paris
+  -- Combine booking_date + time dans le fuseau France, puis convertit en timestamptz
+  v_slot_start := (p_booking_date::text || ' ' || v_slot_record.start_time::text)::timestamp
+                 AT TIME ZONE 'Europe/Paris';
+  
+  v_slot_end := (p_booking_date::text || ' ' || v_slot_record.end_time::text)::timestamp
+               AT TIME ZONE 'Europe/Paris';
 
-  -- Validation 5: le créneau doit être dans le futur
-  IF v_slot_start <= now() THEN
+  -- Validation 5: le créneau doit être dans le futur (timezone France)
+  IF v_slot_start <= v_now_fr THEN
     RAISE EXCEPTION 'Impossible de réserver un créneau passé'
       USING HINT = format('Le créneau %s est déjà passé', v_slot_start);
   END IF;
 
   -- INSERT dans bookings
-  -- La contrainte UNIQUE (court_id, booking_date, slot_id) protège contre le double-booking
+  -- ✅ L'index UNIQUE partiel (court_id, booking_date, slot_id WHERE status IN ('confirmed','pending'))
+  --    protège contre le double-booking (les cancelled ne bloquent plus)
   INSERT INTO public.bookings (
     club_id,
     court_id,
@@ -308,7 +354,7 @@ $$;
 
 -- Commentaire
 COMMENT ON FUNCTION public.create_booking_fixed_slot IS
-  'Crée une réservation avec créneau fixe. Protection anti double-booking via UNIQUE (court_id, booking_date, slot_id)';
+  'Crée une réservation avec créneau fixe (timezone Europe/Paris). Protection anti double-booking via index UNIQUE partiel sur status IN (confirmed, pending)';
 
 -- Grant permissions
 GRANT EXECUTE ON FUNCTION public.create_booking_fixed_slot TO authenticated;

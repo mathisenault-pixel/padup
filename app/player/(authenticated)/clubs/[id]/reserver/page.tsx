@@ -96,13 +96,15 @@ const clubs: Club[] = [
   },
 ]
 
-// Générer les créneaux de 8h à 23h30 par pas de 1h30
+// Générer les créneaux de 8h à 23h par pas de 1h30
+// Dernier créneau: 21:30-23:00
 const generateTimeSlots = () => {
   const slots = []
   let currentHour = 8
   let currentMinute = 0
   
-  while (currentHour < 23 || (currentHour === 23 && currentMinute === 0)) {
+  // ✅ Arrêter à 21:30 (dernier créneau finit à 23:00)
+  while (currentHour < 21 || (currentHour === 21 && currentMinute === 0)) {
     const startTime = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`
     
     // Calculer l'heure de fin (+ 1h30)
@@ -126,6 +128,9 @@ const generateTimeSlots = () => {
     }
     currentHour += 1
   }
+  
+  // ✅ Ajouter explicitement le dernier créneau 21:30-23:00
+  slots.push({ startTime: '21:30', endTime: '23:00' })
   
   return slots
 }
