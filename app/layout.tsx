@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   },
   description: "Réservez facilement vos terrains de padel. Trouvez les meilleurs clubs autour de vous et gérez vos réservations en ligne.",
   keywords: ["padel", "réservation", "terrain", "club", "sport"],
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
