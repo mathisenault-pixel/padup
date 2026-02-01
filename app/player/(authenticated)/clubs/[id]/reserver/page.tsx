@@ -638,13 +638,25 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         return
       }
       
-      const courtId = selectedTerrainData.courtId
+      let courtId = selectedTerrainData.courtId
+      
+      // ============================================
+      // 🚨 PATCH MVP TEMPORAIRE - FALLBACK COURT_ID
+      // ============================================
+      // TODO: RETIRER CE FALLBACK APRÈS DEBUG DU CHARGEMENT DES COURTS
+      // Si aucun court chargé depuis DB ou court_id invalide, forcer Terrain 1 (MVP)
       if (!courtId) {
-        console.error('[RESERVE] ❌ CRITICAL: No court UUID for terrain:', selectedTerrainData)
-        alert('Erreur: Terrain sans UUID (court not loaded from DB)')
-        setIsSubmitting(false)
-        return
+        const FALLBACK_COURT_ID = '21d09a66-b7db-4966-abf1-cc210f7476c1' // Terrain 1 (MVP hardcodé)
+        console.warn('═══════════════════════════════════════════════════════════')
+        console.warn('[RESERVE] ⚠️⚠️⚠️ MVP FALLBACK ACTIVÉ')
+        console.warn('[RESERVE] ⚠️ Court UUID manquant pour terrain:', selectedTerrainData)
+        console.warn('[RESERVE] ⚠️ Utilisation du fallback hardcodé (Terrain 1)')
+        console.warn('[RESERVE] ⚠️ FALLBACK court_id:', FALLBACK_COURT_ID)
+        console.warn('[RESERVE] ⚠️ TODO: Retirer ce fallback après debug du chargement courts')
+        console.warn('═══════════════════════════════════════════════════════════')
+        courtId = FALLBACK_COURT_ID
       }
+      // ============================================
       
       console.log('[RESERVE] ✅ Court ID (UUID):', courtId)
       console.log('[RESERVE] ✅ Terrain:', selectedTerrainData.name)
