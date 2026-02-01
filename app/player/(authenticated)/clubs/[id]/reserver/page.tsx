@@ -191,11 +191,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         .in('status', ['confirmed', 'pending'])
       
       if (error) {
-        console.error('[BOOKINGS] Error:', {
+        console.error('[BOOKINGS] Error object:', error)
+        console.error('[BOOKINGS] Error JSON:', JSON.stringify(error, null, 2))
+        console.error('[BOOKINGS] Error details:', {
           table: 'bookings',
+          query: 'SELECT with in() filters',
           message: error.message,
           code: error.code,
-          details: error.details
+          details: error.details,
+          hint: error.hint
         })
         return
       }
@@ -429,6 +433,27 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     setIsSubmitting(true)
     
     try {
+      // ✅ RÉCUPÉRER L'UTILISATEUR CONNECTÉ (OBLIGATOIRE POUR RLS)
+      console.log('[RESERVE] Getting authenticated user...')
+      const { data: { user }, error: userErr } = await supabase.auth.getUser()
+      
+      if (userErr) {
+        console.error('[RESERVE] ❌ CRITICAL: Error fetching user:', userErr)
+        console.error('[RESERVE] ❌ User error details:', JSON.stringify(userErr, null, 2))
+        alert('Erreur lors de la récupération de l\'utilisateur. Veuillez vous reconnecter.')
+        setIsSubmitting(false)
+        return
+      }
+      
+      if (!user) {
+        console.error('[RESERVE] ❌ CRITICAL: No user logged in')
+        alert('Vous devez être connecté pour réserver. Veuillez vous connecter.')
+        setIsSubmitting(false)
+        return
+      }
+      
+      console.log('[RESERVE] ✅ User authenticated:', user.id)
+      
       // ✅ Récupérer le court_id (UUID réel)
       const courtId = COURT_UUIDS[selectedTerrain]
       if (!courtId) {
@@ -452,7 +477,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         slot_start: slotStartTimestamp,         // timestamptz (snake_case)
         slot_end: slotEndTimestamp,             // timestamptz (snake_case)
         status: 'confirmed' as const,           // 'confirmed' | 'pending' | 'cancelled'
-        created_by: null,                       // TODO: remplacer par auth.uid()
+        created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (OBLIGATOIRE pour RLS)
         created_at: new Date().toISOString()    // timestamptz (snake_case)
       }
       
@@ -460,6 +485,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== FULL PAYLOAD =====')
       console.log(JSON.stringify(bookingPayload, null, 2))
       console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== CRITICAL FIELDS =====')
+      console.log('created_by:', bookingPayload.created_by, '(type:', typeof bookingPayload.created_by, ') ← REQUIRED FOR RLS')
       console.log('booking_date:', bookingPayload.booking_date, '(type:', typeof bookingPayload.booking_date, ')')
       console.log('slot_id:', bookingPayload.slot_id, '(type:', typeof bookingPayload.slot_id, ')')
       console.log('club_id:', bookingPayload.club_id, '(type:', typeof bookingPayload.club_id, ')')
@@ -492,7 +518,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       if (bookingError) {
         // ✅ LOGGING COMPLET DE L'ERREUR
         console.error('[BOOKING INSERT ERROR] ❌❌❌')
-        console.error('[BOOKING INSERT ERROR]', bookingError)
+        console.error('[BOOKING INSERT ERROR] Object:', bookingError)
+        console.error('[BOOKING INSERT ERROR] JSON:', JSON.stringify(bookingError, null, 2))
         console.error('[BOOKING INSERT ERROR - Full details]', {
           table: 'bookings',
           message: bookingError.message,
