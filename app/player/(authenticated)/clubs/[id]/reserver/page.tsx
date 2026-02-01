@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import PlayerSelectionModal from './PlayerSelectionModal'
 import PremiumModal from './PremiumModal'
-import { supabase } from '@/lib/supabaseClient'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
 type Club = {
   id: string
@@ -452,24 +452,40 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     try {
       // ✅ RÉCUPÉRER L'UTILISATEUR CONNECTÉ (OBLIGATOIRE POUR RLS)
       console.log('[RESERVE] Getting authenticated user...')
-      const { data: { user }, error: userErr } = await supabase.auth.getUser()
+      
+      // ✅ LOG DÉTAILLÉ: getUser() + getSession()
+      const getUserResult = await supabase.auth.getUser()
+      console.log('[AUTH getUser] Full response:', getUserResult)
+      console.log('[AUTH getUser] User:', getUserResult.data?.user)
+      console.log('[AUTH getUser] Error:', getUserResult.error)
+      
+      const getSessionResult = await supabase.auth.getSession()
+      console.log('[AUTH getSession] Full response:', getSessionResult)
+      console.log('[AUTH getSession] Session:', getSessionResult.data?.session)
+      console.log('[AUTH getSession] Error:', getSessionResult.error)
+      
+      const { data: { user }, error: userErr } = getUserResult
       
       if (userErr) {
         console.error('[RESERVE] ❌ CRITICAL: Error fetching user:', userErr)
         console.error('[RESERVE] ❌ User error details:', JSON.stringify(userErr, null, 2))
-        alert('Erreur lors de la récupération de l\'utilisateur. Veuillez vous reconnecter.')
+        alert('Erreur lors de la récupération de l\'utilisateur. Redirection vers login...')
         setIsSubmitting(false)
+        router.push('/player/login')
         return
       }
       
       if (!user) {
-        console.error('[RESERVE] ❌ CRITICAL: No user logged in')
-        alert('Vous devez être connecté pour réserver. Veuillez vous connecter.')
+        console.error('[RESERVE] ❌ CRITICAL: No user logged in (user is null)')
+        console.error('[RESERVE] ❌ Not authenticated - redirecting to login')
+        alert('Vous devez être connecté pour réserver. Redirection vers login...')
         setIsSubmitting(false)
+        router.push('/player/login')
         return
       }
       
       console.log('[RESERVE] ✅ User authenticated:', user.id)
+      console.log('[RESERVE] ✅ User email:', user.email)
       
       // ✅ Récupérer le court_id (UUID réel)
       const courtId = COURT_UUIDS[selectedTerrain]
