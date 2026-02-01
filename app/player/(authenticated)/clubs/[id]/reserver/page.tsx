@@ -48,34 +48,41 @@ type Booking = {
 // ============================================
 
 /**
- * Combiner une date (YYYY-MM-DD) et une heure (HH:MM:SS) en timestamp ISO
- * Ex: combineDateAndTime("2026-01-23", "14:00:00") => "2026-01-23T14:00:00"
+ * Combiner une date (YYYY-MM-DD) et une heure (HH:MM:SS) en timestamp ISO UTC
+ * ✅ IMPORTANT: Retourne toujours format ISO avec timezone Z pour cohérence avec Supabase
+ * Ex: combineDateAndTime("2026-01-23", "14:00:00") => "2026-01-23T14:00:00.000Z"
  */
 function combineDateAndTime(dateStr: string, timeStr: string): string {
-  return `${dateStr}T${timeStr}`
+  // Créer un Date object en UTC pour éviter les conversions de timezone
+  const isoString = `${dateStr}T${timeStr}Z` // Ajouter Z pour forcer UTC
+  const date = new Date(isoString)
+  return date.toISOString() // Retourne format cohérent avec Z
 }
 
 /**
  * Calculer slot_end en ajoutant EXACTEMENT 90 minutes à slot_start
- * Garantit la contrainte DB: slot_end - slot_start = 90 minutes
+ * ✅ Garantit la contrainte DB: slot_end - slot_start = 90 minutes EXACT
+ * ✅ Utilise getTime() pour calcul en millisecondes (pas d'arrondi)
  */
 function calculateSlotEnd(slotStartISO: string): string {
   const startDate = new Date(slotStartISO)
-  const endDate = new Date(startDate.getTime() + 90 * 60 * 1000) // +90 minutes
-  return endDate.toISOString()
+  const endDate = new Date(startDate.getTime() + 90 * 60 * 1000) // +90 minutes EXACT
+  return endDate.toISOString() // Format UTC avec Z
 }
 
 /**
  * Valider que la durée entre deux timestamps est exactement 90 minutes
+ * ✅ Compare en millisecondes pour précision maximale (pas d'arrondi)
  */
-function validateSlotDuration(slotStart: string, slotEnd: string): { valid: boolean; durationMinutes: number } {
+function validateSlotDuration(slotStart: string, slotEnd: string): { valid: boolean; durationMs: number; durationMinutes: number } {
   const start = new Date(slotStart)
   const end = new Date(slotEnd)
   const durationMs = end.getTime() - start.getTime()
-  const durationMinutes = Math.round(durationMs / (60 * 1000))
+  const expectedMs = 90 * 60 * 1000 // 5400000 ms
   return {
-    valid: durationMinutes === 90,
-    durationMinutes
+    valid: durationMs === expectedMs, // ✅ Comparaison stricte en millisecondes
+    durationMs,
+    durationMinutes: durationMs / (60 * 1000) // Pour affichage
   }
 }
 
@@ -571,28 +578,51 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
       // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
-      // Calculer slot_start depuis la date et l'heure du créneau
+      // ⚠️ CRITIQUE: slot_start et slot_end doivent être dans le MÊME FORMAT (ISO UTC avec Z)
+      
+      // Étape 1: Créer slot_start depuis date + heure (format ISO UTC)
       const slotStartTimestamp = combineDateAndTime(bookingDate, selectedSlot.start_time)
       
-      // ✅ CALCULER slot_end en ajoutant EXACTEMENT 90 minutes à slot_start
-      // (au lieu d'utiliser selectedSlot.end_time qui pourrait ne pas être précis)
+      // Étape 2: Calculer slot_end = slot_start + 90 minutes EXACT (format ISO UTC)
       const slotEndTimestamp = calculateSlotEnd(slotStartTimestamp)
       
-      // ✅ VALIDATION: Vérifier que la durée est bien 90 minutes
+      // Étape 3: Valider la durée en millisecondes (pas d'arrondi)
       const durationCheck = validateSlotDuration(slotStartTimestamp, slotEndTimestamp)
-      console.log('[BOOKING DURATION CHECK]', {
-        slot_start: slotStartTimestamp,
-        slot_end: slotEndTimestamp,
-        duration_minutes: durationCheck.durationMinutes,
-        is_valid: durationCheck.valid
-      })
       
-      if (!durationCheck.valid) {
-        console.error('[BOOKING DURATION ERROR] ❌ Duration is not 90 minutes:', durationCheck.durationMinutes)
-        alert(`Erreur critique: La durée du créneau doit être exactement 90 minutes.\nDurée calculée: ${durationCheck.durationMinutes} minutes.\nVeuillez contacter le support.`)
+      // ✅ LOGS DÉTAILLÉS POUR DEBUG FORMAT
+      console.log('[BOOKING DURATION CHECK] ===== FORMAT & DURÉE =====')
+      console.log('slot_start:', slotStartTimestamp)
+      console.log('slot_end:', slotEndTimestamp)
+      console.log('Format slot_start ends with Z?', slotStartTimestamp.endsWith('Z'))
+      console.log('Format slot_end ends with Z?', slotEndTimestamp.endsWith('Z'))
+      console.log('Duration (ms):', durationCheck.durationMs, '← MUST BE', 90 * 60 * 1000)
+      console.log('Duration (minutes):', durationCheck.durationMinutes, '← MUST BE 90')
+      console.log('Is valid?', durationCheck.valid)
+      
+      // Conversion en Date objects pour calcul de différence
+      const startDate = new Date(slotStartTimestamp)
+      const endDate = new Date(slotEndTimestamp)
+      const diffMs = endDate.getTime() - startDate.getTime()
+      const diffMinutes = diffMs / (60 * 1000)
+      
+      console.log('[BOOKING DURATION CHECK] ===== VERIFICATION FINALE =====')
+      console.log('startDate.toISOString():', startDate.toISOString())
+      console.log('endDate.toISOString():', endDate.toISOString())
+      console.log('Diff (getTime):', diffMs, 'ms =', diffMinutes, 'minutes')
+      console.log('Expected:', 90 * 60 * 1000, 'ms = 90 minutes')
+      
+      // ✅ GUARD: Bloquer si durée !== 90 minutes EXACT (comparaison en ms)
+      if (diffMs !== 90 * 60 * 1000) {
+        console.error('[BOOKING DURATION ERROR] ❌ Duration is not EXACTLY 90 minutes')
+        console.error('  Expected (ms):', 90 * 60 * 1000)
+        console.error('  Actual (ms):', diffMs)
+        console.error('  Difference:', diffMs - (90 * 60 * 1000), 'ms')
+        alert(`Erreur critique: La durée du créneau doit être exactement 90 minutes.\nDurée calculée: ${diffMinutes} minutes (${diffMs} ms).\nAttendu: 90 minutes (${90 * 60 * 1000} ms).\n\nVeuillez contacter le support.`)
         setIsSubmitting(false)
         return
       }
+      
+      console.log('[BOOKING DURATION CHECK] ✅ Duration is EXACTLY 90 minutes')
       
       const bookingPayload = {
         club_id: club.id,                       // ✅ UUID réel depuis public.clubs
@@ -613,9 +643,17 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('created_by:', bookingPayload.created_by, '(type:', typeof bookingPayload.created_by, ') ← REQUIRED FOR RLS')
       console.log('booking_date:', bookingPayload.booking_date, '(type:', typeof bookingPayload.booking_date, ')')
       console.log('slot_id:', bookingPayload.slot_id, '(type:', typeof bookingPayload.slot_id, ')')
-      console.log('slot_start:', bookingPayload.slot_start, '(type:', typeof bookingPayload.slot_start, ')')
-      console.log('slot_end:', bookingPayload.slot_end, '(type:', typeof bookingPayload.slot_end, ')')
-      console.log('duration (minutes):', durationCheck.durationMinutes, '← MUST BE 90')
+      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== TIMESTAMPS FORMAT =====')
+      console.log('slot_start:', bookingPayload.slot_start)
+      console.log('  - Has Z suffix?', bookingPayload.slot_start.endsWith('Z'))
+      console.log('  - Length:', bookingPayload.slot_start.length, '(expected: 24 for ISO with Z)')
+      console.log('slot_end:', bookingPayload.slot_end)
+      console.log('  - Has Z suffix?', bookingPayload.slot_end.endsWith('Z'))
+      console.log('  - Length:', bookingPayload.slot_end.length, '(expected: 24 for ISO with Z)')
+      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== DURATION VERIFICATION =====')
+      console.log('Duration (ms):', diffMs, '← MUST BE', 90 * 60 * 1000)
+      console.log('Duration (minutes):', diffMinutes, '← MUST BE 90')
+      console.log('Formats match?', bookingPayload.slot_start.endsWith('Z') && bookingPayload.slot_end.endsWith('Z'))
       console.log('club_id:', bookingPayload.club_id, '(type:', typeof bookingPayload.club_id, ')')
       console.log('court_id:', bookingPayload.court_id, '(type:', typeof bookingPayload.court_id, ')')
       console.log('status:', bookingPayload.status, '(type:', typeof bookingPayload.status, ')')
@@ -634,6 +672,23 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         setIsSubmitting(false)
         return
       }
+      
+      // ✅ VALIDATION FORMAT: S'assurer que slot_start et slot_end sont au format ISO UTC (avec Z)
+      if (!bookingPayload.slot_start.endsWith('Z')) {
+        console.error('[RESERVE] ❌ CRITICAL: slot_start does not end with Z:', bookingPayload.slot_start)
+        alert(`Erreur critique: slot_start n'est pas au format UTC.\nFormat actuel: ${bookingPayload.slot_start}\nFormat attendu: ISO avec suffixe Z`)
+        setIsSubmitting(false)
+        return
+      }
+      
+      if (!bookingPayload.slot_end.endsWith('Z')) {
+        console.error('[RESERVE] ❌ CRITICAL: slot_end does not end with Z:', bookingPayload.slot_end)
+        alert(`Erreur critique: slot_end n'est pas au format UTC.\nFormat actuel: ${bookingPayload.slot_end}\nFormat attendu: ISO avec suffixe Z`)
+        setIsSubmitting(false)
+        return
+      }
+      
+      console.log('[RESERVE] ✅ All format validations passed')
       
       console.log('[BOOKING INSERT] Calling Supabase insert...')
       
@@ -662,18 +717,30 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         
         // Erreur de contrainte CHECK (durée 90 minutes)
         if (bookingError.code === '23514' || bookingError.message?.includes('90min') || bookingError.message?.includes('booking_90min')) {
+          const startHasZ = bookingPayload.slot_start.endsWith('Z')
+          const endHasZ = bookingPayload.slot_end.endsWith('Z')
           errorMessage = [
             `❌ Erreur de contrainte: La durée du créneau doit être exactement 90 minutes`,
             ``,
-            `Durée calculée: ${durationCheck.durationMinutes} minutes`,
-            `slot_start: ${bookingPayload.slot_start}`,
-            `slot_end: ${bookingPayload.slot_end}`,
+            `ANALYSE DU PROBLÈME:`,
+            `Durée calculée (frontend): ${diffMinutes} minutes (${diffMs} ms)`,
+            `Durée attendue: 90 minutes (${90 * 60 * 1000} ms)`,
             ``,
-            `Erreur technique:`,
+            `FORMATS DES TIMESTAMPS:`,
+            `slot_start: ${bookingPayload.slot_start}`,
+            `  - Format UTC (Z)? ${startHasZ ? '✅ OUI' : '❌ NON'}`,
+            `  - Longueur: ${bookingPayload.slot_start.length}`,
+            `slot_end: ${bookingPayload.slot_end}`,
+            `  - Format UTC (Z)? ${endHasZ ? '✅ OUI' : '❌ NON'}`,
+            `  - Longueur: ${bookingPayload.slot_end.length}`,
+            ``,
+            `FORMATS COHÉRENTS? ${startHasZ && endHasZ ? '✅ OUI' : '❌ NON - PROBLÈME DÉTECTÉ'}`,
+            ``,
+            `Erreur PostgreSQL:`,
             `${bookingError.message}`,
             bookingError.details ? `Détails: ${bookingError.details}` : '',
             ``,
-            `Veuillez contacter le support technique.`
+            `⚠️ Veuillez contacter le support technique avec ces informations.`
           ].filter(Boolean).join('\n')
         }
         // Erreur de double-booking (UNIQUE violation)
