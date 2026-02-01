@@ -55,6 +55,30 @@ function combineDateAndTime(dateStr: string, timeStr: string): string {
   return `${dateStr}T${timeStr}`
 }
 
+/**
+ * Calculer slot_end en ajoutant EXACTEMENT 90 minutes à slot_start
+ * Garantit la contrainte DB: slot_end - slot_start = 90 minutes
+ */
+function calculateSlotEnd(slotStartISO: string): string {
+  const startDate = new Date(slotStartISO)
+  const endDate = new Date(startDate.getTime() + 90 * 60 * 1000) // +90 minutes
+  return endDate.toISOString()
+}
+
+/**
+ * Valider que la durée entre deux timestamps est exactement 90 minutes
+ */
+function validateSlotDuration(slotStart: string, slotEnd: string): { valid: boolean; durationMinutes: number } {
+  const start = new Date(slotStart)
+  const end = new Date(slotEnd)
+  const durationMs = end.getTime() - start.getTime()
+  const durationMinutes = Math.round(durationMs / (60 * 1000))
+  return {
+    valid: durationMinutes === 90,
+    durationMinutes
+  }
+}
+
 // ============================================
 // CLUB & COURTS — VRAIS UUIDs depuis Supabase
 // ============================================
@@ -547,16 +571,36 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
       // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
+      // Calculer slot_start depuis la date et l'heure du créneau
       const slotStartTimestamp = combineDateAndTime(bookingDate, selectedSlot.start_time)
-      const slotEndTimestamp = combineDateAndTime(bookingDate, selectedSlot.end_time)
+      
+      // ✅ CALCULER slot_end en ajoutant EXACTEMENT 90 minutes à slot_start
+      // (au lieu d'utiliser selectedSlot.end_time qui pourrait ne pas être précis)
+      const slotEndTimestamp = calculateSlotEnd(slotStartTimestamp)
+      
+      // ✅ VALIDATION: Vérifier que la durée est bien 90 minutes
+      const durationCheck = validateSlotDuration(slotStartTimestamp, slotEndTimestamp)
+      console.log('[BOOKING DURATION CHECK]', {
+        slot_start: slotStartTimestamp,
+        slot_end: slotEndTimestamp,
+        duration_minutes: durationCheck.durationMinutes,
+        is_valid: durationCheck.valid
+      })
+      
+      if (!durationCheck.valid) {
+        console.error('[BOOKING DURATION ERROR] ❌ Duration is not 90 minutes:', durationCheck.durationMinutes)
+        alert(`Erreur critique: La durée du créneau doit être exactement 90 minutes.\nDurée calculée: ${durationCheck.durationMinutes} minutes.\nVeuillez contacter le support.`)
+        setIsSubmitting(false)
+        return
+      }
       
       const bookingPayload = {
         club_id: club.id,                       // ✅ UUID réel depuis public.clubs
         court_id: courtId,                      // ✅ UUID réel depuis public.courts
         booking_date: bookingDate,              // ✅ DATE YYYY-MM-DD NOT NULL (snake_case)
         slot_id: selectedSlot.id,               // ✅ INTEGER NOT NULL (snake_case) référence time_slots.id
-        slot_start: slotStartTimestamp,         // timestamptz (snake_case)
-        slot_end: slotEndTimestamp,             // timestamptz (snake_case)
+        slot_start: slotStartTimestamp,         // timestamptz (snake_case) - calculé depuis date + start_time
+        slot_end: slotEndTimestamp,             // timestamptz (snake_case) - calculé = slot_start + 90 min
         status: 'confirmed' as const,           // 'confirmed' | 'cancelled' (enum booking_status)
         created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (OBLIGATOIRE pour RLS)
         created_at: new Date().toISOString()    // timestamptz (snake_case)
@@ -569,6 +613,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('created_by:', bookingPayload.created_by, '(type:', typeof bookingPayload.created_by, ') ← REQUIRED FOR RLS')
       console.log('booking_date:', bookingPayload.booking_date, '(type:', typeof bookingPayload.booking_date, ')')
       console.log('slot_id:', bookingPayload.slot_id, '(type:', typeof bookingPayload.slot_id, ')')
+      console.log('slot_start:', bookingPayload.slot_start, '(type:', typeof bookingPayload.slot_start, ')')
+      console.log('slot_end:', bookingPayload.slot_end, '(type:', typeof bookingPayload.slot_end, ')')
+      console.log('duration (minutes):', durationCheck.durationMinutes, '← MUST BE 90')
       console.log('club_id:', bookingPayload.club_id, '(type:', typeof bookingPayload.club_id, ')')
       console.log('court_id:', bookingPayload.court_id, '(type:', typeof bookingPayload.court_id, ')')
       console.log('status:', bookingPayload.status, '(type:', typeof bookingPayload.status, ')')
@@ -610,13 +657,43 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         })
         
         // ✅ AFFICHAGE DÉTAILLÉ DE L'ERREUR
-        const errorMessage = [
-          `Erreur réservation (table: bookings)`,
-          `Message: ${bookingError.message}`,
-          bookingError.details ? `Détails: ${bookingError.details}` : '',
-          bookingError.hint ? `Conseil: ${bookingError.hint}` : '',
-          bookingError.code ? `Code: ${bookingError.code}` : ''
-        ].filter(Boolean).join('\n')
+        // Détecter les erreurs spécifiques
+        let errorMessage = ''
+        
+        // Erreur de contrainte CHECK (durée 90 minutes)
+        if (bookingError.code === '23514' || bookingError.message?.includes('90min') || bookingError.message?.includes('booking_90min')) {
+          errorMessage = [
+            `❌ Erreur de contrainte: La durée du créneau doit être exactement 90 minutes`,
+            ``,
+            `Durée calculée: ${durationCheck.durationMinutes} minutes`,
+            `slot_start: ${bookingPayload.slot_start}`,
+            `slot_end: ${bookingPayload.slot_end}`,
+            ``,
+            `Erreur technique:`,
+            `${bookingError.message}`,
+            bookingError.details ? `Détails: ${bookingError.details}` : '',
+            ``,
+            `Veuillez contacter le support technique.`
+          ].filter(Boolean).join('\n')
+        }
+        // Erreur de double-booking (UNIQUE violation)
+        else if (bookingError.code === '23505') {
+          errorMessage = `❌ Ce créneau est déjà réservé.\n\nVeuillez choisir un autre créneau disponible.`
+        }
+        // Erreur RLS (permission refusée)
+        else if (bookingError.code === '42501' || bookingError.message?.includes('policy')) {
+          errorMessage = `❌ Permission refusée.\n\nVeuillez vous reconnecter et réessayer.`
+        }
+        // Autres erreurs
+        else {
+          errorMessage = [
+            `Erreur réservation (table: bookings)`,
+            `Message: ${bookingError.message}`,
+            bookingError.details ? `Détails: ${bookingError.details}` : '',
+            bookingError.hint ? `Conseil: ${bookingError.hint}` : '',
+            bookingError.code ? `Code: ${bookingError.code}` : ''
+          ].filter(Boolean).join('\n')
+        }
         
         alert(errorMessage)
         setIsSubmitting(false)
