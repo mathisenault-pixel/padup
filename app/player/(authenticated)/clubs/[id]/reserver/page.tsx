@@ -293,34 +293,82 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           event: '*', // INSERT, UPDATE, DELETE
           schema: 'public',
           table: 'bookings',
-          filter: `court_id=eq.${courtId}`,
+          filter: `court_id=eq.${courtId}`, // ⚠️ Supabase ne supporte pas AND dans filter
         },
         (payload) => {
           console.log('[REALTIME] Change detected:', payload)
           
-          const newBooking = payload.new as BookedSlot
-          const oldBooking = payload.old as BookedSlot
+          // ✅ Filtrer manuellement par booking_date dans le callback
+          const payloadNew = payload.new as BookedSlot | null
+          const payloadOld = payload.old as BookedSlot | null
           
-          // Si INSERT ou UPDATE vers confirmed
-          if (payload.eventType === 'INSERT' || 
-              (payload.eventType === 'UPDATE' && newBooking?.status === 'confirmed')) {
-            if (newBooking.booking_date === bookingDate && newBooking.status === 'confirmed') {
-              setBookedSlots(prev => new Set([...prev, newBooking.slot_id]))
-              console.log('[REALTIME] ✅ Slot marked as booked:', newBooking.slot_id)
+          // Ignorer les événements qui ne concernent pas notre date
+          if (payloadNew && payloadNew.booking_date !== bookingDate) {
+            console.log('[REALTIME] Ignored (wrong date):', payloadNew.booking_date)
+            return
+          }
+          if (!payloadNew && payloadOld && payloadOld.booking_date !== bookingDate) {
+            console.log('[REALTIME] Ignored (wrong date):', payloadOld.booking_date)
+            return
+          }
+          
+          // ✅ INSERT: ajouter si status = 'confirmed'
+          if (payload.eventType === 'INSERT') {
+            if (payloadNew?.status === 'confirmed') {
+              setBookedSlots(prev => new Set([...prev, payloadNew.slot_id]))
+              console.log('[REALTIME] ✅ Slot booked (INSERT):', payloadNew.slot_id)
             }
           }
           
-          // Si UPDATE vers cancelled ou DELETE
-          if (payload.eventType === 'DELETE' || 
-              (payload.eventType === 'UPDATE' && newBooking?.status === 'cancelled')) {
-            const slotToRemove = payload.eventType === 'DELETE' ? oldBooking?.slot_id : newBooking?.slot_id
-            if (slotToRemove) {
+          // ✅ UPDATE: gérer changement de status ou slot_id
+          else if (payload.eventType === 'UPDATE') {
+            if (!payloadOld || !payloadNew) return
+            
+            // Cas 1: changement de status
+            if (payloadOld.status !== payloadNew.status) {
+              // old: cancelled → new: confirmed => ajouter
+              if (payloadNew.status === 'confirmed') {
+                setBookedSlots(prev => new Set([...prev, payloadNew.slot_id]))
+                console.log('[REALTIME] ✅ Slot booked (UPDATE confirmed):', payloadNew.slot_id)
+              }
+              // old: confirmed → new: cancelled => retirer
+              else if (payloadNew.status === 'cancelled' && payloadOld.status === 'confirmed') {
+                setBookedSlots(prev => {
+                  const newSet = new Set(prev)
+                  newSet.delete(payloadOld.slot_id)
+                  return newSet
+                })
+                console.log('[REALTIME] ✅ Slot freed (UPDATE cancelled):', payloadOld.slot_id)
+              }
+            }
+            
+            // Cas 2: changement de slot_id (rare, mais possible)
+            else if (payloadOld.slot_id !== payloadNew.slot_id) {
               setBookedSlots(prev => {
                 const newSet = new Set(prev)
-                newSet.delete(slotToRemove)
+                // Retirer l'ancien slot si c'était confirmed
+                if (payloadOld.status === 'confirmed') {
+                  newSet.delete(payloadOld.slot_id)
+                }
+                // Ajouter le nouveau slot si c'est confirmed
+                if (payloadNew.status === 'confirmed') {
+                  newSet.add(payloadNew.slot_id)
+                }
                 return newSet
               })
-              console.log('[REALTIME] ✅ Slot freed:', slotToRemove)
+              console.log('[REALTIME] ✅ Slot changed:', payloadOld.slot_id, '→', payloadNew.slot_id)
+            }
+          }
+          
+          // ✅ DELETE: retirer le slot
+          else if (payload.eventType === 'DELETE') {
+            if (payloadOld?.slot_id) {
+              setBookedSlots(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(payloadOld.slot_id)
+                return newSet
+              })
+              console.log('[REALTIME] ✅ Slot freed (DELETE):', payloadOld.slot_id)
             }
           }
         }
