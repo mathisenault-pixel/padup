@@ -9,8 +9,8 @@ import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
 type Club = {
   id: string
-  nom: string
-  ville: string
+  name: string // ✅ Correspond à public.clubs.name
+  city: string // ✅ Correspond à public.clubs.city
   imageUrl: string
   prix: number
   adresse: string
@@ -66,8 +66,8 @@ const DEMO_CLUB_UUID = 'ba43c579-e522-4b51-8542-737c2c6452bb'
 const clubs: Club[] = [
   {
     id: DEMO_CLUB_UUID, // ✅ UUID réel depuis public.clubs
-    nom: 'Club Démo Pad\'up',
-    ville: 'Avignon',
+    name: 'Club Démo Pad\'up', // ✅ Correspond à public.clubs.name
+    city: 'Avignon', // ✅ Correspond à public.clubs.city
     imageUrl: '/images/clubs/demo-padup.jpg',
     prix: 12,
     adresse: '123 Avenue du Padel, 84000 Avignon',
@@ -203,7 +203,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const terrains = useMemo(() => 
     Array.from({ length: club.nombreTerrains }, (_, i) => ({
       id: i + 1,
-      nom: `Terrain ${i + 1}`,
+      name: `Terrain ${i + 1}`, // ✅ Utilisé en affichage uniquement
       type: i % 2 === 0 ? 'Intérieur' : 'Extérieur'
     }))
   , [club.nombreTerrains])
@@ -435,7 +435,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           to: invitedEmails, // ✅ Envoyer la liste d'emails
-          clubName: club.nom,
+          clubName: club.name,
           dateText: dateFormatted,
           message: 'Vous avez été invité à rejoindre cette partie de padel !',
           bookingUrl: bookingUrl
@@ -659,8 +659,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           name: `Terrain ${selectedTerrain}`,
           clubs: {
             id: club.id,
-            name: club.nom,
-            city: club.ville,
+            name: club.name,
+            city: club.city,
             address: club.adresse,
             imageUrl: club.imageUrl
           }
@@ -795,11 +795,11 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             <div className="flex items-start gap-6 p-6">
               <img 
                 src={club.imageUrl} 
-                alt={club.nom}
+                alt={club.name}
                 className="w-40 h-40 object-cover rounded-xl shadow-md"
               />
               <div className="flex-1">
-                <h1 className="text-4xl font-black text-gray-900 mb-3">{club.nom}</h1>
+                <h1 className="text-4xl font-black text-gray-900 mb-3">{club.name}</h1>
                 <p className="text-lg text-gray-600 mb-4">{club.description}</p>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold text-lg">
@@ -955,7 +955,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                             {terrain.id}
                           </div>
                           <div>
-                            <h3 className="text-2xl font-black text-gray-900">{terrain.nom}</h3>
+                            <h3 className="text-2xl font-black text-gray-900">{terrain.name}</h3>
                             <p className="text-sm text-gray-600 font-semibold">{terrain.type}</p>
                           </div>
                         </div>
@@ -1018,7 +1018,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         <PlayerSelectionModal
           onClose={() => setShowPlayerModal(false)}
           onContinue={handlePlayersContinue}
-          clubName={`${club.nom} - Terrain ${selectedTerrain}`}
+          clubName={`${club.name} - Terrain ${selectedTerrain}`}
           timeSlot={`${selectedSlot.start_time} - ${selectedSlot.end_time}`}
         />
       )}
@@ -1033,7 +1033,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           }}
           onSubscribe={handleSubscribePremium}
           onContinueWithout={handleContinueWithout}
-          clubName={club.nom}
+          clubName={club.name}
           normalPrice={club.prix}
         />
       )}

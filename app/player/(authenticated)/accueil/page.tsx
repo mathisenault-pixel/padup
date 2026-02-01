@@ -8,8 +8,8 @@ import UseMyLocationButton from '@/components/UseMyLocationButton'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
-  nom: string
-  ville: string
+  name: string // ✅ Correspond à public.clubs.name
+  city: string // ✅ Correspond à public.clubs.city
   distance: string
   nombreTerrains: number
   note: number
@@ -33,8 +33,8 @@ export default function AccueilPage() {
   const [clubs] = useState<Club[]>([
     {
       id: DEMO_CLUB_UUID, // ✅ UUID du club démo (seul club fonctionnel pour MVP)
-      nom: 'Le Hangar Sport & Co',
-      ville: 'Rochefort-du-Gard',
+      name: 'Le Hangar Sport & Co', // ✅ Correspond à public.clubs.name
+      city: 'Rochefort-du-Gard', // ✅ Correspond à public.clubs.city
       distance: '5 min',
       nombreTerrains: 8,
       note: 4.8,
@@ -45,8 +45,8 @@ export default function AccueilPage() {
     },
     {
       id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
-      nom: 'Paul & Louis Sport',
-      ville: 'Le Pontet',
+      name: 'Paul & Louis Sport', // ✅ Correspond à public.clubs.name
+      city: 'Le Pontet', // ✅ Correspond à public.clubs.city
       distance: '10 min',
       nombreTerrains: 8,
       note: 4.7,
@@ -57,8 +57,8 @@ export default function AccueilPage() {
     },
     {
       id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
-      nom: 'ZE Padel',
-      ville: 'Boulbon',
+      name: 'ZE Padel', // ✅ Correspond à public.clubs.name
+      city: 'Boulbon', // ✅ Correspond à public.clubs.city
       distance: '20 min',
       nombreTerrains: 6,
       note: 4.6,
@@ -69,8 +69,8 @@ export default function AccueilPage() {
     },
     {
       id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
-      nom: 'QG Padel Club',
-      ville: 'Saint-Laurent-des-Arbres',
+      name: 'QG Padel Club', // ✅ Correspond à public.clubs.name
+      city: 'Saint-Laurent-des-Arbres', // ✅ Correspond à public.clubs.city
       distance: '15 min',
       nombreTerrains: 4,
       note: 4.7,
@@ -194,13 +194,13 @@ export default function AccueilPage() {
               <Link
                 key={club.id}
                 href={`/player/clubs/${club.id}/reserver`}
-                onClick={() => console.log('[CLUB CARD] Navigation to:', club.nom)}
+                onClick={() => console.log('[CLUB CARD] Navigation to:', club.name)}
                 className="group bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all block"
               >
                 <div className="relative h-64 overflow-hidden">
                   <img
                     src={club.imageUrl}
-                    alt={club.nom}
+                    alt={club.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -219,8 +219,8 @@ export default function AccueilPage() {
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="text-xl font-black mb-1">{club.nom}</h3>
-                    <p className="text-sm text-white/90">{club.ville}</p>
+                    <h3 className="text-xl font-black mb-1">{club.name}</h3>
+                    <p className="text-sm text-white/90">{club.city}</p>
                   </div>
                 </div>
 
@@ -383,8 +383,8 @@ export default function AccueilPage() {
           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h3 className="text-2xl font-black text-gray-900 mb-1">{selectedClub.nom}</h3>
-                <p className="text-gray-600">{selectedClub.ville}</p>
+                <h3 className="text-2xl font-black text-gray-900 mb-1">{selectedClub.name}</h3>
+                <p className="text-gray-600">{selectedClub.city}</p>
               </div>
               <button
                 type="button"
@@ -423,7 +423,7 @@ export default function AccueilPage() {
               <button
                 type="button"
                 onClick={() => {
-                  alert(`Réservation confirmée au ${selectedClub.nom} !`)
+                  alert(`Réservation confirmée au ${selectedClub.name} !`)
                   setShowReservationModal(false)
                 }}
                 className="flex-1 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-full transition-all"

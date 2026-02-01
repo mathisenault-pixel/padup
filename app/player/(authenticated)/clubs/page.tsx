@@ -7,8 +7,8 @@ import UseMyLocationButton from '@/components/UseMyLocationButton'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
-  nom: string
-  ville: string
+  name: string // ✅ Correspond à public.clubs.name
+  city: string // ✅ Correspond à public.clubs.city
   distance: number
   nombreTerrains: number
   note: number
@@ -31,8 +31,8 @@ export default function ClubsPage() {
   const [clubs, setClubs] = useState<Club[]>([
     {
       id: 'ba43c579-e522-4b51-8542-737c2c6452bb', // ✅ UUID réel depuis public.clubs
-      nom: 'Club Démo Pad\'up',
-      ville: 'Avignon',
+      name: 'Club Démo Pad\'up', // ✅ Correspond à public.clubs.name
+      city: 'Avignon', // ✅ Correspond à public.clubs.city
       distance: 5,
       nombreTerrains: 2,
       note: 4.9,
@@ -71,8 +71,8 @@ export default function ClubsPage() {
     const result = clubs
       .filter(club => {
         // Recherche
-        const matchesSearch = club.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          club.ville.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesSearch = club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          club.city.toLowerCase().includes(searchTerm.toLowerCase())
         
         if (!matchesSearch) return false
 
@@ -279,7 +279,7 @@ export default function ClubsPage() {
               <div className="relative w-64 h-44 flex-shrink-0 rounded-lg overflow-hidden">
                 <img
                   src={club.imageUrl}
-                  alt={club.nom}
+                  alt={club.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 {/* Distance badge */}
@@ -314,13 +314,13 @@ export default function ClubsPage() {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                        {club.nom}
+                        {club.name}
                       </h3>
                       <p className="text-gray-600 flex items-center gap-1.5 mt-1">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         </svg>
-                        {club.ville}
+                        {club.city}
                       </p>
                     </div>
                     {club.disponible && (
