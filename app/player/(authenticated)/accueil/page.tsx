@@ -7,7 +7,7 @@ import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 
 type Club = {
-  id: number
+  id: string // ✅ UUID depuis public.clubs
   nom: string
   ville: string
   distance: string
@@ -26,9 +26,13 @@ export default function AccueilPage() {
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
 
+  // ✅ Pour MVP: tous les clubs pointent vers le club démo UUID
+  // En production, chaque club aurait son propre UUID
+  const DEMO_CLUB_UUID = 'ba43c579-e522-4b51-8542-737c2c6452bb'
+
   const [clubs] = useState<Club[]>([
     {
-      id: 1,
+      id: DEMO_CLUB_UUID, // ✅ UUID du club démo (seul club fonctionnel pour MVP)
       nom: 'Le Hangar Sport & Co',
       ville: 'Rochefort-du-Gard',
       distance: '5 min',
@@ -40,7 +44,7 @@ export default function AccueilPage() {
       prixMin: 12,
     },
     {
-      id: 2,
+      id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
       nom: 'Paul & Louis Sport',
       ville: 'Le Pontet',
       distance: '10 min',
@@ -52,7 +56,7 @@ export default function AccueilPage() {
       prixMin: 13,
     },
     {
-      id: 3,
+      id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
       nom: 'ZE Padel',
       ville: 'Boulbon',
       distance: '20 min',
@@ -64,7 +68,7 @@ export default function AccueilPage() {
       prixMin: 11,
     },
     {
-      id: 4,
+      id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
       nom: 'QG Padel Club',
       ville: 'Saint-Laurent-des-Arbres',
       distance: '15 min',

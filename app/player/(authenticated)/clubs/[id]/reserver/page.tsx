@@ -107,6 +107,12 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const resolvedParams = use(params)
   const router = useRouter()
   
+  // ✅ LOGS DÉTAILLÉS POUR DEBUG
+  console.log('[CLUB] params.id=', resolvedParams.id, 'type=', typeof resolvedParams.id)
+  console.log('[CLUB] DEMO_CLUB_UUID=', DEMO_CLUB_UUID)
+  console.log('[CLUB] clubs array length=', clubs.length)
+  console.log('[CLUB] clubs[0]=', clubs[0])
+  
   // ============================================
   // MVP: Redirection vers le club démo si ID invalide
   // ============================================
@@ -122,8 +128,11 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // STABILISATION: Club en dehors du render
   // ============================================
   const club = useMemo(() => {
-    // Toujours retourner le club démo (MVP: un seul club)
-    return clubs[0]
+    // ✅ Pour MVP: toujours retourner le club démo
+    // La redirection ci-dessus s'occupe de corriger l'URL si besoin
+    const foundClub = clubs[0]
+    console.log('[CLUB] Selected club:', foundClub)
+    return foundClub
   }, [])
   
   // Dates (constant)
@@ -174,8 +183,20 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   }, [])
   
   
+  // ✅ Vérification du club (ne devrait jamais arriver en pratique)
   if (!club) {
-    return <div className="p-8">Club introuvable</div>
+    console.error('[CLUB] ❌ CRITICAL: No club found! This should never happen.')
+    console.error('[CLUB] params.id:', resolvedParams.id)
+    console.error('[CLUB] clubs array:', clubs)
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h2 className="text-lg font-bold text-red-900 mb-2">Erreur de configuration</h2>
+          <p className="text-red-700">Aucun club disponible. Redirection en cours...</p>
+          <p className="text-sm text-red-600 mt-2">ID reçu: {resolvedParams.id}</p>
+        </div>
+      </div>
+    )
   }
   
   // Terrains
