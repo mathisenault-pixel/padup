@@ -8,8 +8,8 @@ type Reservation = {
   court_id: string
   slot_start: string
   fin_de_slot: string
-  status: string
-  created_at: string
+  statut: string  // ✅ Correct: 'statut' en DB (pas 'status')
+  cree_a: string  // ✅ Correct: 'cree_a' en DB (pas 'created_at')
 }
 
 export default function ReservationsPage() {
@@ -30,8 +30,16 @@ export default function ReservationsPage() {
           .order('slot_start', { ascending: true })
 
         if (queryError) {
-          console.error('[SUPABASE ERROR - reservations]', queryError)
-          setError(queryError.message)
+          console.error('[SUPABASE ERROR - reservations]', {
+            table: 'reservations',
+            query: 'select * order by slot_start',
+            error: queryError,
+            message: queryError.message,
+            code: queryError.code,
+            details: queryError.details,
+            hint: queryError.hint
+          })
+          setError(`${queryError.message} (code: ${queryError.code || 'N/A'})`)
         } else {
           console.log('[SUPABASE SUCCESS - reservations]', { count: data?.length || 0 })
           setReservations(data || [])
@@ -95,7 +103,10 @@ export default function ReservationsPage() {
                 {new Date(res.slot_start).toLocaleString('fr-FR')}
               </div>
               <div style={{ fontSize: 14, color: '#666' }}>
-                Statut: {res.status}
+                Statut: {res.statut}
+              </div>
+              <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
+                Créée: {new Date(res.cree_a).toLocaleString('fr-FR')}
               </div>
             </li>
           ))}

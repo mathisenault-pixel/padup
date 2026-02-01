@@ -313,7 +313,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         .eq('statut', 'confirmé')
       
       if (error) {
-        console.error('[RESERVATIONS] Error:', error)
+        console.error('[RESERVATIONS] Error:', {
+          table: 'reservations',
+          query: 'select id, court_id, slot_start, fin_de_slot, statut',
+          error,
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        })
         return
       }
       
@@ -570,7 +578,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         fin_de_slot: finDeSlotTimestamp,        // fin_de_slot (timestamptz) ex: "2026-01-23T15:30:00"
         statut: 'confirmé' as const,            // statut ('confirmé' | 'annulé' | ...)
         cree_par: null,                         // TODO: remplacer par auth.uid() quand auth sera en place (nullable pour l'instant)
-        created_at: new Date().toISOString()
+        cree_a: new Date().toISOString()        // ✅ CORRECT: cree_a (colonne réelle en DB)
       }
       
       // ✅ LOGGING COMPLET DU PAYLOAD
@@ -593,6 +601,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         // ✅ LOGGING COMPLET DE L'ERREUR
         console.error('[RESERVATION INSERT ERROR]', reservationError)
         console.error('[RESERVATION INSERT ERROR - Full details]', {
+          table: 'reservations',
           message: reservationError.message,
           details: reservationError.details,
           hint: reservationError.hint,
@@ -601,7 +610,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         
         // ✅ AFFICHAGE DÉTAILLÉ DE L'ERREUR
         const errorMessage = [
-          `Erreur réservation: ${reservationError.message}`,
+          `Erreur réservation (table: reservations)`,
+          `Message: ${reservationError.message}`,
           reservationError.details ? `Détails: ${reservationError.details}` : '',
           reservationError.hint ? `Conseil: ${reservationError.hint}` : '',
           reservationError.code ? `Code: ${reservationError.code}` : ''
