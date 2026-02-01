@@ -35,12 +35,11 @@ type TimeSlot = {
 
 type Booking = {
   id: string
+  club_id: string
   court_id: string
-  booking_date: string // DATE YYYY-MM-DD
-  slot_id: number // référence vers time_slots.id
-  status: string // 'confirmed' | 'cancelled' (enum booking_status ne supporte pas 'pending')
-  slot_start?: string // timestamp ISO (optionnel)
-  slot_end?: string // timestamp ISO (optionnel)
+  slot_start: string // timestamptz (ISO format)
+  fin_de_slot: string // timestamptz (ISO format)
+  statut: string // 'confirmed' | 'cancelled'
 }
 
 // ============================================
@@ -189,7 +188,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ✅ NOUVEAUX STATES POUR SUPABASE
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [courts, setCourts] = useState<Array<{ id: string; name: string; type?: string }>>([])
-  const [bookedByCourt, setBookedByCourt] = useState<Record<string, Set<number>>>({}) // Map de court_id → Set<slot_id>
+  const [bookedByCourt, setBookedByCourt] = useState<Record<string, Set<string>>>({}) // Map de court_id → Set<slot_start ISO>
   const [isLoadingSlots, setIsLoadingSlots] = useState(true)
   const [isLoadingCourts, setIsLoadingCourts] = useState(true)
   
@@ -361,27 +360,40 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       if (courtIds.length === 0) {
         console.warn('🔍 [DEBUG BOOKINGS] No courts loaded yet, skipping booking fetch')
         console.warn('🔍 [DEBUG BOOKINGS] terrains:', terrains)
+        // ✅ Ne pas bloquer : si 0 courts chargés, on attend qu'ils se chargent
+        setBookedByCourt({})
         return
       }
       
-      const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
+      // ✅ Calculer le range de la journée sélectionnée (Europe/Paris UTC+1)
+      const dateStr = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
+      const startOfDay = `${dateStr}T00:00:00+01:00` // 2026-01-23T00:00:00+01:00
+      const endOfDay = `${dateStr}T23:59:59+01:00`   // 2026-01-23T23:59:59+01:00
       
       console.log('🔍 [DEBUG BOOKINGS] START Loading bookings')
+      console.log('🔍 [DEBUG BOOKINGS] Club ID:', club.id)
       console.log('🔍 [DEBUG BOOKINGS] Court IDs:', courtIds)
-      console.log('🔍 [DEBUG BOOKINGS] Booking date:', bookingDate)
-      console.log('🔍 [DEBUG BOOKINGS] Query: from("bookings").select(...).in("court_id", courtIds).eq("booking_date", date).eq("status", "confirmed")')
+      console.log('🔍 [DEBUG BOOKINGS] Date selected:', dateStr)
+      console.log('🔍 [DEBUG BOOKINGS] Range: slot_start >= ', startOfDay, ' AND < ', endOfDay)
+      console.log('🔍 [DEBUG BOOKINGS] Query: from("bookings").select("id, court_id, slot_start, statut").in("court_id", courtIds).gte("slot_start", startOfDay).lt("slot_start", endOfDay).eq("statut", "confirmed")')
       
+      // ✅ Charger les bookings du club pour la journée sélectionnée
       const { data, error } = await supabase
         .from('bookings')
-        .select('id, court_id, booking_date, slot_id, status')
+        .select('id, court_id, slot_start, statut')
         .in('court_id', courtIds)
-        .eq('booking_date', bookingDate)
-        .eq('status', 'confirmed')
+        .gte('slot_start', startOfDay)
+        .lt('slot_start', endOfDay)
+        .eq('statut', 'confirmed')
       
       if (error) {
         console.error('❌ [DEBUG BOOKINGS] Error loading bookings:', error)
         console.error('❌ [DEBUG BOOKINGS] Error message:', error.message)
+        console.error('❌ [DEBUG BOOKINGS] Error code:', error.code)
+        console.error('❌ [DEBUG BOOKINGS] Error details:', error.details)
         console.error('❌ [DEBUG BOOKINGS] Error JSON:', JSON.stringify(error, null, 2))
+        // ✅ En cas d'erreur, on continue avec 0 bookings (tous les slots disponibles)
+        setBookedByCourt({})
         return
       }
       
@@ -389,15 +401,23 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('✅ [DEBUG BOOKINGS] Bookings count:', data?.length || 0)
       console.log('✅ [DEBUG BOOKINGS] Raw data:', JSON.stringify(data, null, 2))
       
-      // ✅ Construire bookedByCourt : court_id → Set<slot_id>
-      const map: Record<string, Set<number>> = {}
+      // ✅ Construire bookedByCourt : court_id → Set<slotStartISO>
+      // Clé = ${courtId}_${slotStartISO}
+      const map: Record<string, Set<string>> = {}
       for (const row of data ?? []) {
         const courtKey = String(row.court_id)
         if (!map[courtKey]) map[courtKey] = new Set()
-        map[courtKey].add(row.slot_id)
+        
+        // ✅ Normaliser slot_start en ISO (doit se terminer par Z)
+        let slotStartISO = row.slot_start
+        if (!slotStartISO.endsWith('Z')) {
+          slotStartISO = new Date(slotStartISO).toISOString()
+        }
+        
+        map[courtKey].add(slotStartISO)
         
         // Log exemple de clé générée
-        console.log(`✅ [DEBUG BOOKINGS] Key example: court_id=${courtKey}, slot_id=${row.slot_id}`)
+        console.log(`✅ [DEBUG BOOKINGS] Key example: court_id=${courtKey}, slot_start=${slotStartISO}`)
       }
       
       const totalBookedSlots = Object.values(map).reduce((sum, set) => sum + set.size, 0)
@@ -418,11 +438,11 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     if (!club) return
     
-    const bookingDate = selectedDate.toISOString().split('T')[0]
+    const dateStr = selectedDate.toISOString().split('T')[0]
     
     console.log('[REALTIME] Subscribing to bookings:', { 
       clubId: club.id, 
-      bookingDate
+      date: dateStr
     })
     
     // ✅ Construire la liste des court_id (UUIDs réels depuis Supabase)
@@ -435,102 +455,121 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
+    // ✅ Écouter TOUS les changements sur bookings pour les courts du club
+    // (Realtime Postgres ne supporte pas les filtres complexes sur timestamptz range)
     const channel = supabase
-      .channel(`bookings-${club.id}-${bookingDate}`)
+      .channel(`bookings-${club.id}-${dateStr}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'bookings',
-          filter: `booking_date=eq.${bookingDate}`
+          filter: `club_id=eq.${club.id}`
         },
         (payload) => {
           console.log('[REALTIME bookings] payload', payload)
           
-          const payloadNew = payload.new as Booking | null
-          const payloadOld = payload.old as Booking | null
+          const payloadNew = payload.new as any
+          const payloadOld = payload.old as any
           
           const courtKey = String((payloadNew ?? payloadOld)?.court_id)
           
           if (!courtKey || !courtIds.includes(courtKey)) {
+            console.log('[REALTIME] Ignoring: court not in our list')
             return
           }
           
-          // ✅ INSERT: ajouter si status = 'confirmed'
+          // ✅ Normaliser slot_start en ISO
+          const normalizeSlotStart = (slotStart: string) => {
+            if (!slotStart) return null
+            if (!slotStart.endsWith('Z')) {
+              return new Date(slotStart).toISOString()
+            }
+            return slotStart
+          }
+          
+          // ✅ INSERT: ajouter si statut = 'confirmed'
           if (payload.eventType === 'INSERT' && payloadNew) {
-            if (payloadNew.status === 'confirmed') {
+            const slotStartISO = normalizeSlotStart(payloadNew.slot_start)
+            if (payloadNew.statut === 'confirmed' && slotStartISO) {
               setBookedByCourt(prev => {
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
-                newMap[courtKey] = new Set([...newMap[courtKey], payloadNew.slot_id])
+                newMap[courtKey] = new Set([...newMap[courtKey], slotStartISO])
                 return newMap
               })
-              console.log('[REALTIME] ✅ Slot booked (INSERT):', { courtKey, slotId: payloadNew.slot_id })
+              console.log('[REALTIME] ✅ Slot booked (INSERT):', { courtKey, slot_start: slotStartISO })
             }
           }
           
-          // ✅ UPDATE: gérer changement de status ou slot_id
+          // ✅ UPDATE: gérer changement de statut ou slot_start
           else if (payload.eventType === 'UPDATE' && payloadNew && payloadOld) {
-            // Cas 1: changement de status
-            if (payloadOld.status !== payloadNew.status) {
+            const newSlotStartISO = normalizeSlotStart(payloadNew.slot_start)
+            const oldSlotStartISO = normalizeSlotStart(payloadOld.slot_start)
+            
+            // Cas 1: changement de statut
+            if (payloadOld.statut !== payloadNew.statut) {
               // old → confirmed: ajouter
-              if (payloadNew.status === 'confirmed') {
+              if (payloadNew.statut === 'confirmed' && newSlotStartISO) {
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (!newMap[courtKey]) newMap[courtKey] = new Set()
-                  newMap[courtKey] = new Set([...newMap[courtKey], payloadNew.slot_id])
+                  newMap[courtKey] = new Set([...newMap[courtKey], newSlotStartISO])
                   return newMap
                 })
-                console.log('[REALTIME] ✅ Slot booked (UPDATE):', { courtKey, slotId: payloadNew.slot_id })
+                console.log('[REALTIME] ✅ Slot booked (UPDATE):', { courtKey, slot_start: newSlotStartISO })
               }
               // confirmed → cancelled: retirer
-              else if (payloadNew.status === 'cancelled' && payloadOld.status === 'confirmed') {
+              else if (payloadNew.statut === 'cancelled' && payloadOld.statut === 'confirmed' && oldSlotStartISO) {
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (newMap[courtKey]) {
                     const newSet = new Set(newMap[courtKey])
-                    newSet.delete(payloadOld.slot_id)
+                    newSet.delete(oldSlotStartISO)
                     newMap[courtKey] = newSet
                   }
                   return newMap
                 })
-                console.log('[REALTIME] ✅ Slot freed (UPDATE cancelled):', { courtKey, slotId: payloadOld.slot_id })
+                console.log('[REALTIME] ✅ Slot freed (UPDATE cancelled):', { courtKey, slot_start: oldSlotStartISO })
               }
             }
-            // Cas 2: changement de slot_id (rare)
-            else if (payloadOld.slot_id !== payloadNew.slot_id) {
+            // Cas 2: changement de slot_start (rare, mais possible)
+            else if (oldSlotStartISO !== newSlotStartISO) {
               setBookedByCourt(prev => {
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
                 const newSet = new Set(newMap[courtKey])
                 // Retirer ancien slot si c'était confirmed
-                if (payloadOld.status === 'confirmed') {
-                  newSet.delete(payloadOld.slot_id)
+                if (payloadOld.statut === 'confirmed' && oldSlotStartISO) {
+                  newSet.delete(oldSlotStartISO)
                 }
                 // Ajouter nouveau slot si c'est confirmed
-                if (payloadNew.status === 'confirmed') {
-                  newSet.add(payloadNew.slot_id)
+                if (payloadNew.statut === 'confirmed' && newSlotStartISO) {
+                  newSet.add(newSlotStartISO)
                 }
                 newMap[courtKey] = newSet
                 return newMap
               })
-              console.log('[REALTIME] ✅ Slot changed:', { courtKey, old: payloadOld.slot_id, new: payloadNew.slot_id })
+              console.log('[REALTIME] ✅ Slot changed:', { courtKey, old: oldSlotStartISO, new: newSlotStartISO })
             }
           }
           
           // ✅ DELETE: retirer le slot
           else if (payload.eventType === 'DELETE' && payloadOld) {
-            setBookedByCourt(prev => {
-              const newMap = { ...prev }
-              if (newMap[courtKey]) {
-                const newSet = new Set(newMap[courtKey])
-                newSet.delete(payloadOld.slot_id)
-                newMap[courtKey] = newSet
-              }
-              return newMap
-            })
-            console.log('[REALTIME] ✅ Slot freed (DELETE):', { courtKey, slotId: payloadOld.slot_id })
+            const oldSlotStartISO = normalizeSlotStart(payloadOld.slot_start)
+            if (oldSlotStartISO) {
+              setBookedByCourt(prev => {
+                const newMap = { ...prev }
+                if (newMap[courtKey]) {
+                  const newSet = new Set(newMap[courtKey])
+                  newSet.delete(oldSlotStartISO)
+                  newMap[courtKey] = newSet
+                }
+                return newMap
+              })
+              console.log('[REALTIME] ✅ Slot freed (DELETE):', { courtKey, slot_start: oldSlotStartISO })
+            }
           }
         }
       )
@@ -542,10 +581,18 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     }
   }, [selectedDate, club, terrains])
   
-  // Vérifier si un créneau est disponible (O(1)) - Compare par slot_id
-  const isSlotAvailable = useCallback((courtId: string, slotId: number): boolean => {
-    return !(bookedByCourt[courtId]?.has(slotId))
-  }, [bookedByCourt])
+  // ✅ Vérifier si un créneau est disponible - Compare par slot_start (timestamptz)
+  const isSlotAvailable = useCallback((courtId: string, slot: TimeSlot): boolean => {
+    // ✅ Calculer le slot_start attendu pour ce créneau
+    // Format attendu: 2026-01-23T08:00:00.000Z (ISO UTC)
+    const dateStr = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
+    const slotStartISO = `${dateStr}T${slot.start_time}Z` // ex: 2026-01-23T08:00:00Z
+    
+    // ✅ Vérifier si ce slot_start existe dans les bookings
+    const isBooked = bookedByCourt[courtId]?.has(slotStartISO) ?? false
+    
+    return !isBooked
+  }, [bookedByCourt, selectedDate])
   
   // ✅ Fonction pour envoyer les invitations automatiquement
   const sendInvitations = useCallback(async (reservationId: string) => {
@@ -735,102 +782,54 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       console.log('[BOOKING] ✅ Duration verified: EXACTLY 90 minutes')
       
+      // ✅ PAYLOAD REAL SCHEMA: bookings(club_id, court_id, slot_start, fin_de_slot, statut)
       const bookingPayload = {
         club_id: club.id,                       // ✅ UUID réel depuis public.clubs
         court_id: courtId,                      // ✅ UUID réel depuis public.courts
-        booking_date: bookingDate,              // ✅ DATE YYYY-MM-DD NOT NULL (snake_case)
-        slot_id: selectedSlot.id,               // ✅ INTEGER NOT NULL (snake_case) référence time_slots.id
-        slot_start: slot_start,                 // ✅ ISO UTC - calculé strictement = date + start_time
-        slot_end: slot_end,                     // ✅ ISO UTC - calculé strictement = slot_start + 90 min EXACT
-        status: 'confirmed' as const,           // ✅ 'confirmed' (enum booking_status validé)
-        created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (OBLIGATOIRE pour RLS)
-        created_at: new Date().toISOString()    // timestamptz (snake_case)
+        slot_start: slot_start,                 // ✅ timestamptz - calculé = date + start_time
+        fin_de_slot: slot_end,                  // ✅ timestamptz - calculé = slot_start + 90 min EXACT
+        statut: 'confirmed' as const,           // ✅ 'confirmed' | 'cancelled'
+        created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (pour RLS)
+        created_at: new Date().toISOString()    // ✅ timestamptz
       }
       
       // ✅ LOGGING COMPLET DU PAYLOAD AVANT INSERT
-      console.log('[BOOKING PAYLOAD] ===== FULL PAYLOAD =====')
-      console.log(JSON.stringify(bookingPayload, null, 2))
-      console.log('[BOOKING PAYLOAD] ===== CRITICAL FIELDS =====')
-      console.log('club_id:', bookingPayload.club_id)
-      console.log('court_id:', bookingPayload.court_id)
-      console.log('booking_date:', bookingPayload.booking_date)
-      console.log('slot_id:', bookingPayload.slot_id)
-      console.log('slot_start:', bookingPayload.slot_start, '← ISO UTC')
-      console.log('slot_end:', bookingPayload.slot_end, '← ISO UTC')
-      console.log('status:', bookingPayload.status, '← enum: confirmed')
-      console.log('created_by:', bookingPayload.created_by, '← REQUIRED FOR RLS')
-      console.log('created_at:', bookingPayload.created_at)
-      
-      // ✅ VALIDATION FINALE : S'assurer qu'aucun champ critique n'est null/undefined
-      if (!bookingPayload.booking_date) {
-        console.error('[BOOKING] ❌ CRITICAL: booking_date is falsy:', bookingPayload.booking_date)
-        alert('Erreur critique: booking_date est vide')
-        setIsSubmitting(false)
-        return
-      }
-      
-      if (!bookingPayload.slot_id && bookingPayload.slot_id !== 0) {
-        console.error('[BOOKING] ❌ CRITICAL: slot_id is falsy:', bookingPayload.slot_id)
-        alert('Erreur critique: slot_id est vide')
-        setIsSubmitting(false)
-        return
-      }
-      
-      if (!bookingPayload.slot_start || !bookingPayload.slot_end) {
-        console.error('[BOOKING] ❌ CRITICAL: slot_start or slot_end is falsy')
-        alert('Erreur critique: Timestamps manquants')
-        setIsSubmitting(false)
-        return
-      }
-      
-      // ✅ VALIDATION FORMAT ISO UTC
-      if (!bookingPayload.slot_start.endsWith('Z') || !bookingPayload.slot_end.endsWith('Z')) {
-        console.error('[BOOKING] ❌ CRITICAL: Timestamps not in UTC format')
-        console.error('  slot_start:', bookingPayload.slot_start, 'has Z?', bookingPayload.slot_start.endsWith('Z'))
-        console.error('  slot_end:', bookingPayload.slot_end, 'has Z?', bookingPayload.slot_end.endsWith('Z'))
-        alert('Erreur critique: Format timestamp invalide (doit être ISO UTC avec Z)')
-        setIsSubmitting(false)
-        return
-      }
-      
-      console.log('[BOOKING] ✅ All validations passed')
-      
-      // ============================================
-      // ✅ LOG FINAL DU PAYLOAD AVANT INSERT
-      // ============================================
       console.log('═══════════════════════════════════════════════════════════')
       console.log('[BOOKING INSERT] 🚀 ABOUT TO INSERT INTO bookings TABLE')
       console.log('═══════════════════════════════════════════════════════════')
       console.log('[BOOKING PAYLOAD] Complete payload:')
       console.log(JSON.stringify(bookingPayload, null, 2))
       console.log('───────────────────────────────────────────────────────────')
-      console.log('[BOOKING PAYLOAD] Critical fields (foreign keys):')
+      console.log('[BOOKING PAYLOAD] Critical fields:')
       console.log('  • club_id:', bookingPayload.club_id, '(UUID from clubs)')
       console.log('  • court_id:', bookingPayload.court_id, '(UUID from courts - MUST EXIST IN DB)')
-      console.log('  • slot_id:', bookingPayload.slot_id, '(INTEGER from time_slots)')
       console.log('[BOOKING PAYLOAD] Timestamps:')
-      console.log('  • slot_start:', bookingPayload.slot_start)
-      console.log('  • slot_end:', bookingPayload.slot_end)
+      console.log('  • slot_start:', bookingPayload.slot_start, '← TIMESTAMPTZ ISO UTC')
+      console.log('  • fin_de_slot:', bookingPayload.fin_de_slot, '← TIMESTAMPTZ ISO UTC')
+      console.log('  • duration:', diffMin, 'minutes (MUST BE 90)')
       console.log('[BOOKING PAYLOAD] Other fields:')
-      console.log('  • booking_date:', bookingPayload.booking_date)
-      console.log('  • status:', bookingPayload.status)
-      console.log('  • created_by:', bookingPayload.created_by)
+      console.log('  • statut:', bookingPayload.statut, '← confirmed | cancelled')
+      console.log('  • created_by:', bookingPayload.created_by, '← REQUIRED FOR RLS')
+      console.log('  • created_at:', bookingPayload.created_at)
       console.log('═══════════════════════════════════════════════════════════')
       
-      // ============================================
-      // 🚨 DEBUG: PAYLOAD EXACT ENVOYÉ À SUPABASE
-      // ============================================
-      console.log('[BOOKING_PAYLOAD]', {
-        club_id: bookingPayload.club_id,
-        court_id: bookingPayload.court_id,
-        booking_date: bookingPayload.booking_date,
-        slot_id: bookingPayload.slot_id,
-        slot_start: bookingPayload.slot_start,
-        slot_end: bookingPayload.slot_end,
-        status: bookingPayload.status,
-        created_by: bookingPayload.created_by,
-        durationMinutes: (new Date(bookingPayload.slot_end).getTime() - new Date(bookingPayload.slot_start).getTime()) / 60000,
-      })
+      // ✅ VALIDATION FINALE : S'assurer qu'aucun champ critique n'est null/undefined
+      if (!bookingPayload.slot_start || !bookingPayload.fin_de_slot) {
+        console.error('[BOOKING] ❌ CRITICAL: slot_start or fin_de_slot is falsy')
+        alert('Erreur critique: Timestamps manquants')
+        setIsSubmitting(false)
+        return
+      }
+      
+      // ✅ VALIDATION FORMAT ISO UTC
+      if (!bookingPayload.slot_start.endsWith('Z') || !bookingPayload.fin_de_slot.endsWith('Z')) {
+        console.error('[BOOKING] ❌ CRITICAL: Timestamps not in UTC format')
+        console.error('  slot_start:', bookingPayload.slot_start, 'has Z?', bookingPayload.slot_start.endsWith('Z'))
+        console.error('  fin_de_slot:', bookingPayload.fin_de_slot, 'has Z?', bookingPayload.fin_de_slot.endsWith('Z'))
+        alert('Erreur critique: Format timestamp invalide (doit être ISO UTC avec Z)')
+        setIsSubmitting(false)
+        return
+      }
       
       // ✅ VALIDATION COURT_ID (CRITIQUE POUR FOREIGN KEY)
       if (!bookingPayload.court_id) {
@@ -852,6 +851,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         return
       }
       
+      console.log('[BOOKING] ✅ All validations passed')
       console.log('[BOOKING] ✅ court_id validation passed:', bookingPayload.court_id)
       console.log('[BOOKING] ✅ court_id is valid UUID format')
       console.log('[BOOKING INSERT] Calling Supabase insert...')
@@ -882,7 +882,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         // Erreur de contrainte CHECK (durée 90 minutes)
         if (bookingError.code === '23514' || bookingError.message?.includes('90min') || bookingError.message?.includes('booking_90min')) {
           const startHasZ = bookingPayload.slot_start.endsWith('Z')
-          const endHasZ = bookingPayload.slot_end.endsWith('Z')
+          const endHasZ = bookingPayload.fin_de_slot.endsWith('Z')
           errorMessage = [
             `❌ Erreur de contrainte: La durée du créneau doit être exactement 90 minutes`,
             ``,
@@ -894,9 +894,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `slot_start: ${bookingPayload.slot_start}`,
             `  - Format UTC (Z)? ${startHasZ ? '✅ OUI' : '❌ NON'}`,
             `  - Longueur: ${bookingPayload.slot_start.length}`,
-            `slot_end: ${bookingPayload.slot_end}`,
+            `fin_de_slot: ${bookingPayload.fin_de_slot}`,
             `  - Format UTC (Z)? ${endHasZ ? '✅ OUI' : '❌ NON'}`,
-            `  - Longueur: ${bookingPayload.slot_end.length}`,
+            `  - Longueur: ${bookingPayload.fin_de_slot.length}`,
             ``,
             `FORMATS COHÉRENTS? ${startHasZ && endHasZ ? '✅ OUI' : '❌ NON - PROBLÈME DÉTECTÉ'}`,
             ``,
@@ -926,9 +926,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `PAYLOAD ENVOYÉ:`,
             `  • club_id: ${bookingPayload.club_id}`,
             `  • court_id: ${bookingPayload.court_id} ← DOIT EXISTER DANS public.courts`,
-            `  • slot_id: ${bookingPayload.slot_id}`,
             `  • slot_start: ${bookingPayload.slot_start}`,
-            `  • slot_end: ${bookingPayload.slot_end}`,
+            `  • fin_de_slot: ${bookingPayload.fin_de_slot}`,
             ``,
             `ERREUR POSTGRESQL:`,
             `${bookingError.message}`,
@@ -950,11 +949,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `PAYLOAD ENVOYÉ:`,
             `  • club_id: ${bookingPayload.club_id}`,
             `  • court_id: ${bookingPayload.court_id}`,
-            `  • booking_date: ${bookingPayload.booking_date}`,
-            `  • slot_id: ${bookingPayload.slot_id}`,
             `  • slot_start: ${bookingPayload.slot_start}`,
-            `  • slot_end: ${bookingPayload.slot_end}`,
-            `  • status: ${bookingPayload.status}`,
+            `  • fin_de_slot: ${bookingPayload.fin_de_slot}`,
+            `  • statut: ${bookingPayload.statut}`,
             `  • created_by: ${bookingPayload.created_by}`
           ].filter(Boolean).join('\n')
         }
@@ -971,19 +968,19 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('  - id:', bookingData.id)
       console.log('  - club_id:', bookingData.club_id)
       console.log('  - court_id:', bookingData.court_id)
-      console.log('  - booking_date:', bookingData.booking_date, '(should NOT be NULL)')
-      console.log('  - slot_id:', bookingData.slot_id, '(should NOT be NULL)')
-      console.log('  - status:', bookingData.status)
+      console.log('  - slot_start:', bookingData.slot_start, '(TIMESTAMPTZ)')
+      console.log('  - fin_de_slot:', bookingData.fin_de_slot, '(TIMESTAMPTZ)')
+      console.log('  - statut:', bookingData.statut, '(confirmed | cancelled)')
       
-      // ✅ VÉRIFICATION POST-INSERT : booking_date et slot_id ne doivent PAS être NULL
-      if (!bookingData.booking_date) {
-        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: booking_date is NULL in DB!')
-        alert('ATTENTION: La réservation a été créée mais booking_date est NULL en base!')
+      // ✅ VÉRIFICATION POST-INSERT : slot_start et fin_de_slot ne doivent PAS être NULL
+      if (!bookingData.slot_start) {
+        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: slot_start is NULL in DB!')
+        alert('ATTENTION: La réservation a été créée mais slot_start est NULL en base!')
       }
       
-      if (!bookingData.slot_id && bookingData.slot_id !== 0) {
-        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: slot_id is NULL in DB!')
-        alert('ATTENTION: La réservation a été créée mais slot_id est NULL en base!')
+      if (!bookingData.fin_de_slot) {
+        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: fin_de_slot is NULL in DB!')
+        alert('ATTENTION: La réservation a été créée mais fin_de_slot est NULL en base!')
       }
       
       // ✅ Sauvegarder aussi dans localStorage pour affichage "Mes réservations"
@@ -1062,7 +1059,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
-    if (isSlotAvailable(String(courtId), slot.id)) {
+    if (isSlotAvailable(String(courtId), slot)) {
       console.log('[SLOT CLICK] Opening player modal')
       setSelectedTerrain(terrainId)
       setSelectedSlot(slot)
@@ -1070,7 +1067,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     } else {
       console.log('[SLOT CLICK] Slot not available')
     }
-  }, [isSlotAvailable, isSubmitting, terrains])
+  }, [isSlotAvailable, isSubmitting, terrains, selectedDate])
   
   const handlePlayersContinue = useCallback((players: string[], emails: string[], showPremium: boolean) => {
     console.log('[PLAYERS CONTINUE]', { 
@@ -1315,7 +1312,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 
                 // Calculer le nombre de créneaux disponibles pour ce terrain
                 const availableCount = courtKey 
-                  ? timeSlots.filter(slot => isSlotAvailable(courtKey, slot.id)).length
+                  ? timeSlots.filter(slot => isSlotAvailable(courtKey, slot)).length
                   : timeSlots.length // Si pas de court_id, tous sont disponibles (fallback)
                 const totalCount = timeSlots.length
                 const availabilityPercent = Math.round((availableCount / totalCount) * 100)
@@ -1348,8 +1345,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                     <div className="p-5">
                       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                         {timeSlots.map((slot) => {
-                          // ✅ Vérifier disponibilité par slot_id
-                          const available = courtKey ? isSlotAvailable(courtKey, slot.id) : true
+                          // ✅ Vérifier disponibilité par slot_start (timestamptz)
+                          const available = courtKey ? isSlotAvailable(courtKey, slot) : true
                           
                           return (
                             <button
