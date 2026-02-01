@@ -28,12 +28,22 @@ export const supabaseBrowser = createBrowserClient(
   {
     cookies: {
       get(name: string) {
+        // ✅ Guard: vérifier que document existe (côté client uniquement)
+        if (typeof document === 'undefined') {
+          return undefined
+        }
+        
         // Utilise document.cookie pour lire les cookies
         const value = `; ${document.cookie}`
         const parts = value.split(`; ${name}=`)
         if (parts.length === 2) return parts.pop()?.split(';').shift()
       },
       set(name: string, value: string, options: any) {
+        // ✅ Guard: vérifier que document existe (côté client uniquement)
+        if (typeof document === 'undefined') {
+          return
+        }
+        
         // Utilise document.cookie pour écrire les cookies
         let cookie = `${name}=${value}`
         

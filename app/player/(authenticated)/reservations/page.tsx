@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
+// ✅ Force dynamic rendering (pas de pre-render statique)
+// Nécessaire car supabaseBrowser accède à document.cookie
+export const dynamic = 'force-dynamic'
+
 type Booking = {
   id: string
   court_id: string

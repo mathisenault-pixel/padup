@@ -7,6 +7,10 @@ import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 
+// ✅ Force dynamic rendering (pas de pre-render statique)
+// Nécessaire car supabaseBrowser accède à document.cookie
+export const dynamic = 'force-dynamic'
+
 type Club = {
   id: string // ✅ UUID depuis public.clubs
   name: string // ✅ Correspond à public.clubs.name

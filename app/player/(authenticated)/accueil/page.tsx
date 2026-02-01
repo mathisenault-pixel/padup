@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+
+// ✅ Force dynamic rendering (pas de pre-render statique)
+// Nécessaire car supabaseBrowser accède à document.cookie
+export const dynamic = 'force-dynamic'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
