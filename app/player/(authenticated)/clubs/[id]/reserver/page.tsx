@@ -121,32 +121,16 @@ const generateNextDays = () => {
 }
 
 export default function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
-  console.log('[RESERVER PAGE] ✅ Component mounted, params (promise):', params)
-  
+  // ============================================
+  // 1️⃣ RÉSOUDRE params EN PREMIER (avant tout autre code)
+  // ============================================
   const resolvedParams = use(params)
-  console.log('[RESERVER PAGE] ✅ Params resolved:', resolvedParams)
-  
-  const router = useRouter()
-  
-  // ============================================
-  // SÉCURISATION: Vérifier que params.id existe
-  // ============================================
   const clubId = resolvedParams?.id
   
-  console.log('[RESERVER PAGE] clubId:', clubId, 'type=', typeof clubId)
-  
-  if (!clubId) {
-    console.error('[RESERVER PAGE] ❌ CRITICAL: clubId is undefined/null!')
-  }
-  
-  // Si pas d'ID, rediriger vers la liste des clubs
-  useEffect(() => {
-    if (!clubId) {
-      console.error('[RESERVER PAGE] ❌ No clubId in params, redirecting to clubs list')
-      console.error('[RESERVER PAGE] resolvedParams:', resolvedParams)
-      router.replace('/player/clubs')
-    }
-  }, [clubId, router, resolvedParams])
+  // ============================================
+  // 2️⃣ TOUS LES HOOKS (SANS CONDITION)
+  // ============================================
+  const router = useRouter()
   
   // ============================================
   // CHARGEMENT DU CLUB DEPUIS SUPABASE
@@ -268,64 +252,13 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     checkAuth()
   }, [])
   
-  
-  // ✅ Guard: Si pas d'ID, ne rien afficher (le useEffect redirige)
-  if (!clubId) {
-    return null
-  }
-  
-  // ✅ Vérification du club (chargement en cours ou erreur)
-  if (isLoadingClub) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
-          <p className="text-gray-600 font-semibold">Chargement du club...</p>
-        </div>
-      </div>
-    )
-  }
-  
-  // ✅ GUARD STRICT: Vérifier que club existe ET a toutes les propriétés nécessaires
-  if (!club) {
-    console.error('[CLUB] ❌ CRITICAL: No club found!')
-    console.error('[CLUB] clubId:', clubId)
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-md mx-auto p-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <div className="text-5xl mb-4">🏟️</div>
-            <h2 className="text-xl font-bold text-red-900 mb-2">Club introuvable</h2>
-            <p className="text-red-700 mb-4">Le club demandé n'existe pas ou n'est plus disponible.</p>
-            <p className="text-sm text-red-600 mb-6 font-mono">ID: {clubId}</p>
-            <Link href="/player/clubs" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
-              ← Retour aux clubs
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
-  }
-  
-  // ✅ GUARD STRICT: Vérifier que club.id existe (propriété critique)
-  if (!club.id) {
-    console.error('[CLUB] ❌ CRITICAL: Club has no id!')
-    console.error('[CLUB] club object:', club)
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="max-w-md mx-auto p-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <div className="text-5xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-red-900 mb-2">Données invalides</h2>
-            <p className="text-red-700 mb-4">Les données du club sont incomplètes.</p>
-            <Link href="/player/clubs" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
-              ← Retour aux clubs
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // ✅ Redirection si pas de clubId (dans useEffect pour ne pas bloquer les hooks)
+  useEffect(() => {
+    if (!clubId) {
+      console.error('[RESERVER PAGE] ❌ No clubId in params, redirecting to clubs list')
+      router.replace('/player/clubs')
+    }
+  }, [clubId, router])
   
   // ============================================
   // ÉTAPE 0 — Charger les courts depuis Supabase
@@ -1207,6 +1140,72 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       handleFinalConfirmation(false)
     })
   }, [handleFinalConfirmation])
+  
+  // ============================================
+  // 3️⃣ GUARDS POUR LE JSX (APRÈS TOUS LES HOOKS)
+  // ============================================
+  
+  // ✅ Guard: Si pas d'ID, ne rien afficher (le useEffect redirige)
+  if (!clubId) {
+    return null
+  }
+  
+  // ✅ Vérification du club (chargement en cours ou erreur)
+  if (isLoadingClub) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+          <p className="text-gray-600 font-semibold">Chargement du club...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  // ✅ GUARD STRICT: Vérifier que club existe ET a toutes les propriétés nécessaires
+  if (!club) {
+    console.error('[CLUB] ❌ CRITICAL: No club found!')
+    console.error('[CLUB] clubId:', clubId)
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="max-w-md mx-auto p-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div className="text-5xl mb-4">🏟️</div>
+            <h2 className="text-xl font-bold text-red-900 mb-2">Club introuvable</h2>
+            <p className="text-red-700 mb-4">Le club demandé n'existe pas ou n'est plus disponible.</p>
+            <p className="text-sm text-red-600 mb-6 font-mono">ID: {clubId}</p>
+            <Link href="/player/clubs" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
+              ← Retour aux clubs
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
+  // ✅ GUARD STRICT: Vérifier que club.id existe (propriété critique)
+  if (!club.id) {
+    console.error('[CLUB] ❌ CRITICAL: Club has no id!')
+    console.error('[CLUB] club object:', club)
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="max-w-md mx-auto p-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-xl font-bold text-red-900 mb-2">Données invalides</h2>
+            <p className="text-red-700 mb-4">Les données du club sont incomplètes.</p>
+            <Link href="/player/clubs" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
+              ← Retour aux clubs
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
+  // ============================================
+  // 4️⃣ HELPER FUNCTIONS & JSX
+  // ============================================
   
   const formatDate = (date: Date) => {
     const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
