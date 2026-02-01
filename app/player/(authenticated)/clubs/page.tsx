@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 
@@ -27,23 +28,56 @@ export default function ClubsPage() {
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
+  const [isLoading, setIsLoading] = useState(true)
 
-  const [clubs, setClubs] = useState<Club[]>([
-    {
-      id: 'ba43c579-e522-4b51-8542-737c2c6452bb', // ✅ UUID réel depuis public.clubs
-      name: 'Club Démo Pad\'up', // ✅ Correspond à public.clubs.name
-      city: 'Avignon', // ✅ Correspond à public.clubs.city
-      distance: 5,
-      nombreTerrains: 2,
-      note: 4.9,
-      avis: 42,
-      imageUrl: '/images/clubs/demo-padup.jpg',
-      prixMin: 12,
-      equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
-      favoris: false,
-      disponible: true
+  const [clubs, setClubs] = useState<Club[]>([])
+
+  // ============================================
+  // CHARGEMENT DES CLUBS DEPUIS SUPABASE
+  // ============================================
+  // ✅ Identique connecté ou non (pas de filtre user/owner_id/memberships)
+  useEffect(() => {
+    const loadClubs = async () => {
+      console.log('[CLUBS] Loading clubs from Supabase...')
+      console.log('[CLUBS] Query: from("clubs").select("id,name,city").order("created_at",{ascending:false})')
+      
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('id, name, city')
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('[CLUBS] Error loading clubs:', error)
+        console.error('[CLUBS] Error details:', JSON.stringify(error, null, 2))
+        setIsLoading(false)
+        return
+      }
+      
+      console.log('[CLUBS] ✅ Clubs loaded:', data?.length || 0, 'clubs')
+      console.log('[CLUBS] Data:', data)
+      
+      // Transformer les données Supabase en format UI
+      const clubsWithUI = (data || []).map(club => ({
+        id: club.id,
+        name: club.name || 'Club sans nom',
+        city: club.city || 'Ville non spécifiée',
+        distance: 5, // TODO: Calculer avec géolocation
+        nombreTerrains: 2, // TODO: Compter depuis public.courts
+        note: 4.5,
+        avis: 0,
+        imageUrl: '/images/clubs/demo-padup.jpg', // TODO: Utiliser logo_url depuis DB
+        prixMin: 12,
+        equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'], // TODO: Depuis DB
+        favoris: false,
+        disponible: true
+      }))
+      
+      setClubs(clubsWithUI)
+      setIsLoading(false)
     }
-  ])
+    
+    loadClubs()
+  }, [])
 
   const toggleEquipement = (equipement: string) => {
     setSelectedEquipements(prev => 
@@ -267,9 +301,18 @@ export default function ClubsPage() {
           </div>
         </div>
 
+        {/* Loading state */}
+        {isLoading && (
+          <div className="text-center py-16">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+            <p className="text-gray-600 font-semibold">Chargement des clubs...</p>
+          </div>
+        )}
+
         {/* Liste des clubs */}
-        <div className="space-y-4">
-          {filteredAndSortedClubs.map((club) => (
+        {!isLoading && (
+          <div className="space-y-4">
+            {filteredAndSortedClubs.map((club) => (
             <Link
               key={club.id}
               href={`/player/clubs/${club.id}/reserver`}
@@ -369,10 +412,9 @@ export default function ClubsPage() {
               </div>
             </Link>
           ))}
-        </div>
 
-        {/* Message si aucun résultat */}
-        {filteredAndSortedClubs.length === 0 && (
+            {/* Message si aucun résultat */}
+            {filteredAndSortedClubs.length === 0 && (
           <div className="text-center py-16">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -390,6 +432,8 @@ export default function ClubsPage() {
             >
               Réinitialiser
             </button>
+            </div>
+            )}
           </div>
         )}
       </div>

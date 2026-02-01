@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 
@@ -25,61 +26,54 @@ export default function AccueilPage() {
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
+  const [isLoading, setIsLoading] = useState(true)
 
-  // ✅ Pour MVP: tous les clubs pointent vers le club démo UUID
-  // En production, chaque club aurait son propre UUID
-  const DEMO_CLUB_UUID = 'ba43c579-e522-4b51-8542-737c2c6452bb'
+  const [clubs, setClubs] = useState<Club[]>([])
 
-  const [clubs] = useState<Club[]>([
-    {
-      id: DEMO_CLUB_UUID, // ✅ UUID du club démo (seul club fonctionnel pour MVP)
-      name: 'Le Hangar Sport & Co', // ✅ Correspond à public.clubs.name
-      city: 'Rochefort-du-Gard', // ✅ Correspond à public.clubs.city
-      distance: '5 min',
-      nombreTerrains: 8,
-      note: 4.8,
-      avis: 245,
-      photo: '🏗️',
-      imageUrl: '/images/clubs/le-hangar.jpg',
-      prixMin: 12,
-    },
-    {
-      id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
-      name: 'Paul & Louis Sport', // ✅ Correspond à public.clubs.name
-      city: 'Le Pontet', // ✅ Correspond à public.clubs.city
-      distance: '10 min',
-      nombreTerrains: 8,
-      note: 4.7,
-      avis: 189,
-      photo: '🎾',
-      imageUrl: '/images/clubs/paul-louis.jpg',
-      prixMin: 13,
-    },
-    {
-      id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
-      name: 'ZE Padel', // ✅ Correspond à public.clubs.name
-      city: 'Boulbon', // ✅ Correspond à public.clubs.city
-      distance: '20 min',
-      nombreTerrains: 6,
-      note: 4.6,
-      avis: 127,
-      photo: '⚡',
-      imageUrl: '/images/clubs/ze-padel.jpg',
-      prixMin: 11,
-    },
-    {
-      id: DEMO_CLUB_UUID, // ✅ Pour MVP, tous redirigent vers le club démo
-      name: 'QG Padel Club', // ✅ Correspond à public.clubs.name
-      city: 'Saint-Laurent-des-Arbres', // ✅ Correspond à public.clubs.city
-      distance: '15 min',
-      nombreTerrains: 4,
-      note: 4.7,
-      avis: 98,
-      photo: '🏟️',
-      imageUrl: '/images/clubs/qg-padel.jpg',
-      prixMin: 12,
-    },
-  ])
+  // ============================================
+  // CHARGEMENT DES CLUBS DEPUIS SUPABASE
+  // ============================================
+  // ✅ Identique connecté ou non (pas de filtre user/owner_id/memberships)
+  useEffect(() => {
+    const loadClubs = async () => {
+      console.log('[ACCUEIL] Loading clubs from Supabase...')
+      console.log('[ACCUEIL] Query: from("clubs").select("id,name,city").order("created_at",{ascending:false})')
+      
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('id, name, city')
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('[ACCUEIL] Error loading clubs:', error)
+        console.error('[ACCUEIL] Error details:', JSON.stringify(error, null, 2))
+        setIsLoading(false)
+        return
+      }
+      
+      console.log('[ACCUEIL] ✅ Clubs loaded:', data?.length || 0, 'clubs')
+      console.log('[ACCUEIL] Data:', data)
+      
+      // Transformer les données Supabase en format UI
+      const clubsWithUI = (data || []).map((club, index) => ({
+        id: club.id,
+        name: club.name || 'Club sans nom',
+        city: club.city || 'Ville non spécifiée',
+        distance: `${5 + index * 5} min`, // TODO: Calculer avec géolocation
+        nombreTerrains: 6 + index * 2, // TODO: Compter depuis public.courts
+        note: 4.6 + (index * 0.1),
+        avis: 100 + index * 50,
+        photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
+        imageUrl: `/images/clubs/demo-padup.jpg`, // TODO: Utiliser logo_url depuis DB
+        prixMin: 11 + index,
+      }))
+      
+      setClubs(clubsWithUI)
+      setIsLoading(false)
+    }
+    
+    loadClubs()
+  }, [])
 
   const handleReserver = (club: Club) => {
     setSelectedClub(club)
