@@ -171,7 +171,7 @@
 ## 📝 NOTES
 
 - **Pas de page 403 custom** : Pour le moment, redirect vers l'espace correct
-- **API routes exclues** : Matcher `/((?!_next/static|_next/image|favicon.ico|api/).*)` 
+- **API routes exclues** : Matcher `/((?!_next/static|_next/image|icon.png|api/).*)` 
 - **Logout propre** : Server action `signOutAction` → `/player/accueil`
 - **Login si connecté** : Redirect automatique vers l'espace approprié
 
