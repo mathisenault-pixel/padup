@@ -50,18 +50,8 @@ export default function PlayerNav() {
     }
   ]
 
-  const accountNavItems = [
-    {
-      href: '/player/compte',
-      label: 'Mon compte',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-      badge: null
-    }
-  ]
+  // Onglet "Mon compte" retiré - accessible via le bouton dans AuthStatus
+  const accountNavItems: any[] = []
 
   const isActive = (href: string) => pathname === href
 
@@ -88,31 +78,7 @@ export default function PlayerNav() {
         ))}
       </div>
 
-      {/* Navigation compte */}
-      <div className="flex items-center gap-2">
-        {accountNavItems.map((item) => (
-          <button
-            key={item.href}
-            type="button"
-            onClick={() => router.push(item.href)}
-            className={`group relative inline-flex items-center px-5 py-3 text-[15px] font-semibold rounded-2xl transition-all duration-300 whitespace-nowrap ${
-              isActive(item.href)
-                ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
-                : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <span className="whitespace-nowrap">{item.label}</span>
-            {isActive(item.href) && (
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl blur-xl opacity-30 -z-10"></div>
-            )}
-            {item.badge && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                {item.badge}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      {/* Navigation compte - Désactivée, accessible via bouton dans AuthStatus */}
     </nav>
   )
 }
