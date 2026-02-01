@@ -146,6 +146,33 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const [bookedByCourt, setBookedByCourt] = useState<Record<string, Set<number>>>({}) // Map de court_id → Set<slot_id>
   const [isLoadingSlots, setIsLoadingSlots] = useState(true)
   
+  // ============================================
+  // LOGS AUTH AU MOUNT DE LA PAGE
+  // ============================================
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log('[RESERVER PAGE] Checking auth on mount...')
+      
+      const sessionResult = await supabase.auth.getSession()
+      console.log('[AUTH session] On mount:', sessionResult)
+      console.log('[AUTH session] Session present:', sessionResult.data.session ? 'YES' : 'NO')
+      if (sessionResult.data.session) {
+        console.log('[AUTH session] User email:', sessionResult.data.session.user?.email)
+        console.log('[AUTH session] Access token:', sessionResult.data.session.access_token?.substring(0, 20) + '...')
+      }
+      
+      const userResult = await supabase.auth.getUser()
+      console.log('[AUTH user] On mount:', userResult)
+      console.log('[AUTH user] User present:', userResult.data.user ? 'YES' : 'NO')
+      if (userResult.data.user) {
+        console.log('[AUTH user] User email:', userResult.data.user.email)
+        console.log('[AUTH user] User ID:', userResult.data.user.id)
+      }
+    }
+    
+    checkAuth()
+  }, [])
+  
   
   if (!club) {
     return <div className="p-8">Club introuvable</div>
