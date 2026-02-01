@@ -97,17 +97,17 @@ export default function AccueilPage() {
           <div className="text-center mb-12">
             <div className="inline-block mb-6">
               <span className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
-                Le padel, simplement
+                Jouez plus, cherchez moins
               </span>
             </div>
             
             <h1 className="text-7xl md:text-8xl font-black text-gray-900 mb-6 leading-none">
-              Réservez votre terrain de padel<br />
-              <span className="text-blue-600">en quelques secondes</span>
+              Trouvez votre terrain de padel<br />
+              <span className="text-blue-600">près de chez vous</span>
             </h1>
             
             <p className="text-2xl text-gray-600 mb-10 max-w-3xl mx-auto">
-              Trouvez un club, choisissez un créneau, jouez.
+              Consultez les créneaux disponibles et réservez en quelques clics.
             </p>
 
             {/* BARRE DE RECHERCHE DISCRÈTE */}
@@ -135,7 +135,7 @@ export default function AccueilPage() {
                 <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="font-medium">Réservation instantanée</span>
+                <span className="font-medium">Disponibilités en temps réel</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
