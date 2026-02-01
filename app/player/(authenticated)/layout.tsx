@@ -35,15 +35,16 @@ export default function PlayerAuthLayout({
 
             {/* Auth Section Premium - Dynamic based on auth state */}
             <div className="flex items-center gap-3">
-              {/* Espace club */}
+              {/* Espace club - Visible desktop et mobile */}
               <Link
                 href="/club-access"
-                className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                Espace club
+                <span className="hidden sm:inline">Espace club</span>
+                <span className="sm:hidden">Club</span>
               </Link>
 
               <AuthStatus />
