@@ -38,8 +38,7 @@ type Booking = {
   club_id: string
   court_id: string
   slot_start: string // timestamptz (ISO format)
-  fin_de_slot: string // timestamptz (ISO format)
-  statut: string // 'confirmed' | 'cancelled'
+  status: string // 'confirmed' | 'cancelled'
 }
 
 // ============================================
@@ -375,16 +374,16 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('🔍 [DEBUG BOOKINGS] Court IDs:', courtIds)
       console.log('🔍 [DEBUG BOOKINGS] Date selected:', dateStr)
       console.log('🔍 [DEBUG BOOKINGS] Range: slot_start >= ', startOfDay, ' AND < ', endOfDay)
-      console.log('🔍 [DEBUG BOOKINGS] Query: from("bookings").select("id, court_id, slot_start, statut").in("court_id", courtIds).gte("slot_start", startOfDay).lt("slot_start", endOfDay).eq("statut", "confirmed")')
+      console.log('🔍 [DEBUG BOOKINGS] Query: from("bookings").select("id, court_id, slot_start, status").in("court_id", courtIds).gte("slot_start", startOfDay).lt("slot_start", endOfDay).eq("status", "confirmed")')
       
       // ✅ Charger les bookings du club pour la journée sélectionnée
       const { data, error } = await supabase
         .from('bookings')
-        .select('id, court_id, slot_start, statut')
+        .select('id, court_id, slot_start, status')
         .in('court_id', courtIds)
         .gte('slot_start', startOfDay)
         .lt('slot_start', endOfDay)
-        .eq('statut', 'confirmed')
+        .eq('status', 'confirmed')
       
       if (error) {
         console.error('❌ [DEBUG BOOKINGS] Error loading bookings:', error)
@@ -489,10 +488,10 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             return slotStart
           }
           
-          // ✅ INSERT: ajouter si statut = 'confirmed'
+          // ✅ INSERT: ajouter si status = 'confirmed'
           if (payload.eventType === 'INSERT' && payloadNew) {
             const slotStartISO = normalizeSlotStart(payloadNew.slot_start)
-            if (payloadNew.statut === 'confirmed' && slotStartISO) {
+            if (payloadNew.status === 'confirmed' && slotStartISO) {
               setBookedByCourt(prev => {
                 const newMap = { ...prev }
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
@@ -503,15 +502,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             }
           }
           
-          // ✅ UPDATE: gérer changement de statut ou slot_start
+          // ✅ UPDATE: gérer changement de status ou slot_start
           else if (payload.eventType === 'UPDATE' && payloadNew && payloadOld) {
             const newSlotStartISO = normalizeSlotStart(payloadNew.slot_start)
             const oldSlotStartISO = normalizeSlotStart(payloadOld.slot_start)
             
-            // Cas 1: changement de statut
-            if (payloadOld.statut !== payloadNew.statut) {
+            // Cas 1: changement de status
+            if (payloadOld.status !== payloadNew.status) {
               // old → confirmed: ajouter
-              if (payloadNew.statut === 'confirmed' && newSlotStartISO) {
+              if (payloadNew.status === 'confirmed' && newSlotStartISO) {
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (!newMap[courtKey]) newMap[courtKey] = new Set()
@@ -521,7 +520,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 console.log('[REALTIME] ✅ Slot booked (UPDATE):', { courtKey, slot_start: newSlotStartISO })
               }
               // confirmed → cancelled: retirer
-              else if (payloadNew.statut === 'cancelled' && payloadOld.statut === 'confirmed' && oldSlotStartISO) {
+              else if (payloadNew.status === 'cancelled' && payloadOld.status === 'confirmed' && oldSlotStartISO) {
                 setBookedByCourt(prev => {
                   const newMap = { ...prev }
                   if (newMap[courtKey]) {
@@ -541,11 +540,11 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                 if (!newMap[courtKey]) newMap[courtKey] = new Set()
                 const newSet = new Set(newMap[courtKey])
                 // Retirer ancien slot si c'était confirmed
-                if (payloadOld.statut === 'confirmed' && oldSlotStartISO) {
+                if (payloadOld.status === 'confirmed' && oldSlotStartISO) {
                   newSet.delete(oldSlotStartISO)
                 }
                 // Ajouter nouveau slot si c'est confirmed
-                if (payloadNew.statut === 'confirmed' && newSlotStartISO) {
+                if (payloadNew.status === 'confirmed' && newSlotStartISO) {
                   newSet.add(newSlotStartISO)
                 }
                 newMap[courtKey] = newSet
@@ -782,13 +781,13 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       console.log('[BOOKING] ✅ Duration verified: EXACTLY 90 minutes')
       
-      // ✅ PAYLOAD REAL SCHEMA: bookings(club_id, court_id, slot_start, fin_de_slot, statut)
+      // ✅ PAYLOAD REAL SCHEMA: bookings(club_id, court_id, slot_start, status)
+      // Note: Pas de colonne fin_de_slot en DB, durée = slot_start + 90 min (calculé côté frontend/DB)
       const bookingPayload = {
         club_id: club.id,                       // ✅ UUID réel depuis public.clubs
         court_id: courtId,                      // ✅ UUID réel depuis public.courts
         slot_start: slot_start,                 // ✅ timestamptz - calculé = date + start_time
-        fin_de_slot: slot_end,                  // ✅ timestamptz - calculé = slot_start + 90 min EXACT
-        statut: 'confirmed' as const,           // ✅ 'confirmed' | 'cancelled'
+        status: 'confirmed' as const,           // ✅ 'confirmed' | 'cancelled'
         created_by: user.id,                    // ✅ UUID de l'utilisateur connecté (pour RLS)
         created_at: new Date().toISOString()    // ✅ timestamptz
       }
@@ -805,27 +804,26 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('  • court_id:', bookingPayload.court_id, '(UUID from courts - MUST EXIST IN DB)')
       console.log('[BOOKING PAYLOAD] Timestamps:')
       console.log('  • slot_start:', bookingPayload.slot_start, '← TIMESTAMPTZ ISO UTC')
-      console.log('  • fin_de_slot:', bookingPayload.fin_de_slot, '← TIMESTAMPTZ ISO UTC')
+      console.log('  • slot_end (calculated):', slot_end, '← slot_start + 90 min (NOT in DB)')
       console.log('  • duration:', diffMin, 'minutes (MUST BE 90)')
       console.log('[BOOKING PAYLOAD] Other fields:')
-      console.log('  • statut:', bookingPayload.statut, '← confirmed | cancelled')
+      console.log('  • status:', bookingPayload.status, '← confirmed | cancelled')
       console.log('  • created_by:', bookingPayload.created_by, '← REQUIRED FOR RLS')
       console.log('  • created_at:', bookingPayload.created_at)
       console.log('═══════════════════════════════════════════════════════════')
       
       // ✅ VALIDATION FINALE : S'assurer qu'aucun champ critique n'est null/undefined
-      if (!bookingPayload.slot_start || !bookingPayload.fin_de_slot) {
-        console.error('[BOOKING] ❌ CRITICAL: slot_start or fin_de_slot is falsy')
-        alert('Erreur critique: Timestamps manquants')
+      if (!bookingPayload.slot_start) {
+        console.error('[BOOKING] ❌ CRITICAL: slot_start is falsy')
+        alert('Erreur critique: slot_start manquant')
         setIsSubmitting(false)
         return
       }
       
       // ✅ VALIDATION FORMAT ISO UTC
-      if (!bookingPayload.slot_start.endsWith('Z') || !bookingPayload.fin_de_slot.endsWith('Z')) {
-        console.error('[BOOKING] ❌ CRITICAL: Timestamps not in UTC format')
+      if (!bookingPayload.slot_start.endsWith('Z')) {
+        console.error('[BOOKING] ❌ CRITICAL: slot_start not in UTC format')
         console.error('  slot_start:', bookingPayload.slot_start, 'has Z?', bookingPayload.slot_start.endsWith('Z'))
-        console.error('  fin_de_slot:', bookingPayload.fin_de_slot, 'has Z?', bookingPayload.fin_de_slot.endsWith('Z'))
         alert('Erreur critique: Format timestamp invalide (doit être ISO UTC avec Z)')
         setIsSubmitting(false)
         return
@@ -882,7 +880,6 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         // Erreur de contrainte CHECK (durée 90 minutes)
         if (bookingError.code === '23514' || bookingError.message?.includes('90min') || bookingError.message?.includes('booking_90min')) {
           const startHasZ = bookingPayload.slot_start.endsWith('Z')
-          const endHasZ = bookingPayload.fin_de_slot.endsWith('Z')
           errorMessage = [
             `❌ Erreur de contrainte: La durée du créneau doit être exactement 90 minutes`,
             ``,
@@ -890,15 +887,12 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `Durée calculée (frontend): ${diffMin} minutes`,
             `Durée attendue: 90 minutes exactement`,
             ``,
-            `FORMATS DES TIMESTAMPS:`,
+            `FORMAT DU TIMESTAMP:`,
             `slot_start: ${bookingPayload.slot_start}`,
             `  - Format UTC (Z)? ${startHasZ ? '✅ OUI' : '❌ NON'}`,
             `  - Longueur: ${bookingPayload.slot_start.length}`,
-            `fin_de_slot: ${bookingPayload.fin_de_slot}`,
-            `  - Format UTC (Z)? ${endHasZ ? '✅ OUI' : '❌ NON'}`,
-            `  - Longueur: ${bookingPayload.fin_de_slot.length}`,
             ``,
-            `FORMATS COHÉRENTS? ${startHasZ && endHasZ ? '✅ OUI' : '❌ NON - PROBLÈME DÉTECTÉ'}`,
+            `Note: La fin de créneau est calculée automatiquement (slot_start + 90 min)`,
             ``,
             `Erreur PostgreSQL:`,
             `${bookingError.message}`,
@@ -927,7 +921,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `  • club_id: ${bookingPayload.club_id}`,
             `  • court_id: ${bookingPayload.court_id} ← DOIT EXISTER DANS public.courts`,
             `  • slot_start: ${bookingPayload.slot_start}`,
-            `  • fin_de_slot: ${bookingPayload.fin_de_slot}`,
+            `  • status: ${bookingPayload.status}`,
             ``,
             `ERREUR POSTGRESQL:`,
             `${bookingError.message}`,
@@ -950,8 +944,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             `  • club_id: ${bookingPayload.club_id}`,
             `  • court_id: ${bookingPayload.court_id}`,
             `  • slot_start: ${bookingPayload.slot_start}`,
-            `  • fin_de_slot: ${bookingPayload.fin_de_slot}`,
-            `  • statut: ${bookingPayload.statut}`,
+            `  • status: ${bookingPayload.status}`,
             `  • created_by: ${bookingPayload.created_by}`
           ].filter(Boolean).join('\n')
         }
@@ -969,18 +962,17 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('  - club_id:', bookingData.club_id)
       console.log('  - court_id:', bookingData.court_id)
       console.log('  - slot_start:', bookingData.slot_start, '(TIMESTAMPTZ)')
-      console.log('  - fin_de_slot:', bookingData.fin_de_slot, '(TIMESTAMPTZ)')
-      console.log('  - statut:', bookingData.statut, '(confirmed | cancelled)')
+      console.log('  - status:', bookingData.status, '(confirmed | cancelled)')
       
-      // ✅ VÉRIFICATION POST-INSERT : slot_start et fin_de_slot ne doivent PAS être NULL
+      // ✅ VÉRIFICATION POST-INSERT : slot_start ne doit PAS être NULL
       if (!bookingData.slot_start) {
         console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: slot_start is NULL in DB!')
         alert('ATTENTION: La réservation a été créée mais slot_start est NULL en base!')
       }
       
-      if (!bookingData.fin_de_slot) {
-        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: fin_de_slot is NULL in DB!')
-        alert('ATTENTION: La réservation a été créée mais fin_de_slot est NULL en base!')
+      if (!bookingData.status) {
+        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: status is NULL in DB!')
+        alert('ATTENTION: La réservation a été créée mais status est NULL en base!')
       }
       
       // ✅ Sauvegarder aussi dans localStorage pour affichage "Mes réservations"
