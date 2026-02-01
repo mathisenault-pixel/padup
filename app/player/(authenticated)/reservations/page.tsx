@@ -3,36 +3,38 @@
 import { useState, useEffect } from 'react'
 import supabase from '@/lib/supabaseClient'
 
-type Reservation = {
+type Booking = {
   id: string
   court_id: string
+  booking_date: string
+  slot_id: number
   slot_start: string
-  fin_de_slot: string
-  statut: string  // ✅ Correct: 'statut' en DB (pas 'status')
-  cree_a: string  // ✅ Correct: 'cree_a' en DB (pas 'created_at')
+  slot_end: string
+  status: string  // 'confirmed' | 'pending' | 'cancelled'
+  created_at: string
 }
 
 export default function ReservationsPage() {
-  const [reservations, setReservations] = useState<Reservation[]>([])
+  const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function loadReservations() {
+    async function loadBookings() {
       try {
         setLoading(true)
         setError(null)
 
-        // TODO: Filtrer par user_id une fois l'auth implémentée
+        // TODO: Filtrer par created_by une fois l'auth implémentée
         const { data, error: queryError } = await supabase
-          .from('reservations')
+          .from('bookings')
           .select('*')
-          .order('slot_start', { ascending: true })
+          .order('created_at', { ascending: false })
 
         if (queryError) {
-          console.error('[SUPABASE ERROR - reservations]', {
-            table: 'reservations',
-            query: 'select * order by slot_start',
+          console.error('[SUPABASE ERROR - bookings]', {
+            table: 'bookings',
+            query: 'select * order by created_at desc',
             error: queryError,
             message: queryError.message,
             code: queryError.code,
@@ -41,18 +43,18 @@ export default function ReservationsPage() {
           })
           setError(`${queryError.message} (code: ${queryError.code || 'N/A'})`)
         } else {
-          console.log('[SUPABASE SUCCESS - reservations]', { count: data?.length || 0 })
-          setReservations(data || [])
+          console.log('[SUPABASE SUCCESS - bookings]', { count: data?.length || 0 })
+          setBookings(data || [])
         }
       } catch (err: any) {
-        console.error('[ERROR - reservations]', err)
+        console.error('[ERROR - bookings]', err)
         setError(err.message)
       } finally {
         setLoading(false)
       }
     }
 
-    loadReservations()
+    loadBookings()
   }, [])
 
   if (loading) {
@@ -79,18 +81,18 @@ export default function ReservationsPage() {
     <div style={{ padding: 24 }}>
       <h1>Mes réservations</h1>
       <p style={{ marginBottom: 16, color: '#666' }}>
-        {reservations.length} réservation{reservations.length !== 1 ? 's' : ''}
+        {bookings.length} réservation{bookings.length !== 1 ? 's' : ''}
       </p>
 
-      {reservations.length === 0 ? (
+      {bookings.length === 0 ? (
         <p style={{ padding: 16, background: '#f0f9ff', borderRadius: 8 }}>
           Aucune réservation pour le moment
         </p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {reservations.map((res) => (
+          {bookings.map((booking) => (
             <li
-              key={res.id}
+              key={booking.id}
               style={{
                 padding: 16,
                 marginBottom: 12,
@@ -100,13 +102,16 @@ export default function ReservationsPage() {
               }}
             >
               <div style={{ fontWeight: 700, marginBottom: 8 }}>
-                {new Date(res.slot_start).toLocaleString('fr-FR')}
+                {new Date(booking.slot_start).toLocaleString('fr-FR')}
               </div>
               <div style={{ fontSize: 14, color: '#666' }}>
-                Statut: {res.statut}
+                Date: {booking.booking_date} | Slot #{booking.slot_id}
+              </div>
+              <div style={{ fontSize: 14, color: '#666' }}>
+                Statut: {booking.status}
               </div>
               <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
-                Créée: {new Date(res.cree_a).toLocaleString('fr-FR')}
+                Créée: {new Date(booking.created_at).toLocaleString('fr-FR')}
               </div>
             </li>
           ))}
