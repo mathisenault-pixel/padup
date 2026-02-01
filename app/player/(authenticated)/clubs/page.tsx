@@ -4,8 +4,9 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import SmartSearchBar from '../components/SmartSearchBar'
-import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
+import { useUserLocation } from '@/hooks/useUserLocation'
+import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
 
 // ✅ Force dynamic rendering (pas de pre-render statique)
 // Nécessaire car supabaseBrowser accède à document.cookie
@@ -15,7 +16,10 @@ type Club = {
   id: string // ✅ UUID depuis public.clubs
   name: string // ✅ Correspond à public.clubs.name
   city: string // ✅ Correspond à public.clubs.city
-  distance: number
+  lat: number // ✅ Latitude GPS
+  lng: number // ✅ Longitude GPS
+  distanceKm?: number // ✅ Distance calculée (uniquement si géoloc active)
+  distanceMinutes?: number // ✅ Temps de trajet estimé (uniquement si géoloc active)
   nombreTerrains: number
   note: number
   avis: number
@@ -26,16 +30,28 @@ type Club = {
   disponible: boolean
 }
 
+/**
+ * Coordonnées GPS des clubs (hardcodé pour MVP)
+ * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
+ */
+const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  'a1b2c3d4-e5f6-4789-a012-3456789abcde': { lat: 43.9781, lng: 4.6911 }, // Le Hangar - Rochefort-du-Gard
+  'b2c3d4e5-f6a7-4890-b123-456789abcdef': { lat: 43.9608, lng: 4.8583 }, // Paul & Louis - Le Pontet
+  'c3d4e5f6-a7b8-4901-c234-56789abcdef0': { lat: 43.8519, lng: 4.7111 }, // ZE Padel - Boulbon
+  'd4e5f6a7-b8c9-4012-d345-6789abcdef01': { lat: 44.0528, lng: 4.6981 }, // QG Padel - Saint-Laurent-des-Arbres
+}
+
 export default function ClubsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'distance' | 'prix-asc' | 'prix-desc' | 'note'>('distance')
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
-  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
-  const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
   const [isLoading, setIsLoading] = useState(true)
 
   const [clubs, setClubs] = useState<Club[]>([])
+  
+  // ✅ Géolocalisation avec hook custom (cache + gestion erreurs)
+  const { status: locationStatus, coords: userCoords, error: locationError, requestLocation } = useUserLocation()
 
   // ============================================
   // CHARGEMENT DES CLUBS DEPUIS SUPABASE
@@ -62,20 +78,25 @@ export default function ClubsPage() {
       console.log('[CLUBS] Data:', data)
       
       // Transformer les données Supabase en format UI
-      const clubsWithUI = (data || []).map(club => ({
-        id: club.id,
-        name: club.name || 'Club sans nom',
-        city: club.city || 'Ville non spécifiée',
-        distance: 5, // TODO: Calculer avec géolocation
-        nombreTerrains: 2, // TODO: Compter depuis public.courts
-        note: 4.5,
-        avis: 0,
-        imageUrl: getClubImage(club.id), // ✅ Image par clubId
-        prixMin: 12,
-        equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'], // TODO: Depuis DB
-        favoris: false,
-        disponible: true
-      }))
+      const clubsWithUI = (data || []).map(club => {
+        const coordinates = CLUB_COORDINATES[club.id]
+        
+        return {
+          id: club.id,
+          name: club.name || 'Club sans nom',
+          city: club.city || 'Ville non spécifiée',
+          lat: coordinates?.lat || 0,
+          lng: coordinates?.lng || 0,
+          nombreTerrains: 2, // TODO: Compter depuis public.courts
+          note: 4.5,
+          avis: 0,
+          imageUrl: getClubImage(club.id), // ✅ Image par clubId
+          prixMin: 12,
+          equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'], // TODO: Depuis DB
+          favoris: false,
+          disponible: true
+        }
+      })
       
       // ✅ Filtrer pour exclure le Club Démo
       const filteredClubs = filterOutDemoClub(clubsWithUI)
@@ -109,9 +130,32 @@ export default function ClubsPage() {
     )
   }, [])
 
+  // Calculer les distances et temps de trajet (uniquement si géoloc active)
+  const clubsWithDistance = useMemo(() => {
+    if (locationStatus !== 'ready' || !userCoords) {
+      return clubs
+    }
+
+    return clubs.map(club => {
+      // Calcul de distance uniquement si le club a des coordonnées
+      if (!club.lat || !club.lng) {
+        return club
+      }
+
+      const distanceKm = haversineKm(userCoords.lat, userCoords.lng, club.lat, club.lng)
+      const distanceMinutes = estimateMinutes(distanceKm)
+
+      return {
+        ...club,
+        distanceKm,
+        distanceMinutes
+      }
+    })
+  }, [clubs, userCoords, locationStatus])
+
   // Filtrer et trier avec useMemo (évite recalcul inutile)
   const filteredAndSortedClubs = useMemo(() => {
-    const result = clubs
+    const result = clubsWithDistance
       .filter(club => {
         // Recherche
         const matchesSearch = club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,7 +183,12 @@ export default function ClubsPage() {
       .sort((a, b) => {
         switch (sortBy) {
           case 'distance':
-            return a.distance - b.distance
+            // Si géoloc active, trier par distance calculée
+            if (a.distanceKm !== undefined && b.distanceKm !== undefined) {
+              return a.distanceKm - b.distanceKm
+            }
+            // Sinon, pas de tri (ordre par défaut)
+            return 0
           case 'prix-asc':
             return a.prixMin - b.prixMin
           case 'prix-desc':
@@ -152,7 +201,7 @@ export default function ClubsPage() {
       })
     
     return result
-  }, [clubs, searchTerm, sortBy, selectedEquipements, selectedPrixRanges])
+  }, [clubsWithDistance, searchTerm, sortBy, selectedEquipements, selectedPrixRanges])
 
   return (
     <div className="min-h-screen bg-white">
@@ -184,24 +233,61 @@ export default function ClubsPage() {
 
           {/* Géolocalisation */}
           <div className="mb-4">
-            <UseMyLocationButton
-              onCoords={(coords) => {
-                setUserCoords(coords);
-                setLocationStatus('success');
-                console.log('📍 Position utilisateur:', coords);
-                // TODO: Trier les clubs par distance réelle ou appeler API
-              }}
-            />
+            {locationStatus === 'idle' && (
+              <button
+                onClick={requestLocation}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                Activer la localisation
+              </button>
+            )}
+
+            {locationStatus === 'loading' && (
+              <div className="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                <p className="text-sm font-medium text-blue-800">
+                  Localisation en cours...
+                </p>
+              </div>
+            )}
             
-            {/* ✅ Affichage propre sans popup */}
-            {locationStatus === 'success' && userCoords && (
-              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+            {locationStatus === 'ready' && userCoords && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
                 <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm font-medium text-green-800">
-                  📍 Position détectée ! Les clubs seront bientôt triés par distance.
+                  📍 Localisation active • Les distances sont calculées en temps réel
                 </p>
+              </div>
+            )}
+
+            {locationStatus === 'error' && (
+              <div className="space-y-3">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                  <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-800">
+                      Localisation refusée ou indisponible
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      {locationError?.code === 1 && 'Permission refusée. Activez la localisation dans les paramètres de votre navigateur.'}
+                      {locationError?.code === 2 && 'Position indisponible. Vérifiez votre connexion GPS.'}
+                      {locationError?.code === 3 && 'Délai expiré. Réessayez.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={requestLocation}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+                >
+                  Réessayer
+                </button>
               </div>
             )}
           </div>
@@ -342,13 +428,27 @@ export default function ClubsPage() {
                   alt={club.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                {/* Distance badge */}
-                <div className="absolute top-3 left-3 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  </svg>
-                  <span className="font-bold text-sm">À {club.distance} min</span>
-                </div>
+                {/* Distance badge - Uniquement si géoloc active */}
+                {locationStatus === 'ready' && club.distanceKm !== undefined && club.distanceMinutes !== undefined && (
+                  <div className="absolute top-3 left-3 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <span className="font-bold text-sm">
+                      {formatDistance(club.distanceKm)} • {formatTravelTime(club.distanceMinutes)}
+                    </span>
+                  </div>
+                )}
+                
+                {/* Badge "Activer localisation" si pas de géoloc */}
+                {locationStatus !== 'ready' && (
+                  <div className="absolute top-3 left-3 bg-gray-800/80 text-white px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <span className="font-medium text-xs">Distance indisponible</span>
+                  </div>
+                )}
                 <button
                   onClick={(e) => {
                     e.preventDefault()
