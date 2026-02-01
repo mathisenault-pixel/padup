@@ -493,7 +493,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         created_at: new Date().toISOString()
       }
       
-      console.log('[BOOKING INSERT] Payload:', bookingPayload)
+      // ✅ LOGGING COMPLET DU PAYLOAD
+      console.log('[BOOKING INSERT PAYLOAD]', JSON.stringify(bookingPayload, null, 2))
+      console.log('[BOOKING INSERT PAYLOAD - Types]', {
+        club_id: typeof bookingPayload.club_id,
+        court_id: typeof bookingPayload.court_id,
+        booking_date: typeof bookingPayload.booking_date,
+        slot_id: typeof bookingPayload.slot_id,
+        status: typeof bookingPayload.status
+      })
       
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
@@ -502,21 +510,31 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         .single()
       
       if (bookingError) {
-        console.error('[BOOKING INSERT] Error:', bookingError)
+        // ✅ LOGGING COMPLET DE L'ERREUR
+        console.error('[BOOKING INSERT ERROR]', bookingError)
+        console.error('[BOOKING INSERT ERROR - Full details]', {
+          message: bookingError.message,
+          details: bookingError.details,
+          hint: bookingError.hint,
+          code: bookingError.code
+        })
         
-        // ✅ Gestion erreur 409 (double-booking)
-        if (bookingError.code === '23505') {
-          alert('Ce créneau vient d\'être réservé par quelqu\'un d\'autre. Veuillez en choisir un autre.')
-          setIsSubmitting(false)
-          return
-        }
+        // ✅ AFFICHAGE DÉTAILLÉ DE L'ERREUR
+        const errorMessage = [
+          `Erreur réservation: ${bookingError.message}`,
+          bookingError.details ? `Détails: ${bookingError.details}` : '',
+          bookingError.hint ? `Conseil: ${bookingError.hint}` : '',
+          bookingError.code ? `Code: ${bookingError.code}` : ''
+        ].filter(Boolean).join('\n')
         
-        alert('Erreur lors de la réservation. Veuillez réessayer.')
+        alert(errorMessage)
         setIsSubmitting(false)
         return
       }
       
+      // ✅ LOGGING SUCCÈS AVEC DONNÉES COMPLÈTES
       console.log('[BOOKING INSERT] ✅ Success:', bookingData)
+      console.log('[BOOKING INSERT] ✅ Success - ID:', bookingData.id)
       
       // ✅ Sauvegarder aussi dans localStorage pour affichage "Mes réservations"
       const reservationId = bookingData.id
@@ -557,10 +575,18 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       router.push('/player/reservations')
       
     } catch (error) {
+      // ✅ LOGGING COMPLET DES ERREURS INATTENDUES
       console.error('[RESERVE] ERROR:', error)
+      console.error('[RESERVE] ERROR - Full object:', JSON.stringify(error, null, 2))
       console.timeEnd('reserve')
       setIsSubmitting(false)
-      alert('Erreur inattendue lors de la réservation.')
+      
+      // ✅ AFFICHAGE DÉTAILLÉ DE L'ERREUR
+      const errorMessage = error instanceof Error 
+        ? `Erreur inattendue: ${error.message}\n\nStack: ${error.stack || 'N/A'}`
+        : `Erreur inattendue: ${JSON.stringify(error)}`
+      
+      alert(errorMessage)
     }
   }, [isSubmitting, selectedDate, selectedSlot, selectedPlayers, selectedTerrain, club, router, invitedEmails, sendInvitations])
   
