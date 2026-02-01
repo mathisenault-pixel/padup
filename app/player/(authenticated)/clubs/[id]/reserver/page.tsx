@@ -464,20 +464,69 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
+    if (!selectedSlot || !selectedTerrain) {
+      console.error('[RESERVE] Missing slot or terrain')
+      return
+    }
+    
     setIsSubmitting(true)
     
     try {
-      console.log('[RESERVE] Creating reservation object...')
+      // ✅ Récupérer le court_id
+      const courtId = COURT_ID_MAP[club.id]?.[selectedTerrain]
+      if (!courtId) {
+        console.error('[RESERVE] No court_id for terrain', selectedTerrain)
+        setIsSubmitting(false)
+        return
+      }
       
-      // Créer la nouvelle réservation
-      const reservationId = `res_${Date.now()}`
+      const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
+      
+      // ✅ INSERTION DANS public.bookings (SOURCE DE VÉRITÉ)
+      const bookingPayload = {
+        club_id: club.id,                    // club_id (string)
+        court_id: courtId,                   // court_id (UUID)
+        booking_date: bookingDate,           // booking_date (DATE)
+        slot_id: selectedSlot.id,            // slot_id (INTEGER)
+        status: 'confirmed' as const,        // status ('confirmed' | 'cancelled')
+        created_by: 'player-demo-user',      // TODO: remplacer par auth.uid() quand auth sera en place
+        created_at: new Date().toISOString()
+      }
+      
+      console.log('[BOOKING INSERT] Payload:', bookingPayload)
+      
+      const { data: bookingData, error: bookingError } = await supabase
+        .from('bookings')
+        .insert([bookingPayload])
+        .select()
+        .single()
+      
+      if (bookingError) {
+        console.error('[BOOKING INSERT] Error:', bookingError)
+        
+        // ✅ Gestion erreur 409 (double-booking)
+        if (bookingError.code === '23505') {
+          alert('Ce créneau vient d\'être réservé par quelqu\'un d\'autre. Veuillez en choisir un autre.')
+          setIsSubmitting(false)
+          return
+        }
+        
+        alert('Erreur lors de la réservation. Veuillez réessayer.')
+        setIsSubmitting(false)
+        return
+      }
+      
+      console.log('[BOOKING INSERT] ✅ Success:', bookingData)
+      
+      // ✅ Sauvegarder aussi dans localStorage pour affichage "Mes réservations"
+      const reservationId = bookingData.id
       const newReservation = {
         id: reservationId,
-        date: selectedDate.toISOString().split('T')[0],
-        start_time: selectedSlot?.start_time,
-        end_time: selectedSlot?.end_time,
+        date: bookingDate,
+        start_time: selectedSlot.start_time,
+        end_time: selectedSlot.end_time,
         status: 'confirmed',
-        price: club.prix * (selectedPlayers.length + 1), // Prix total
+        price: club.prix * (selectedPlayers.length + 1),
         created_at: new Date().toISOString(),
         courts: {
           name: `Terrain ${selectedTerrain}`,
@@ -491,18 +540,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         }
       }
       
-      console.log('[RESERVE] Saving to localStorage...')
-      
-      // Sauvegarder dans localStorage
       const existingReservations = JSON.parse(localStorage.getItem('demoReservations') || '[]')
-      existingReservations.unshift(newReservation) // Ajouter au début
+      existingReservations.unshift(newReservation)
       localStorage.setItem('demoReservations', JSON.stringify(existingReservations))
       
       console.log('[RESERVE] Saved successfully')
       console.timeEnd('reserve')
       
       // ✅ Envoyer les invitations automatiquement (async, non bloquant)
-      sendInvitations(reservationId).catch(err => {
+      sendInvitations(String(reservationId)).catch(err => {
         console.error('[RESERVE] Invitation sending failed (non-blocking):', err)
       })
       
@@ -514,7 +560,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.error('[RESERVE] ERROR:', error)
       console.timeEnd('reserve')
       setIsSubmitting(false)
-      // ✅ Toast au lieu d'alert si besoin
+      alert('Erreur inattendue lors de la réservation.')
     }
   }, [isSubmitting, selectedDate, selectedSlot, selectedPlayers, selectedTerrain, club, router, invitedEmails, sendInvitations])
   
