@@ -121,7 +121,11 @@ const generateNextDays = () => {
 }
 
 export default function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
+  console.log('[RESERVER PAGE] ✅ Component mounted, params (promise):', params)
+  
   const resolvedParams = use(params)
+  console.log('[RESERVER PAGE] ✅ Params resolved:', resolvedParams)
+  
   const router = useRouter()
   
   // ============================================
@@ -129,15 +133,20 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ============================================
   const clubId = resolvedParams?.id
   
-  console.log('[CLUB] clubId:', clubId, 'type=', typeof clubId)
+  console.log('[RESERVER PAGE] clubId:', clubId, 'type=', typeof clubId)
+  
+  if (!clubId) {
+    console.error('[RESERVER PAGE] ❌ CRITICAL: clubId is undefined/null!')
+  }
   
   // Si pas d'ID, rediriger vers la liste des clubs
   useEffect(() => {
     if (!clubId) {
-      console.error('[CLUB] ❌ No clubId in params, redirecting to clubs list')
+      console.error('[RESERVER PAGE] ❌ No clubId in params, redirecting to clubs list')
+      console.error('[RESERVER PAGE] resolvedParams:', resolvedParams)
       router.replace('/player/clubs')
     }
-  }, [clubId, router])
+  }, [clubId, router, resolvedParams])
   
   // ============================================
   // CHARGEMENT DU CLUB DEPUIS SUPABASE
@@ -146,10 +155,14 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   const [isLoadingClub, setIsLoadingClub] = useState(true)
   
   useEffect(() => {
-    if (!clubId) return // Guard: pas d'ID
+    if (!clubId) {
+      console.warn('[CLUB FETCH] Guard: clubId is falsy, skipping fetch')
+      return // Guard: pas d'ID
+    }
     
     const loadClub = async () => {
-      console.log('[CLUB] Loading club from Supabase:', clubId)
+      console.log('[CLUB FETCH] 🔍 Starting fetch for clubId:', clubId)
+      console.log('[CLUB FETCH] Query: from("clubs").select("id, name, city").eq("id", clubId).maybeSingle()')
       
       // ✅ Utiliser maybeSingle() pour ne jamais throw
       const { data, error } = await supabase
@@ -158,14 +171,19 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         .eq('id', clubId)
         .maybeSingle()
       
+      console.log('[CLUB FETCH] Response received - data:', data, 'error:', error)
+      
       if (error || !data) {
-        console.error('[CLUB] ❌ Club fetch failed:', error || 'No data')
+        console.error('[CLUB FETCH] ❌ Club fetch failed!')
+        console.error('[CLUB FETCH] Error object:', error)
+        console.error('[CLUB FETCH] Data object:', data)
+        console.error('[CLUB FETCH] clubId used:', clubId)
         setIsLoadingClub(false)
         setClubData(null)
         return
       }
       
-      console.log('[CLUB] ✅ Club loaded:', data)
+      console.log('[CLUB FETCH] ✅ Club loaded successfully:', data)
       
       // Transformer les données Supabase en format UI avec image mappée
       const club: Club = {

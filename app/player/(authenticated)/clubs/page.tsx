@@ -321,6 +321,14 @@ export default function ClubsPage() {
             <Link
               key={club.id}
               href={`/player/clubs/${club.id}/reserver`}
+              onClick={() => {
+                console.log('[CLUB LIST CLICK] ✅ Navigation to:', club.name)
+                console.log('[CLUB LIST CLICK] club.id:', club.id, 'type:', typeof club.id)
+                console.log('[CLUB LIST CLICK] URL will be:', `/player/clubs/${club.id}/reserver`)
+                if (!club.id) {
+                  console.error('[CLUB LIST CLICK] ❌ WARNING: club.id is undefined/null!')
+                }
+              }}
               className="group flex gap-6 bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-500 hover:shadow-lg transition-all"
             >
               {/* Image */}

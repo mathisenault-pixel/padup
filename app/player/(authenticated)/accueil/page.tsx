@@ -193,7 +193,14 @@ export default function AccueilPage() {
               <Link
                 key={club.id}
                 href={`/player/clubs/${club.id}/reserver`}
-                onClick={() => console.log('[CLUB CARD] Navigation to:', club.name)}
+                onClick={() => {
+                  console.log('[CLUB CARD CLICK] ✅ Navigation to:', club.name)
+                  console.log('[CLUB CARD CLICK] club.id:', club.id, 'type:', typeof club.id)
+                  console.log('[CLUB CARD CLICK] URL will be:', `/player/clubs/${club.id}/reserver`)
+                  if (!club.id) {
+                    console.error('[CLUB CARD CLICK] ❌ WARNING: club.id is undefined/null!')
+                  }
+                }}
                 className="group bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all block"
               >
                 <div className="relative h-64 overflow-hidden">

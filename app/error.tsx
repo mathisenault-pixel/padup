@@ -11,9 +11,12 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log l'erreur en développement uniquement
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error page:', error)
+    // ✅ TOUJOURS logger l'erreur (dev ET prod)
+    console.error('❌ [ERROR BOUNDARY] Error caught:', error)
+    console.error('❌ [ERROR BOUNDARY] Error message:', error.message)
+    console.error('❌ [ERROR BOUNDARY] Error stack:', error.stack)
+    if (error.digest) {
+      console.error('❌ [ERROR BOUNDARY] Error digest:', error.digest)
     }
   }, [error])
 
