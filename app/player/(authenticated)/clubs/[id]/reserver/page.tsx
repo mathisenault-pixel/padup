@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, use, useMemo, useCallback } from 'react'
+import { useState, use, useMemo, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import PlayerSelectionModal from './PlayerSelectionModal'
 import PremiumModal from './PremiumModal'
+import { supabase } from '@/lib/supabaseClient'
 
 type Club = {
   id: string
@@ -22,6 +23,21 @@ type Club = {
   description: string
   equipements: string[]
   nombreTerrains: number
+}
+
+type TimeSlot = {
+  id: number
+  start_time: string
+  end_time: string
+  duration_minutes: number
+  label: string
+}
+
+type BookedSlot = {
+  slot_id: number
+  court_id: string
+  booking_date: string
+  status: string
 }
 
 // Clubs en dur (même que dans la page clubs)
@@ -96,43 +112,44 @@ const clubs: Club[] = [
   },
 ]
 
-// Générer les créneaux de 8h à 23h par pas de 1h30
-// Dernier créneau: 21:30-23:00
-const generateTimeSlots = () => {
-  const slots = []
-  let currentHour = 8
-  let currentMinute = 0
-  
-  // ✅ Arrêter à 21:30 (dernier créneau finit à 23:00)
-  while (currentHour < 21 || (currentHour === 21 && currentMinute === 0)) {
-    const startTime = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`
-    
-    // Calculer l'heure de fin (+ 1h30)
-    let endHour = currentHour + 1
-    let endMinute = currentMinute + 30
-    
-    if (endMinute >= 60) {
-      endHour += 1
-      endMinute -= 60
-    }
-    
-    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`
-    
-    slots.push({ startTime, endTime })
-    
-    // Passer au créneau suivant (+1h30)
-    currentMinute += 30
-    if (currentMinute >= 60) {
-      currentHour += 1
-      currentMinute -= 60
-    }
-    currentHour += 1
+// ============================================
+// MOCK DATA POUR DEMO (sera remplacé par vraies tables courts)
+// ============================================
+const COURT_ID_MAP: Record<string, Record<number, string>> = {
+  '1': { // Le Hangar
+    1: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // Terrain 1
+    2: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9f', // Terrain 2
+    3: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea0', // Terrain 3
+    4: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea1', // Terrain 4
+    5: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea2', // Terrain 5
+    6: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea3', // Terrain 6
+    7: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea4', // Terrain 7
+    8: '6dceaf95-80dd-4fcf-b401-7d4c937f6ea5', // Terrain 8
+  },
+  '2': { // Paul & Louis
+    1: '7dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
+    2: '7dceaf95-80dd-4fcf-b401-7d4c937f6e9f',
+    3: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea0',
+    4: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea1',
+    5: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea2',
+    6: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea3',
+    7: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea4',
+    8: '7dceaf95-80dd-4fcf-b401-7d4c937f6ea5',
+  },
+  '3': { // ZE Padel
+    1: '8dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
+    2: '8dceaf95-80dd-4fcf-b401-7d4c937f6e9f',
+    3: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea0',
+    4: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea1',
+    5: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea2',
+    6: '8dceaf95-80dd-4fcf-b401-7d4c937f6ea3',
+  },
+  '4': { // QG Padel
+    1: '9dceaf95-80dd-4fcf-b401-7d4c937f6e9e',
+    2: '9dceaf95-80dd-4fcf-b401-7d4c937f6e9f',
+    3: '9dceaf95-80dd-4fcf-b401-7d4c937f6ea0',
+    4: '9dceaf95-80dd-4fcf-b401-7d4c937f6ea1',
   }
-  
-  // ✅ Ajouter explicitement le dernier créneau 21:30-23:00
-  slots.push({ startTime: '21:30', endTime: '23:00' })
-  
-  return slots
 }
 
 // Générer les 7 prochains jours
@@ -149,33 +166,6 @@ const generateNextDays = () => {
   return days
 }
 
-// Générer des créneaux indisponibles aléatoirement (environ 30%)
-const generateUnavailableSlots = (terrainId: number, date: Date) => {
-  const slots = generateTimeSlots()
-  const unavailableCount = Math.floor(slots.length * 0.3) // 30% des créneaux
-  const unavailableSet = new Set<string>()
-  
-  // Utiliser une seed basée sur le terrain et la date pour avoir des résultats cohérents
-  const seed = terrainId * 1000 + date.getDate() * 100 + date.getMonth()
-  
-  // ✅ OPTIMISATION: Éviter la boucle infinie avec un compteur max
-  let attempts = 0
-  const maxAttempts = slots.length * 3 // Protection contre boucle infinie
-  
-  while (unavailableSet.size < unavailableCount && attempts < maxAttempts) {
-    // Utiliser seed + attempts pour varier les résultats
-    const x = Math.sin(seed + attempts) * 10000
-    const randomIndex = Math.floor((x - Math.floor(x)) * slots.length)
-    const slot = slots[randomIndex].startTime
-    
-    // ✅ Set.add() est O(1) vs array.includes() qui est O(n)
-    unavailableSet.add(slot)
-    attempts++
-  }
-  
-  return Array.from(unavailableSet)
-}
-
 export default function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params)
   const router = useRouter()
@@ -185,8 +175,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ============================================
   const club = useMemo(() => clubs.find(c => c.id === resolvedParams.id), [resolvedParams.id])
   
-  // Créneaux et dates (constants)
-  const timeSlots = useMemo(() => generateTimeSlots(), [])
+  // Dates (constant)
   const nextDays = useMemo(() => generateNextDays(), [])
   
   // ============================================
@@ -194,12 +183,17 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   // ============================================
   const [selectedDate, setSelectedDate] = useState(nextDays[0])
   const [selectedTerrain, setSelectedTerrain] = useState<number | null>(null)
-  const [selectedSlot, setSelectedSlot] = useState<{ startTime: string; endTime: string } | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [showPlayerModal, setShowPlayerModal] = useState(false)
   const [showPremiumModal, setShowPremiumModal] = useState(false)
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([])
   const [invitedEmails, setInvitedEmails] = useState<string[]>([]) // ✅ Stocker les emails invités
   const [isSubmitting, setIsSubmitting] = useState(false) // ✅ Guard anti double-clic global
+  
+  // ✅ NOUVEAUX STATES POUR SUPABASE
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
+  const [bookedSlots, setBookedSlots] = useState<Set<number>>(new Set()) // Set de slot_id réservés
+  const [isLoadingSlots, setIsLoadingSlots] = useState(true)
   
   
   if (!club) {
@@ -215,22 +209,134 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     }))
   , [club.nombreTerrains])
   
-  // Map/Set pour O(1) lookup des créneaux indisponibles
-  const unavailableSet = useMemo(() => {
-    const map = new Map<number, Set<string>>()
-    terrains.forEach(terrain => {
-      const unavailableSlots = generateUnavailableSlots(terrain.id, selectedDate)
-      map.set(terrain.id, new Set(unavailableSlots))
-    })
-    return map
-  }, [selectedDate, club.nombreTerrains]) // ✅ Retirer 'terrains' pour éviter recalculs inutiles
+  // ============================================
+  // ÉTAPE 1 — Charger les time_slots depuis Supabase
+  // ============================================
+  useEffect(() => {
+    const loadTimeSlots = async () => {
+      console.log('[SLOTS] Loading time_slots from Supabase...')
+      const { data, error } = await supabase
+        .from('time_slots')
+        .select('*')
+        .order('start_time', { ascending: true })
+      
+      if (error) {
+        console.error('[SLOTS] Error loading time_slots:', error)
+        return
+      }
+      
+      console.log('[SLOTS] Loaded:', data)
+      setTimeSlots(data || [])
+      setIsLoadingSlots(false)
+    }
+    
+    loadTimeSlots()
+  }, [])
+  
+  // ============================================
+  // ÉTAPE 2 — Charger les bookings confirmés pour la date sélectionnée
+  // ============================================
+  useEffect(() => {
+    if (!selectedTerrain || !club) return
+    
+    const loadBookings = async () => {
+      const courtId = COURT_ID_MAP[club.id]?.[selectedTerrain]
+      if (!courtId) {
+        console.warn('[BOOKINGS] No court_id mapping for', club.id, selectedTerrain)
+        return
+      }
+      
+      const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
+      
+      console.log('[BOOKINGS] Loading for:', { courtId, bookingDate })
+      
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('slot_id, court_id, booking_date, status')
+        .eq('court_id', courtId)
+        .eq('booking_date', bookingDate)
+        .eq('status', 'confirmed')
+      
+      if (error) {
+        console.error('[BOOKINGS] Error:', error)
+        return
+      }
+      
+      console.log('[BOOKINGS] Loaded:', data)
+      
+      // ✅ Mettre les slot_id dans un Set pour O(1) lookup
+      const bookedSlotIds = new Set(data?.map(b => b.slot_id) || [])
+      setBookedSlots(bookedSlotIds)
+    }
+    
+    loadBookings()
+  }, [selectedDate, selectedTerrain, club])
+  
+  // ============================================
+  // ÉTAPE 3 — SYNCHRONISATION TEMPS RÉEL
+  // ============================================
+  useEffect(() => {
+    if (!selectedTerrain || !club) return
+    
+    const courtId = COURT_ID_MAP[club.id]?.[selectedTerrain]
+    if (!courtId) return
+    
+    const bookingDate = selectedDate.toISOString().split('T')[0]
+    
+    console.log('[REALTIME] Subscribing to bookings for:', { courtId, bookingDate })
+    
+    const channel = supabase
+      .channel(`bookings-${courtId}-${bookingDate}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'bookings',
+          filter: `court_id=eq.${courtId}`,
+        },
+        (payload) => {
+          console.log('[REALTIME] Change detected:', payload)
+          
+          const newBooking = payload.new as BookedSlot
+          const oldBooking = payload.old as BookedSlot
+          
+          // Si INSERT ou UPDATE vers confirmed
+          if (payload.eventType === 'INSERT' || 
+              (payload.eventType === 'UPDATE' && newBooking?.status === 'confirmed')) {
+            if (newBooking.booking_date === bookingDate && newBooking.status === 'confirmed') {
+              setBookedSlots(prev => new Set([...prev, newBooking.slot_id]))
+              console.log('[REALTIME] ✅ Slot marked as booked:', newBooking.slot_id)
+            }
+          }
+          
+          // Si UPDATE vers cancelled ou DELETE
+          if (payload.eventType === 'DELETE' || 
+              (payload.eventType === 'UPDATE' && newBooking?.status === 'cancelled')) {
+            const slotToRemove = payload.eventType === 'DELETE' ? oldBooking?.slot_id : newBooking?.slot_id
+            if (slotToRemove) {
+              setBookedSlots(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(slotToRemove)
+                return newSet
+              })
+              console.log('[REALTIME] ✅ Slot freed:', slotToRemove)
+            }
+          }
+        }
+      )
+      .subscribe()
+    
+    return () => {
+      console.log('[REALTIME] Unsubscribing')
+      supabase.removeChannel(channel)
+    }
+  }, [selectedDate, selectedTerrain, club])
   
   // Vérifier si un créneau est disponible (O(1))
-  const isSlotAvailable = useCallback((terrainId: number, slot: { startTime: string }): boolean => {
-    const terrainSet = unavailableSet.get(terrainId)
-    if (!terrainSet) return true
-    return !terrainSet.has(slot.startTime)
-  }, [unavailableSet])
+  const isSlotAvailable = useCallback((slot: TimeSlot): boolean => {
+    return !bookedSlots.has(slot.id)
+  }, [bookedSlots])
   
   // ✅ Fonction pour envoyer les invitations automatiquement
   const sendInvitations = useCallback(async (reservationId: string) => {
@@ -243,7 +349,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     console.log('[INVITE] Sending invitations to:', invitedEmails)
 
     try {
-      const dateFormatted = `${formatDate(selectedDate).day} ${formatDate(selectedDate).date} ${formatDate(selectedDate).month} à ${selectedSlot?.startTime}`
+      const dateFormatted = `${formatDate(selectedDate).day} ${formatDate(selectedDate).date} ${formatDate(selectedDate).month} à ${selectedSlot?.start_time}`
       const bookingUrl = `${window.location.origin}/player/reservations`
 
       const response = await fetch('/api/invite', {
@@ -296,8 +402,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       const newReservation = {
         id: reservationId,
         date: selectedDate.toISOString().split('T')[0],
-        start_time: selectedSlot?.startTime,
-        end_time: selectedSlot?.endTime,
+        start_time: selectedSlot?.start_time,
+        end_time: selectedSlot?.end_time,
         status: 'confirmed',
         price: club.prix * (selectedPlayers.length + 1), // Prix total
         created_at: new Date().toISOString(),
@@ -340,7 +446,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     }
   }, [isSubmitting, selectedDate, selectedSlot, selectedPlayers, selectedTerrain, club, router, invitedEmails, sendInvitations])
   
-  const handleSlotClick = useCallback((terrainId: number, slot: { startTime: string; endTime: string }) => {
+  const handleSlotClick = useCallback((terrainId: number, slot: TimeSlot) => {
     console.log('[SLOT CLICK]', { terrainId, slot, isSubmitting })
     
     // ✅ Guard: Ne pas ouvrir de modal si en cours de soumission
@@ -349,7 +455,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
-    if (isSlotAvailable(terrainId, slot)) {
+    if (isSlotAvailable(slot)) {
       console.log('[SLOT CLICK] Opening player modal')
       setSelectedTerrain(terrainId)
       setSelectedSlot(slot)
@@ -556,75 +662,87 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             Choisir un terrain et un créneau - {formatDate(selectedDate).full}
           </h2>
           
-          <div className="space-y-6">
-            {terrains.map((terrain) => {
-              // Calculer le nombre de créneaux disponibles pour ce terrain
-              const availableCount = timeSlots.filter(slot => isSlotAvailable(terrain.id, slot)).length
-              const totalCount = timeSlots.length
-              const availabilityPercent = Math.round((availableCount / totalCount) * 100)
-              
-              return (
-                <div key={terrain.id} className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                  {/* Header du terrain */}
-                  <div className="bg-gradient-to-r from-blue-50 to-gray-50 p-5 border-b-2 border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg">
-                          {terrain.id}
+          {/* ✅ Affichage de chargement */}
+          {isLoadingSlots ? (
+            <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+              <p className="text-gray-600 font-semibold">Chargement des créneaux disponibles...</p>
+            </div>
+          ) : timeSlots.length === 0 ? (
+            <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center">
+              <p className="text-gray-600 font-semibold">Aucun créneau disponible</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {terrains.map((terrain) => {
+                // Calculer le nombre de créneaux disponibles pour ce terrain
+                const availableCount = timeSlots.filter(slot => isSlotAvailable(slot)).length
+                const totalCount = timeSlots.length
+                const availabilityPercent = Math.round((availableCount / totalCount) * 100)
+                
+                return (
+                  <div key={terrain.id} className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    {/* Header du terrain */}
+                    <div className="bg-gradient-to-r from-blue-50 to-gray-50 p-5 border-b-2 border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg">
+                            {terrain.id}
+                          </div>
+                          <div>
+                            <h3 className="text-2xl font-black text-gray-900">{terrain.nom}</h3>
+                            <p className="text-sm text-gray-600 font-semibold">{terrain.type}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-2xl font-black text-gray-900">{terrain.nom}</h3>
-                          <p className="text-sm text-gray-600 font-semibold">{terrain.type}</p>
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1">Disponibilité</div>
+                          <div className={`text-2xl font-black ${availabilityPercent > 50 ? 'text-green-600' : availabilityPercent > 30 ? 'text-yellow-600' : 'text-red-600'}`}>
+                            {availableCount}/{totalCount}
+                          </div>
+                          <div className="text-xs text-gray-600">({availabilityPercent}%)</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1">Disponibilité</div>
-                        <div className={`text-2xl font-black ${availabilityPercent > 50 ? 'text-green-600' : availabilityPercent > 30 ? 'text-yellow-600' : 'text-red-600'}`}>
-                          {availableCount}/{totalCount}
-                        </div>
-                        <div className="text-xs text-gray-600">({availabilityPercent}%)</div>
+                    </div>
+                    
+                    {/* Créneaux pour ce terrain */}
+                    <div className="p-5">
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        {timeSlots.map((slot) => {
+                          const available = isSlotAvailable(slot)
+                          
+                          return (
+                            <button
+                              type="button"
+                              key={slot.id}
+                              onClick={() => handleSlotClick(terrain.id, slot)}
+                              disabled={!available || isSubmitting}
+                              className={`p-3 rounded-xl border-2 font-bold transition-all ${
+                                available && !isSubmitting
+                                  ? 'bg-white text-gray-900 border-gray-200 hover:border-blue-600 hover:bg-blue-50 hover:scale-105'
+                                  : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
+                              }`}
+                            >
+                              <div className="text-center">
+                                <div className="text-base font-black">{slot.start_time}</div>
+                                <div className="text-xs text-gray-500">→</div>
+                                <div className="text-base font-black">{slot.end_time}</div>
+                              </div>
+                              {!available && (
+                                <div className="text-xs mt-1 text-red-500 font-semibold">Réservé</div>
+                              )}
+                              {isSubmitting && available && (
+                                <div className="text-xs mt-1 text-blue-500 font-semibold">...</div>
+                              )}
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Créneaux pour ce terrain */}
-                  <div className="p-5">
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                      {timeSlots.map((slot, idx) => {
-                        const available = isSlotAvailable(terrain.id, slot)
-                        
-                        return (
-                          <button
-                            type="button"
-                            key={idx}
-                            onClick={() => handleSlotClick(terrain.id, slot)}
-                            disabled={!available || isSubmitting}
-                            className={`p-3 rounded-xl border-2 font-bold transition-all ${
-                              available && !isSubmitting
-                                ? 'bg-white text-gray-900 border-gray-200 hover:border-blue-600 hover:bg-blue-50 hover:scale-105'
-                                : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
-                            }`}
-                          >
-                            <div className="text-center">
-                              <div className="text-base font-black">{slot.startTime}</div>
-                              <div className="text-xs text-gray-500">→</div>
-                              <div className="text-base font-black">{slot.endTime}</div>
-                            </div>
-                            {!available && (
-                              <div className="text-xs mt-1 text-red-500 font-semibold">Réservé</div>
-                            )}
-                            {isSubmitting && available && (
-                              <div className="text-xs mt-1 text-blue-500 font-semibold">...</div>
-                            )}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </div>
         
       </div>
@@ -635,7 +753,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           onClose={() => setShowPlayerModal(false)}
           onContinue={handlePlayersContinue}
           clubName={`${club.nom} - Terrain ${selectedTerrain}`}
-          timeSlot={`${selectedSlot.startTime} - ${selectedSlot.endTime}`}
+          timeSlot={`${selectedSlot.start_time} - ${selectedSlot.end_time}`}
         />
       )}
       
