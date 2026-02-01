@@ -401,8 +401,28 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
-    if (!selectedSlot || !selectedTerrain) {
-      console.error('[RESERVE] Missing slot or terrain')
+    // ✅ GUARDS CRITIQUES : Vérifier TOUS les champs obligatoires
+    if (!selectedDate) {
+      console.error('[RESERVE] ❌ CRITICAL: selectedDate is null/undefined')
+      alert('Erreur critique: Date non sélectionnée')
+      return
+    }
+    
+    if (!selectedSlot) {
+      console.error('[RESERVE] ❌ CRITICAL: selectedSlot is null/undefined')
+      alert('Erreur critique: Créneau non sélectionné')
+      return
+    }
+    
+    if (!selectedSlot.id) {
+      console.error('[RESERVE] ❌ CRITICAL: selectedSlot.id is null/undefined', selectedSlot)
+      alert('Erreur critique: ID du créneau manquant')
+      return
+    }
+    
+    if (!selectedTerrain) {
+      console.error('[RESERVE] ❌ CRITICAL: selectedTerrain is null/undefined')
+      alert('Erreur critique: Terrain non sélectionné')
       return
     }
     
@@ -427,23 +447,41 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       const bookingPayload = {
         club_id: club.id,                       // ✅ UUID réel depuis public.clubs
         court_id: courtId,                      // ✅ UUID réel depuis public.courts
-        booking_date: bookingDate,              // DATE YYYY-MM-DD NOT NULL
-        slot_id: selectedSlot.id,               // INTEGER NOT NULL (référence time_slots.id)
-        slot_start: slotStartTimestamp,         // timestamptz
-        slot_end: slotEndTimestamp,             // timestamptz
+        booking_date: bookingDate,              // ✅ DATE YYYY-MM-DD NOT NULL (snake_case)
+        slot_id: selectedSlot.id,               // ✅ INTEGER NOT NULL (snake_case) référence time_slots.id
+        slot_start: slotStartTimestamp,         // timestamptz (snake_case)
+        slot_end: slotEndTimestamp,             // timestamptz (snake_case)
         status: 'confirmed' as const,           // 'confirmed' | 'pending' | 'cancelled'
         created_by: null,                       // TODO: remplacer par auth.uid()
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString()    // timestamptz (snake_case)
       }
       
-      // ✅ LOGGING DU PAYLOAD
-      console.log('[BOOKING INSERT]', {
-        club_id: bookingPayload.club_id,
-        court_id: bookingPayload.court_id,
-        booking_date: bookingPayload.booking_date,
-        slot_id: bookingPayload.slot_id,
-        status: bookingPayload.status
-      })
+      // ✅ LOGGING COMPLET DU PAYLOAD AVANT INSERT
+      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== FULL PAYLOAD =====')
+      console.log(JSON.stringify(bookingPayload, null, 2))
+      console.log('[BOOKING PAYLOAD BEFORE INSERT] ===== CRITICAL FIELDS =====')
+      console.log('booking_date:', bookingPayload.booking_date, '(type:', typeof bookingPayload.booking_date, ')')
+      console.log('slot_id:', bookingPayload.slot_id, '(type:', typeof bookingPayload.slot_id, ')')
+      console.log('club_id:', bookingPayload.club_id, '(type:', typeof bookingPayload.club_id, ')')
+      console.log('court_id:', bookingPayload.court_id, '(type:', typeof bookingPayload.court_id, ')')
+      console.log('status:', bookingPayload.status, '(type:', typeof bookingPayload.status, ')')
+      
+      // ✅ VALIDATION FINALE : S'assurer qu'aucun champ critique n'est null/undefined
+      if (!bookingPayload.booking_date) {
+        console.error('[RESERVE] ❌ CRITICAL: bookingPayload.booking_date is falsy:', bookingPayload.booking_date)
+        alert('Erreur critique: booking_date est vide')
+        setIsSubmitting(false)
+        return
+      }
+      
+      if (!bookingPayload.slot_id && bookingPayload.slot_id !== 0) {
+        console.error('[RESERVE] ❌ CRITICAL: bookingPayload.slot_id is falsy:', bookingPayload.slot_id)
+        alert('Erreur critique: slot_id est vide')
+        setIsSubmitting(false)
+        return
+      }
+      
+      console.log('[BOOKING INSERT] Calling Supabase insert...')
       
       const { data: bookingData, error: bookingError } = await supabase
         .from('bookings')
@@ -453,6 +491,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       if (bookingError) {
         // ✅ LOGGING COMPLET DE L'ERREUR
+        console.error('[BOOKING INSERT ERROR] ❌❌❌')
         console.error('[BOOKING INSERT ERROR]', bookingError)
         console.error('[BOOKING INSERT ERROR - Full details]', {
           table: 'bookings',
@@ -477,8 +516,26 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       }
       
       // ✅ LOGGING SUCCÈS AVEC DONNÉES COMPLÈTES
-      console.log('[BOOKING INSERT] ✅ Success:', bookingData)
-      console.log('[BOOKING INSERT] ✅ Success - ID:', bookingData.id)
+      console.log('[BOOKING INSERT] ✅✅✅ SUCCESS')
+      console.log('[BOOKING INSERT] ✅ Data returned from DB:', JSON.stringify(bookingData, null, 2))
+      console.log('[BOOKING INSERT] ✅ Vérification champs critiques:')
+      console.log('  - id:', bookingData.id)
+      console.log('  - club_id:', bookingData.club_id)
+      console.log('  - court_id:', bookingData.court_id)
+      console.log('  - booking_date:', bookingData.booking_date, '(should NOT be NULL)')
+      console.log('  - slot_id:', bookingData.slot_id, '(should NOT be NULL)')
+      console.log('  - status:', bookingData.status)
+      
+      // ✅ VÉRIFICATION POST-INSERT : booking_date et slot_id ne doivent PAS être NULL
+      if (!bookingData.booking_date) {
+        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: booking_date is NULL in DB!')
+        alert('ATTENTION: La réservation a été créée mais booking_date est NULL en base!')
+      }
+      
+      if (!bookingData.slot_id && bookingData.slot_id !== 0) {
+        console.error('[BOOKING INSERT] ⚠️⚠️⚠️ WARNING: slot_id is NULL in DB!')
+        alert('ATTENTION: La réservation a été créée mais slot_id est NULL en base!')
+      }
       
       // ✅ Sauvegarder aussi dans localStorage pour affichage "Mes réservations"
       const reservationId = bookingData.id
