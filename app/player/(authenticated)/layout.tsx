@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import PlayerNav from './components/PlayerNav'
+import AuthStatus from './components/AuthStatus'
 
 export default function PlayerAuthLayout({
   children,
@@ -32,28 +33,8 @@ export default function PlayerAuthLayout({
               <PlayerNav />
             </div>
 
-            {/* Auth Section Premium */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => router.push('/login')}
-                className="px-5 py-2.5 text-[14px] font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
-              >
-                Se connecter
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push('/login')}
-                className="group relative px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[14px] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-              >
-                <span className="flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                  </svg>
-                  S&apos;inscrire
-                </span>
-              </button>
-            </div>
+            {/* Auth Section Premium - Dynamic based on auth state */}
+            <AuthStatus />
 
           </div>
         </div>

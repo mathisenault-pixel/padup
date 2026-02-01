@@ -114,11 +114,16 @@ const clubs: Club[] = [
   }
 ]
 
-// UUIDs réels des terrains depuis public.courts
-const COURT_UUIDS: Record<number, string> = {
-  1: '21d9a066-b7db-4966-abf1-cc210f7476c1', // ✅ Terrain 1
-  2: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // ✅ Terrain 2
-}
+// ============================================
+// ⚠️ OBSOLETE: COURT_UUIDS hardcodé
+// ============================================
+// Les courts sont maintenant chargés depuis Supabase (public.courts)
+// via useEffect → setCourts() → terrains.map(court => ({ id, courtId: court.id, ... }))
+// Conserver ici uniquement pour référence historique
+// const COURT_UUIDS: Record<number, string> = {
+//   1: '21d9a066-b7db-4966-abf1-cc210f7476c1', // Terrain 1
+//   2: '6dceaf95-80dd-4fcf-b401-7d4c937f6e9e', // Terrain 2
+// }
 
 // Générer les 7 prochains jours
 const generateNextDays = () => {
@@ -183,8 +188,10 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   
   // ✅ NOUVEAUX STATES POUR SUPABASE
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
+  const [courts, setCourts] = useState<Array<{ id: string; name: string; type?: string }>>([])
   const [bookedByCourt, setBookedByCourt] = useState<Record<string, Set<number>>>({}) // Map de court_id → Set<slot_id>
   const [isLoadingSlots, setIsLoadingSlots] = useState(true)
+  const [isLoadingCourts, setIsLoadingCourts] = useState(true)
   
   // ============================================
   // LOGS AUTH AU MOUNT DE LA PAGE
@@ -230,14 +237,60 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     )
   }
   
-  // Terrains
+  // ============================================
+  // ÉTAPE 0 — Charger les courts depuis Supabase
+  // ============================================
+  useEffect(() => {
+    const loadCourts = async () => {
+      if (!club?.id) return
+      
+      console.log('[COURTS] Loading courts from Supabase for club:', club.id)
+      
+      const { data, error } = await supabase
+        .from('courts')
+        .select('id, name, court_type')
+        .eq('club_id', club.id)
+        .order('name', { ascending: true })
+      
+      if (error) {
+        console.error('[COURTS] Error loading courts:', error)
+        console.error('[COURTS] Error details:', JSON.stringify(error, null, 2))
+        setIsLoadingCourts(false)
+        return
+      }
+      
+      console.log('[COURTS] ✅ Loaded:', data?.length || 0, 'courts')
+      console.log('[COURTS] Data:', data)
+      
+      // Transform DB data to UI format
+      const courtsFormatted = (data || []).map(court => ({
+        id: court.id, // UUID
+        name: court.name || 'Terrain',
+        type: court.court_type || 'Indoor'
+      }))
+      
+      setCourts(courtsFormatted)
+      setIsLoadingCourts(false)
+      
+      // ✅ Sélectionner le premier terrain par défaut si aucun n'est sélectionné
+      if (!selectedTerrain && courtsFormatted.length > 0) {
+        // On garde selectedTerrain comme number pour compatibilité UI, mais on utilise l'UUID pour les requêtes
+        setSelectedTerrain(1)
+      }
+    }
+    
+    loadCourts()
+  }, [club?.id])
+  
+  // ✅ LEGACY: Mapping terrains pour compatibilité UI (utilise les courts depuis Supabase)
   const terrains = useMemo(() => 
-    Array.from({ length: club.nombreTerrains }, (_, i) => ({
-      id: i + 1,
-      name: `Terrain ${i + 1}`, // ✅ Utilisé en affichage uniquement
-      type: i % 2 === 0 ? 'Intérieur' : 'Extérieur'
+    courts.map((court, i) => ({
+      id: i + 1, // Index UI (1, 2, 3...)
+      courtId: court.id, // ✅ VRAI UUID pour insert bookings
+      name: court.name,
+      type: court.type || 'Intérieur'
     }))
-  , [club.nombreTerrains])
+  , [courts])
   
   // ============================================
   // ÉTAPE 1 — Charger les time_slots depuis Supabase
@@ -270,10 +323,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     if (!club) return
     
     const loadBookings = async () => {
-      // ✅ Construire la liste de tous les court_id (UUIDs réels)
+      // ✅ Construire la liste de tous les court_id (UUIDs réels depuis Supabase)
       const courtIds = terrains
-        .map(t => COURT_UUIDS[t.id])
+        .map(t => t.courtId)
         .filter(Boolean) as string[]
+      
+      if (courtIds.length === 0) {
+        console.warn('[BOOKINGS] No courts loaded yet, skipping booking fetch')
+        return
+      }
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
@@ -330,10 +388,15 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       bookingDate
     })
     
-    // ✅ Construire la liste des court_id (UUIDs réels)
+    // ✅ Construire la liste des court_id (UUIDs réels depuis Supabase)
     const courtIds = terrains
-      .map(t => COURT_UUIDS[t.id])
+      .map(t => t.courtId)
       .filter(Boolean) as string[]
+    
+    if (courtIds.length === 0) {
+      console.warn('[REALTIME] No courts loaded yet, skipping subscription')
+      return
+    }
     
     const channel = supabase
       .channel(`bookings-${club.id}-${bookingDate}`)
@@ -566,14 +629,25 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       console.log('[RESERVE] ✅ User authenticated:', user.id)
       console.log('[RESERVE] ✅ User email:', user.email)
       
-      // ✅ Récupérer le court_id (UUID réel)
-      const courtId = COURT_UUIDS[selectedTerrain]
-      if (!courtId) {
-        console.error('[RESERVE] No court UUID for terrain', selectedTerrain)
+      // ✅ Récupérer le court_id (UUID réel depuis le terrain sélectionné)
+      const selectedTerrainData = terrains.find(t => t.id === selectedTerrain)
+      if (!selectedTerrainData) {
+        console.error('[RESERVE] ❌ CRITICAL: No terrain found for id:', selectedTerrain)
         alert('Erreur: Terrain invalide')
         setIsSubmitting(false)
         return
       }
+      
+      const courtId = selectedTerrainData.courtId
+      if (!courtId) {
+        console.error('[RESERVE] ❌ CRITICAL: No court UUID for terrain:', selectedTerrainData)
+        alert('Erreur: Terrain sans UUID (court not loaded from DB)')
+        setIsSubmitting(false)
+        return
+      }
+      
+      console.log('[RESERVE] ✅ Court ID (UUID):', courtId)
+      console.log('[RESERVE] ✅ Terrain:', selectedTerrainData.name)
       
       const bookingDate = selectedDate.toISOString().split('T')[0] // YYYY-MM-DD
       
@@ -672,6 +746,28 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       console.log('[BOOKING] ✅ All validations passed')
       
+      // ============================================
+      // ✅ LOG FINAL DU PAYLOAD AVANT INSERT
+      // ============================================
+      console.log('═══════════════════════════════════════════════════════════')
+      console.log('[BOOKING INSERT] 🚀 ABOUT TO INSERT INTO bookings TABLE')
+      console.log('═══════════════════════════════════════════════════════════')
+      console.log('[BOOKING PAYLOAD] Complete payload:')
+      console.log(JSON.stringify(bookingPayload, null, 2))
+      console.log('───────────────────────────────────────────────────────────')
+      console.log('[BOOKING PAYLOAD] Critical fields (foreign keys):')
+      console.log('  • club_id:', bookingPayload.club_id, '(UUID from clubs)')
+      console.log('  • court_id:', bookingPayload.court_id, '(UUID from courts - MUST EXIST IN DB)')
+      console.log('  • slot_id:', bookingPayload.slot_id, '(INTEGER from time_slots)')
+      console.log('[BOOKING PAYLOAD] Timestamps:')
+      console.log('  • slot_start:', bookingPayload.slot_start)
+      console.log('  • slot_end:', bookingPayload.slot_end)
+      console.log('[BOOKING PAYLOAD] Other fields:')
+      console.log('  • booking_date:', bookingPayload.booking_date)
+      console.log('  • status:', bookingPayload.status)
+      console.log('  • created_by:', bookingPayload.created_by)
+      console.log('═══════════════════════════════════════════════════════════')
+      
       console.log('[BOOKING INSERT] Calling Supabase insert...')
       
       const { data: bookingData, error: bookingError } = await supabase
@@ -733,14 +829,47 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         else if (bookingError.code === '42501' || bookingError.message?.includes('policy')) {
           errorMessage = `❌ Permission refusée.\n\nVeuillez vous reconnecter et réessayer.`
         }
+        // Erreur Foreign Key (ex: court_id not found in courts table)
+        else if (bookingError.code === '23503' || bookingError.message?.includes('foreign key') || bookingError.message?.includes('fkey')) {
+          errorMessage = [
+            `❌ Erreur de clé étrangère (foreign key violation)`,
+            ``,
+            `PROBLÈME DÉTECTÉ:`,
+            `Un des IDs envoyés n'existe pas dans la base de données.`,
+            ``,
+            `PAYLOAD ENVOYÉ:`,
+            `  • club_id: ${bookingPayload.club_id}`,
+            `  • court_id: ${bookingPayload.court_id} ← DOIT EXISTER DANS public.courts`,
+            `  • slot_id: ${bookingPayload.slot_id}`,
+            `  • slot_start: ${bookingPayload.slot_start}`,
+            `  • slot_end: ${bookingPayload.slot_end}`,
+            ``,
+            `ERREUR POSTGRESQL:`,
+            `${bookingError.message}`,
+            bookingError.details ? `Détails: ${bookingError.details}` : '',
+            ``,
+            `⚠️ Veuillez vérifier que le terrain sélectionné existe dans la base.`
+          ].filter(Boolean).join('\n')
+        }
         // Autres erreurs
         else {
           errorMessage = [
-            `Erreur réservation (table: bookings)`,
-            `Message: ${bookingError.message}`,
-            bookingError.details ? `Détails: ${bookingError.details}` : '',
-            bookingError.hint ? `Conseil: ${bookingError.hint}` : '',
-            bookingError.code ? `Code: ${bookingError.code}` : ''
+            `❌ Erreur réservation (table: bookings)`,
+            ``,
+            `MESSAGE: ${bookingError.message}`,
+            bookingError.details ? `DÉTAILS: ${bookingError.details}` : '',
+            bookingError.hint ? `CONSEIL: ${bookingError.hint}` : '',
+            bookingError.code ? `CODE: ${bookingError.code}` : '',
+            ``,
+            `PAYLOAD ENVOYÉ:`,
+            `  • club_id: ${bookingPayload.club_id}`,
+            `  • court_id: ${bookingPayload.court_id}`,
+            `  • booking_date: ${bookingPayload.booking_date}`,
+            `  • slot_id: ${bookingPayload.slot_id}`,
+            `  • slot_start: ${bookingPayload.slot_start}`,
+            `  • slot_end: ${bookingPayload.slot_end}`,
+            `  • status: ${bookingPayload.status}`,
+            `  • created_by: ${bookingPayload.created_by}`
           ].filter(Boolean).join('\n')
         }
         
@@ -834,7 +963,14 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       return
     }
     
-    const courtId = COURT_UUIDS[terrainId]
+    // ✅ Récupérer le court depuis terrains (chargé depuis Supabase)
+    const terrain = terrains.find(t => t.id === terrainId)
+    if (!terrain) {
+      console.warn('[SLOT CLICK] No terrain found for id:', terrainId)
+      return
+    }
+    
+    const courtId = terrain.courtId
     if (!courtId) {
       console.warn('[SLOT CLICK] No court UUID for terrain', terrainId)
       return
@@ -848,7 +984,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     } else {
       console.log('[SLOT CLICK] Slot not available')
     }
-  }, [isSlotAvailable, isSubmitting, club])
+  }, [isSlotAvailable, isSubmitting, terrains])
   
   const handlePlayersContinue = useCallback((players: string[], emails: string[], showPremium: boolean) => {
     console.log('[PLAYERS CONTINUE]', { 
@@ -1047,8 +1183,21 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             Choisir un terrain et un créneau - {formatDate(selectedDate).full}
           </h2>
           
-          {/* ✅ Affichage de chargement */}
-          {isLoadingSlots ? (
+          {/* ✅ Affichage de chargement courts */}
+          {isLoadingCourts ? (
+            <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+              <p className="text-gray-600 font-semibold">Chargement des terrains...</p>
+            </div>
+          ) : courts.length === 0 ? (
+            <div className="bg-white rounded-2xl border-2 border-red-200 p-12 text-center bg-red-50">
+              <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p className="text-red-900 font-bold text-lg mb-2">Aucun terrain disponible</p>
+              <p className="text-red-700">Les réservations ne sont pas disponibles pour ce club actuellement.</p>
+            </div>
+          ) : isLoadingSlots ? (
             <div className="bg-white rounded-2xl border-2 border-gray-200 p-12 text-center">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
               <p className="text-gray-600 font-semibold">Chargement des créneaux disponibles...</p>
@@ -1060,9 +1209,14 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           ) : (
             <div className="space-y-6">
               {terrains.map((terrain) => {
-                // ✅ Récupérer le court_id (UUID réel)
-                const courtId = COURT_UUIDS[terrain.id]
+                // ✅ Récupérer le court_id (UUID réel depuis Supabase)
+                const courtId = terrain.courtId
                 const courtKey = courtId ? String(courtId) : null
+                
+                if (!courtId) {
+                  console.error('[RENDER] Terrain missing courtId:', terrain)
+                  return null // Skip terrains without UUID
+                }
                 
                 // Calculer le nombre de créneaux disponibles pour ce terrain
                 const availableCount = courtKey 
