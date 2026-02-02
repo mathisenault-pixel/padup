@@ -92,20 +92,20 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       {/* Hero - PREMIUM */}
-      <section className="px-6 pt-8 md:pt-32 pb-20">
+      <section className="px-6 pt-5 md:pt-32 pb-20">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-9">
-            <div className="inline-block mb-4">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-6">
               <span className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
                 Jouez plus, cherchez moins
               </span>
             </div>
             
-            <h1 className="text-7xl md:text-8xl font-black text-gray-900 mb-4 leading-none">
+            <h1 className="text-7xl md:text-8xl font-black text-gray-900 mb-6 leading-none">
               Réservez votre terrain de padel
             </h1>
             
-            <p className="text-2xl text-gray-600 mb-7 max-w-3xl mx-auto">
+            <p className="text-2xl text-gray-600 mb-10 max-w-3xl mx-auto">
               Accédez aux meilleurs clubs de France et réservez votre terrain en quelques clics.
             </p>
 
@@ -129,7 +129,7 @@ export default function AccueilPage() {
               />
             </div>
 
-            <div className="flex items-center justify-center gap-8 mt-5 text-sm text-gray-600">
+            <div className="flex items-center justify-center gap-8 mt-8 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500 font-medium">🇫🇷 Made in France</span>
               </div>
