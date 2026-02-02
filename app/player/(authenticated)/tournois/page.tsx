@@ -211,7 +211,7 @@ export default function TournoisPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">
+      <div className="px-4 md:px-6 py-4 md:py-8">
         
 
         {/* Barre de recherche + Filtres */}
