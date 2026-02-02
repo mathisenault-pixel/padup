@@ -44,6 +44,7 @@ export default function TournoisPage() {
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'ouverts' | 'inscrits'>('ouverts')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+  const [selectedCity, setSelectedCity] = useState<string>('')
   const [sortBy, setSortBy] = useState<'date' | 'distance'>('date')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [selectedTournoi, setSelectedTournoi] = useState<Tournoi | null>(null)
@@ -233,6 +234,12 @@ export default function TournoisPage() {
   const inscritsCount = useMemo(() => tournois.filter(t => t.inscrit).length, [tournois])
   const ouvertsCount = useMemo(() => tournois.filter(t => t.statut === 'Ouvert').length, [tournois])
 
+  // Obtenir la liste unique des villes
+  const availableCities = useMemo(() => {
+    const cities = tournois.map(t => t.clubAdresse).filter(Boolean)
+    return Array.from(new Set(cities)).sort()
+  }, [tournois])
+
   // Mémoïser le filtrage et le tri (évite recalcul inutile)
   const filteredTournois = useMemo(() => {
     let result = tournoisWithDistance.filter(t => {
@@ -243,6 +250,9 @@ export default function TournoisPage() {
       const matchSearch = clubName.includes(searchLower) || tournoiName.includes(searchLower)
       
       if (searchTerm && !matchSearch) return false
+
+      // Filtre ville
+      const matchesCity = !selectedCity || t.clubAdresse === selectedCity
 
       // Filtre statut
       let matchesStatut = true
@@ -255,7 +265,7 @@ export default function TournoisPage() {
       // Filtre genre (multi-sélection)
       const matchesGenre = selectedGenres.length === 0 || selectedGenres.includes(t.genre)
 
-      return matchesStatut && matchesCategorie && matchesGenre
+      return matchesCity && matchesStatut && matchesCategorie && matchesGenre
     })
 
     // Tri
@@ -266,7 +276,7 @@ export default function TournoisPage() {
     }
 
     return result
-  }, [tournoisWithDistance, searchTerm, selectedFilter, selectedCategories, selectedGenres, sortBy, userCoords])
+  }, [tournoisWithDistance, searchTerm, selectedFilter, selectedCategories, selectedGenres, sortBy, userCoords, selectedCity])
 
   return (
     <div className="min-h-screen bg-white">
@@ -387,6 +397,36 @@ export default function TournoisPage() {
                 </svg>
                 Date
               </button>
+            </div>
+          </div>
+
+          {/* Filtre Ville */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Autour de :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedCity('')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  !selectedCity
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                Toutes les villes
+              </button>
+              {availableCities.map((city) => (
+                <button
+                  key={city}
+                  onClick={() => setSelectedCity(city)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                    selectedCity === city
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
             </div>
           </div>
 

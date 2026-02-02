@@ -46,6 +46,7 @@ export default function ClubsPage() {
   const [sortBy, setSortBy] = useState<'distance' | 'prix-asc' | 'prix-desc' | 'note'>('distance')
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
+  const [selectedCity, setSelectedCity] = useState<string>('')
   const [isLoading, setIsLoading] = useState(true)
 
   const [clubs, setClubs] = useState<Club[]>([])
@@ -153,6 +154,12 @@ export default function ClubsPage() {
     })
   }, [clubs, userCoords, locationStatus])
 
+  // Obtenir la liste unique des villes
+  const availableCities = useMemo(() => {
+    const cities = clubs.map(club => club.city).filter(Boolean)
+    return Array.from(new Set(cities)).sort()
+  }, [clubs])
+
   // Filtrer et trier avec useMemo (évite recalcul inutile)
   const filteredAndSortedClubs = useMemo(() => {
     const result = clubsWithDistance
@@ -162,6 +169,9 @@ export default function ClubsPage() {
           club.city.toLowerCase().includes(searchTerm.toLowerCase())
         
         if (!matchesSearch) return false
+
+        // Filtre ville
+        const matchesCity = !selectedCity || club.city === selectedCity
 
         // Filtre équipements (multi-sélection)
         const matchesEquipements = selectedEquipements.length === 0 || 
@@ -178,7 +188,7 @@ export default function ClubsPage() {
           })
         }
 
-        return matchesEquipements && matchesPrix
+        return matchesCity && matchesEquipements && matchesPrix
       })
       .sort((a, b) => {
         switch (sortBy) {
@@ -201,7 +211,7 @@ export default function ClubsPage() {
       })
     
     return result
-  }, [clubsWithDistance, searchTerm, sortBy, selectedEquipements, selectedPrixRanges])
+  }, [clubsWithDistance, searchTerm, sortBy, selectedEquipements, selectedPrixRanges, selectedCity])
 
   return (
     <div className="min-h-screen bg-white">
@@ -290,6 +300,36 @@ export default function ClubsPage() {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Filtre Ville */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Autour de :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedCity('')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  !selectedCity
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                Toutes les villes
+              </button>
+              {availableCities.map((city) => (
+                <button
+                  key={city}
+                  onClick={() => setSelectedCity(city)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                    selectedCity === city
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Filtres Tri */}
