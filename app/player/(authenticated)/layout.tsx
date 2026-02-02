@@ -25,9 +25,6 @@ export default function PlayerAuthLayout({
               onClick={() => router.push('/player/accueil')}
               className="group flex items-center gap-2 transition-all"
             >
-              <div className="w-6 h-6 md:w-7 md:h-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                <span className="text-white font-bold text-sm md:text-base">P</span>
-              </div>
               <span className="text-lg md:text-xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">Pad&apos;Up</span>
             </button>
 

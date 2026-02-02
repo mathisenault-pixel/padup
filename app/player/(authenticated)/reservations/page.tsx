@@ -209,13 +209,7 @@ export default function ReservationsPage() {
 
   if (loading) {
     return (
-      <div className="px-4 md:px-6 py-4 md:py-8">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
-            Mes réservations
-          </h1>
-          <p className="text-xl text-gray-600">Chargement...</p>
-        </div>
+      <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         <div className="grid gap-5">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-white border border-gray-200 rounded-3xl p-5 animate-pulse">
@@ -236,12 +230,7 @@ export default function ReservationsPage() {
 
   if (error) {
     return (
-      <div className="px-4 md:px-6 py-4 md:py-8">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
-            Mes réservations
-          </h1>
-        </div>
+      <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         <div className="p-6 bg-red-50 border border-red-200 rounded-2xl">
           <p className="text-red-700 font-semibold">Erreur : {error}</p>
         </div>
@@ -250,17 +239,7 @@ export default function ReservationsPage() {
   }
 
   return (
-    <div className="px-4 md:px-6 py-4 md:py-8">
-      {/* Header */}
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
-          Mes réservations
-        </h1>
-        <p className="text-xl text-gray-600">
-          {bookings.length} réservation{bookings.length !== 1 ? 's' : ''}
-        </p>
-      </div>
-
+    <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
       {/* Filtres */}
       <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6">
         <h3 className="text-sm font-bold text-gray-900 mb-3">Filtrer par statut</h3>
