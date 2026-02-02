@@ -142,11 +142,9 @@ export default function AccueilPage() {
                 </svg>
                 <span className="font-medium">Réservations sans frais</span>
               </div>
-            </div>
-
-            {/* Made in France */}
-            <div className="mt-6 text-center">
-              <span className="text-sm text-gray-500 font-medium">🇫🇷 Made in France</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 font-medium">🇫🇷 Made in France</span>
+              </div>
             </div>
           </div>
         </div>
