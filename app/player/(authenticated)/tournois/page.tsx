@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import SmartSearchBar from '../components/SmartSearchBar'
 import { debug } from '@/lib/debug'
+import { useUserLocation } from '@/hooks/useUserLocation'
+import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
 
 type Tournoi = {
   id: number
@@ -21,6 +23,20 @@ type Tournoi = {
   statut: 'Ouvert' | 'Complet' | 'En cours' | 'Terminé'
   inscrit: boolean
   image: string
+  lat: number
+  lng: number
+  distanceKm?: number
+  distanceMinutes?: number
+}
+
+/**
+ * Coordonnées GPS des clubs (pour calculer les distances des tournois)
+ */
+const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  'Le Hangar Sport & Co': { lat: 43.9781, lng: 4.6911 }, // Rochefort-du-Gard
+  'Paul & Louis Sport': { lat: 43.9608, lng: 4.8583 }, // Le Pontet
+  'ZE Padel': { lat: 43.8519, lng: 4.7111 }, // Boulbon
+  'QG Padel Club': { lat: 44.0528, lng: 4.6981 }, // Saint-Laurent-des-Arbres
 }
 
 export default function TournoisPage() {
@@ -28,12 +44,16 @@ export default function TournoisPage() {
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'ouverts' | 'inscrits'>('ouverts')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState<'date' | 'distance'>('date')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [selectedTournoi, setSelectedTournoi] = useState<Tournoi | null>(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [tournoiToConfirm, setTournoiToConfirm] = useState<Tournoi | null>(null)
+
+  // Géolocalisation
+  const { coords: userCoords, status: locationStatus, error: locationError, requestLocation } = useUserLocation()
 
   const [tournois, setTournois] = useState<Tournoi[]>([
     {
@@ -52,7 +72,9 @@ export default function TournoisPage() {
       dotation: '500€ + Trophées',
       statut: 'Ouvert',
       inscrit: false,
-      image: '/images/clubs/le-hangar.jpg'
+      image: '/images/clubs/le-hangar.jpg',
+      lat: 43.9781,
+      lng: 4.6911
     },
     {
       id: 2,
@@ -70,7 +92,9 @@ export default function TournoisPage() {
       dotation: '300€ + Trophées',
       statut: 'Ouvert',
       inscrit: true,
-      image: '/images/clubs/paul-louis.jpg'
+      image: '/images/clubs/paul-louis.jpg',
+      lat: 43.9608,
+      lng: 4.8583
     },
     {
       id: 3,
@@ -88,7 +112,9 @@ export default function TournoisPage() {
       dotation: 'Médailles + Cadeaux',
       statut: 'Ouvert',
       inscrit: false,
-      image: '/images/clubs/ze-padel.jpg'
+      image: '/images/clubs/ze-padel.jpg',
+      lat: 43.8519,
+      lng: 4.7111
     },
     {
       id: 4,
@@ -106,7 +132,9 @@ export default function TournoisPage() {
       dotation: '1000€ + Trophées',
       statut: 'Complet',
       inscrit: false,
-      image: '/images/clubs/qg-padel.jpg'
+      image: '/images/clubs/qg-padel.jpg',
+      lat: 44.0528,
+      lng: 4.6981
     },
     {
       id: 5,
@@ -124,9 +152,32 @@ export default function TournoisPage() {
       dotation: '200€ + Trophées',
       statut: 'Ouvert',
       inscrit: false,
-      image: '/images/clubs/le-hangar.jpg'
+      image: '/images/clubs/le-hangar.jpg',
+      lat: 43.9781,
+      lng: 4.6911
     },
   ])
+
+  // Calculer les distances si géolocalisation active
+  const tournoisWithDistance = useMemo(() => {
+    if (!userCoords) return tournois
+
+    return tournois.map(tournoi => {
+      const distanceKm = haversineKm(
+        userCoords.lat,
+        userCoords.lng,
+        tournoi.lat,
+        tournoi.lng
+      )
+      const distanceMinutes = estimateMinutes(distanceKm)
+
+      return {
+        ...tournoi,
+        distanceKm,
+        distanceMinutes
+      }
+    })
+  }, [tournois, userCoords])
 
   const handleInscrire = (tournoi: Tournoi) => {
     setTournoiToConfirm(tournoi)
@@ -182,9 +233,9 @@ export default function TournoisPage() {
   const inscritsCount = useMemo(() => tournois.filter(t => t.inscrit).length, [tournois])
   const ouvertsCount = useMemo(() => tournois.filter(t => t.statut === 'Ouvert').length, [tournois])
 
-  // Mémoïser le filtrage (évite recalcul inutile)
+  // Mémoïser le filtrage et le tri (évite recalcul inutile)
   const filteredTournois = useMemo(() => {
-    return tournois.filter(t => {
+    let result = tournoisWithDistance.filter(t => {
       // Recherche
       const clubName = t.club.toLowerCase()
       const tournoiName = t.nom.toLowerCase()
@@ -206,7 +257,16 @@ export default function TournoisPage() {
 
       return matchesStatut && matchesCategorie && matchesGenre
     })
-  }, [tournois, searchTerm, selectedFilter, selectedCategories, selectedGenres])
+
+    // Tri
+    if (sortBy === 'distance' && userCoords) {
+      result = result.sort((a, b) => (a.distanceKm || 999) - (b.distanceKm || 999))
+    } else if (sortBy === 'date') {
+      result = result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    }
+
+    return result
+  }, [tournoisWithDistance, searchTerm, selectedFilter, selectedCategories, selectedGenres, sortBy, userCoords])
 
   return (
     <div className="min-h-screen bg-white">
@@ -234,6 +294,100 @@ export default function TournoisPage() {
               storageKey="search-history-tournois"
               compact={false}
             />
+          </div>
+
+          {/* Géolocalisation */}
+          <div className="mb-3 md:mb-4">
+            {locationStatus === 'idle' && (
+              <button
+                onClick={requestLocation}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                Activer la localisation
+              </button>
+            )}
+
+            {locationStatus === 'loading' && (
+              <div className="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                <p className="text-sm font-medium text-blue-800">
+                  Localisation en cours...
+                </p>
+              </div>
+            )}
+            
+            {locationStatus === 'ready' && userCoords && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm font-medium text-green-800">
+                  📍 Localisation active • Les distances sont calculées en temps réel
+                </p>
+              </div>
+            )}
+
+            {locationStatus === 'error' && (
+              <div className="space-y-3">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                  <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-800">
+                      Localisation refusée ou indisponible
+                    </p>
+                    <p className="text-xs text-red-600 mt-1">
+                      {locationError?.code === 1 && 'Permission refusée. Activez la localisation dans les paramètres de votre navigateur.'}
+                      {locationError?.code === 2 && 'Position indisponible. Vérifiez votre connexion GPS.'}
+                      {locationError?.code === 3 && 'Délai expiré. Réessayez.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={requestLocation}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
+                >
+                  Réessayer
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Filtres Tri */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSortBy('distance')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  sortBy === 'distance'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                Autour de moi
+              </button>
+              <button
+                onClick={() => setSortBy('date')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  sortBy === 'date'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Date
+              </button>
+            </div>
           </div>
 
           {/* Filtres Statut */}
@@ -413,6 +567,26 @@ export default function TournoisPage() {
                       </svg>
                       <span className="line-clamp-1">{tournoi.club} · {tournoi.clubAdresse}</span>
                     </p>
+
+                    {/* Distance (si géolocalisation active) */}
+                    {tournoi.distanceKm !== undefined && (
+                      <div className="flex items-center gap-2 -mt-1">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          </svg>
+                          <span>{formatDistance(tournoi.distanceKm)}</span>
+                        </div>
+                        {tournoi.distanceMinutes !== undefined && (
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>{formatTravelTime(tournoi.distanceMinutes)}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Date + Heure + Genre */}
                     <div className="flex items-center gap-3 md:gap-6 flex-wrap">
