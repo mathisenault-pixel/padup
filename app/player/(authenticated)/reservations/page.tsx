@@ -8,6 +8,9 @@ import { getClubImage } from '@/lib/clubImages'
 // ✅ Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// ID du club démo à exclure
+const DEMO_CLUB_ID = 'ba43c579-e522-4b51-8542-737c2c6452bb'
+
 type Booking = {
   id: string
   court_id: string
@@ -82,7 +85,10 @@ export default function ReservationsPage() {
             })
           )
 
-          setBookings(enriched)
+          // ✅ Filtrer pour exclure le club démo
+          const filteredEnriched = enriched.filter(b => b.clubId !== DEMO_CLUB_ID)
+
+          setBookings(filteredEnriched)
         }
       } catch (err: any) {
         console.error('[RESERVATIONS ERROR]', err)
