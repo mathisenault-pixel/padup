@@ -48,7 +48,7 @@ export default function TournoisPage() {
       format: 'Format B1',
       nombreEquipes: 14,
       nombreEquipesMax: 16,
-      prixInscription: 40,
+      prixInscription: 20,
       dotation: '500€ + Trophées',
       statut: 'Ouvert',
       inscrit: false,
@@ -66,7 +66,7 @@ export default function TournoisPage() {
       format: 'Format C2',
       nombreEquipes: 12,
       nombreEquipesMax: 16,
-      prixInscription: 30,
+      prixInscription: 15,
       dotation: '300€ + Trophées',
       statut: 'Ouvert',
       inscrit: true,
@@ -102,7 +102,7 @@ export default function TournoisPage() {
       format: 'Format A1',
       nombreEquipes: 16,
       nombreEquipesMax: 16,
-      prixInscription: 50,
+      prixInscription: 20,
       dotation: '1000€ + Trophées',
       statut: 'Complet',
       inscrit: false,
@@ -120,7 +120,7 @@ export default function TournoisPage() {
       format: 'Format D1',
       nombreEquipes: 10,
       nombreEquipesMax: 12,
-      prixInscription: 25,
+      prixInscription: 15,
       dotation: '200€ + Trophées',
       statut: 'Ouvert',
       inscrit: false,
@@ -402,7 +402,7 @@ export default function TournoisPage() {
                       </h3>
                       <div className="text-right flex-shrink-0">
                         <p className="text-xl md:text-2xl font-bold text-gray-900">{tournoi.prixInscription}€</p>
-                        <p className="text-xs text-gray-500">inscription</p>
+                        <p className="text-xs text-gray-500">par personne</p>
                       </div>
                     </div>
 
@@ -540,7 +540,7 @@ export default function TournoisPage() {
                   { label: 'Niveau', value: selectedTournoi.categorie },
                   { label: 'Genre', value: selectedTournoi.genre },
                   { label: 'Format', value: selectedTournoi.format },
-                  { label: 'Inscription', value: `${selectedTournoi.prixInscription}€` },
+                  { label: 'Inscription', value: `${selectedTournoi.prixInscription}€ par personne` },
                   { label: 'Dotation', value: selectedTournoi.dotation },
                   { label: 'Places', value: `${selectedTournoi.nombreEquipes}/${selectedTournoi.nombreEquipesMax}` },
                 ].map((item, i) => (
@@ -577,7 +577,7 @@ export default function TournoisPage() {
             <p className="text-gray-600 mb-6 text-center">
               {tournoiToConfirm.inscrit 
                 ? `Êtes-vous sûr de vouloir vous désinscrire du tournoi "${tournoiToConfirm.nom}" ?`
-                : `Confirmer votre inscription au tournoi "${tournoiToConfirm.nom}" pour ${tournoiToConfirm.prixInscription}€ ?`
+                : `Confirmer votre inscription au tournoi "${tournoiToConfirm.nom}" pour ${tournoiToConfirm.prixInscription}€ par personne ?`
               }
             </p>
             <div className="flex gap-3">
