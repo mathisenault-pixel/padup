@@ -45,7 +45,7 @@ export default function ClubsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [cityClubFilter, setCityClubFilter] = useState<string>('')
   const [radiusKm, setRadiusKm] = useState<number>(50)
-  const [sortBy, setSortBy] = useState<'distance' | 'prix-asc' | 'prix-desc' | 'note'>('distance')
+  const [sortBy, setSortBy] = useState<'prix-asc' | 'prix-desc' | 'note'>('note')
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -213,13 +213,6 @@ export default function ClubsPage() {
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case 'distance':
-            // Si géoloc active, trier par distance calculée
-            if (a.distanceKm !== undefined && b.distanceKm !== undefined) {
-              return a.distanceKm - b.distanceKm
-            }
-            // Sinon, pas de tri (ordre par défaut)
-            return 0
           case 'prix-asc':
             return a.prixMin - b.prixMin
           case 'prix-desc':
@@ -262,117 +255,35 @@ export default function ClubsPage() {
             />
           </div>
 
-          {/* Géolocalisation */}
-          <div className="mb-3 md:mb-4">
-            {locationStatus === 'idle' && (
-              <button
-                onClick={requestLocation}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-                Activer la localisation
-              </button>
-            )}
-
-            {locationStatus === 'loading' && (
-              <div className="w-full p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
-                <p className="text-sm font-medium text-blue-800">
-                  Localisation en cours...
-                </p>
-              </div>
-            )}
-            
-            {locationStatus === 'ready' && userCoords && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-sm font-medium text-green-800">
-                  📍 Localisation active • Les distances sont calculées en temps réel
-                </p>
-              </div>
-            )}
-
-            {locationStatus === 'error' && (
-              <div className="space-y-3">
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
-                  <svg className="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-red-800">
-                      Localisation refusée ou indisponible
-                    </p>
-                    <p className="text-xs text-red-600 mt-1">
-                      {locationError?.code === 1 && 'Permission refusée. Activez la localisation dans les paramètres de votre navigateur.'}
-                      {locationError?.code === 2 && 'Position indisponible. Vérifiez votre connexion GPS.'}
-                      {locationError?.code === 3 && 'Délai expiré. Réessayez.'}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={requestLocation}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all"
-                >
-                  Réessayer
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Filtre Autour de (Ville ou Club) */}
+          {/* Filtre Autour de (Ville ou Club) avec Rayon */}
           <div className="mb-3 md:mb-4">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
-            <input
-              type="text"
-              placeholder="Ville ou club"
-              value={cityClubFilter}
-              onChange={(e) => setCityClubFilter(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
-            />
-            
-            {cityClubFilter && (
-              <div className="mt-2">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Rayon :</span>
-                <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
-                  {[5, 10, 20, 50, 100].map((km) => (
-                    <button
-                      key={km}
-                      onClick={() => setRadiusKm(km)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                        radiusKm === km
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                      }`}
-                    >
-                      {km} km
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Ville ou club"
+                value={cityClubFilter}
+                onChange={(e) => setCityClubFilter(e.target.value)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <select
+                value={radiusKm}
+                onChange={(e) => setRadiusKm(Number(e.target.value))}
+                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              >
+                <option value={10}>10 km</option>
+                <option value={20}>20 km</option>
+                <option value={30}>30 km</option>
+                <option value={50}>50 km</option>
+                <option value={100}>100 km</option>
+              </select>
+            </div>
           </div>
 
           {/* Filtres Tri */}
           <div className="mb-3 md:mb-4">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
             <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
-              <button
-                onClick={() => setSortBy('distance')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  sortBy === 'distance'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                </svg>
-                Autour de moi
-              </button>
               <button
                 onClick={() => setSortBy('prix-asc')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
@@ -614,7 +525,7 @@ export default function ClubsPage() {
             <button
               onClick={() => {
                 setSearchTerm('')
-                setSortBy('distance')
+                setSortBy('note')
               }}
               className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
             >
