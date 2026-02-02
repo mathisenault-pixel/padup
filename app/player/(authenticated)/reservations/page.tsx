@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import Link from 'next/link'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import { getClubImage } from '@/lib/clubImages'
 
-// ✅ Force dynamic rendering (pas de pre-render statique)
-// Nécessaire car supabaseBrowser accède à document.cookie
+// ✅ Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 type Booking = {
@@ -14,15 +15,26 @@ type Booking = {
   slot_id: number
   slot_start: string
   slot_end: string
-  status: string  // 'confirmed' | 'cancelled'
+  status: string
   created_at: string
 }
 
+type EnrichedBooking = Booking & {
+  clubName?: string
+  clubCity?: string
+  clubImage?: string
+  clubId?: string
+  courtName?: string
+}
+
 export default function ReservationsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([])
+  const [bookings, setBookings] = useState<EnrichedBooking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [selectedFilter, setSelectedFilter] = useState<'tous' | 'a-venir' | 'passees' | 'annulees'>('tous')
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [bookingToCancel, setBookingToCancel] = useState<EnrichedBooking | null>(null)
 
   useEffect(() => {
     async function loadBookings() {
@@ -30,29 +42,50 @@ export default function ReservationsPage() {
         setLoading(true)
         setError(null)
 
-        // TODO: Filtrer par created_by une fois l'auth implémentée
-        const { data, error: queryError } = await supabase
+        // Charger les réservations
+        const { data: bookingsData, error: queryError } = await supabase
           .from('bookings')
           .select('*')
-          .order('created_at', { ascending: false })
+          .order('slot_start', { ascending: false })
 
         if (queryError) {
-          console.error('[SUPABASE ERROR - bookings]', {
-            table: 'bookings',
-            query: 'select * order by created_at desc',
-            error: queryError,
-            message: queryError.message,
-            code: queryError.code,
-            details: queryError.details,
-            hint: queryError.hint
-          })
-          setError(`${queryError.message} (code: ${queryError.code || 'N/A'})`)
+          console.error('[RESERVATIONS ERROR]', queryError)
+          setError(`${queryError.message}`)
         } else {
-          console.log('[SUPABASE SUCCESS - bookings]', { count: data?.length || 0 })
-          setBookings(data || [])
+          // Enrichir avec les infos club/court
+          const enriched = await Promise.all(
+            (bookingsData || []).map(async (booking) => {
+              // Récupérer le court
+              const { data: court } = await supabase
+                .from('courts')
+                .select('name, club_id')
+                .eq('id', booking.court_id)
+                .maybeSingle()
+
+              if (!court) return { ...booking }
+
+              // Récupérer le club
+              const { data: club } = await supabase
+                .from('clubs')
+                .select('name, city')
+                .eq('id', court.club_id)
+                .maybeSingle()
+
+              return {
+                ...booking,
+                clubName: club?.name || 'Club inconnu',
+                clubCity: club?.city || '',
+                clubImage: getClubImage(court.club_id),
+                clubId: court.club_id,
+                courtName: court?.name || 'Terrain'
+              }
+            })
+          )
+
+          setBookings(enriched)
         }
       } catch (err: any) {
-        console.error('[ERROR - bookings]', err)
+        console.error('[RESERVATIONS ERROR]', err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -62,154 +95,362 @@ export default function ReservationsPage() {
     loadBookings()
   }, [])
 
-  // ============================================
-  // ANNULER UNE RÉSERVATION
-  // ============================================
-  const cancelBooking = async (bookingId: string) => {
-    // Confirmation avant annulation
-    if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
-      return
+  // Filtrage des réservations
+  const filteredBookings = useMemo(() => {
+    let filtered = bookings
+
+    const now = new Date()
+
+    if (selectedFilter === 'a-venir') {
+      filtered = filtered.filter(b => 
+        b.status === 'confirmed' && new Date(b.slot_start) > now
+      )
+    } else if (selectedFilter === 'passees') {
+      filtered = filtered.filter(b => 
+        b.status === 'confirmed' && new Date(b.slot_start) < now
+      )
+    } else if (selectedFilter === 'annulees') {
+      filtered = filtered.filter(b => b.status === 'cancelled')
     }
 
-    setCancellingId(bookingId)
-    console.log('[CANCEL] Cancelling booking:', bookingId)
+    return filtered
+  }, [bookings, selectedFilter])
+
+  // Annuler une réservation
+  const handleCancelClick = (booking: EnrichedBooking) => {
+    setBookingToCancel(booking)
+    setShowCancelModal(true)
+  }
+
+  const confirmCancel = async () => {
+    if (!bookingToCancel) return
+
+    setCancellingId(bookingToCancel.id)
+    setShowCancelModal(false)
 
     try {
       const { error } = await supabase
         .from('bookings')
         .update({ status: 'cancelled' })
-        .eq('id', bookingId)
+        .eq('id', bookingToCancel.id)
 
       if (error) {
-        console.error('[CANCEL] Error:', error)
-        alert(`Erreur lors de l'annulation: ${error.message}`)
+        console.error('[CANCEL ERROR]', error)
+        alert(`Erreur: ${error.message}`)
       } else {
-        console.log('[CANCEL] ✅ Booking cancelled successfully')
-        // Mettre à jour l'UI localement
         setBookings(prev => 
           prev.map(b => 
-            b.id === bookingId ? { ...b, status: 'cancelled' } : b
+            b.id === bookingToCancel.id ? { ...b, status: 'cancelled' } : b
           )
         )
-        alert('Réservation annulée avec succès !')
       }
     } catch (err: any) {
-      console.error('[CANCEL] Exception:', err)
+      console.error('[CANCEL ERROR]', err)
       alert(`Erreur: ${err.message}`)
     } finally {
       setCancellingId(null)
+      setBookingToCancel(null)
     }
+  }
+
+  // Format de date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('fr-FR', { 
+      weekday: 'long',
+      day: 'numeric', 
+      month: 'long', 
+      year: 'numeric' 
+    })
+  }
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('fr-FR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    })
+  }
+
+  // Badge de statut
+  const StatusBadge = ({ booking }: { booking: EnrichedBooking }) => {
+    const now = new Date()
+    const slotDate = new Date(booking.slot_start)
+    const isPast = slotDate < now
+
+    if (booking.status === 'cancelled') {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-semibold">
+          ❌ Annulée
+        </span>
+      )
+    }
+
+    if (isPast) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
+          ⏱️ Passée
+        </span>
+      )
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-semibold">
+        ✅ Confirmée
+      </span>
+    )
   }
 
   if (loading) {
     return (
-      <div style={{ padding: 24 }}>
-        <h1>Mes réservations</h1>
-        <p>Chargement...</p>
+      <div className="px-4 md:px-6 py-4 md:py-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
+            Mes réservations
+          </h1>
+          <p className="text-xl text-gray-600">Chargement...</p>
+        </div>
+        <div className="grid gap-5">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white border border-gray-200 rounded-3xl p-5 animate-pulse">
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-full md:w-64 h-48 md:h-44 bg-gray-200 rounded-2xl" />
+                <div className="flex-1 space-y-4">
+                  <div className="h-6 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div style={{ padding: 24 }}>
-        <h1>Mes réservations</h1>
-        <div style={{ padding: 16, background: '#fee', borderRadius: 8, marginTop: 16 }}>
-          <strong>Erreur Supabase :</strong> {error}
+      <div className="px-4 md:px-6 py-4 md:py-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
+            Mes réservations
+          </h1>
+        </div>
+        <div className="p-6 bg-red-50 border border-red-200 rounded-2xl">
+          <p className="text-red-700 font-semibold">Erreur : {error}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Mes réservations</h1>
-      <p style={{ marginBottom: 16, color: '#666' }}>
-        {bookings.length} réservation{bookings.length !== 1 ? 's' : ''}
-      </p>
-
-      {bookings.length === 0 ? (
-        <p style={{ padding: 16, background: '#f0f9ff', borderRadius: 8 }}>
-          Aucune réservation pour le moment
+    <div className="px-4 md:px-6 py-4 md:py-8">
+      {/* Header */}
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">
+          Mes réservations
+        </h1>
+        <p className="text-xl text-gray-600">
+          {bookings.length} réservation{bookings.length !== 1 ? 's' : ''}
         </p>
+      </div>
+
+      {/* Filtres */}
+      <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6">
+        <h3 className="text-sm font-bold text-gray-900 mb-3">Filtrer par statut</h3>
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <button
+            onClick={() => setSelectedFilter('tous')}
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+              selectedFilter === 'tous'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Toutes ({bookings.length})
+          </button>
+          <button
+            onClick={() => setSelectedFilter('a-venir')}
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+              selectedFilter === 'a-venir'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            À venir ({bookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})
+          </button>
+          <button
+            onClick={() => setSelectedFilter('passees')}
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+              selectedFilter === 'passees'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Passées ({bookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})
+          </button>
+          <button
+            onClick={() => setSelectedFilter('annulees')}
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+              selectedFilter === 'annulees'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Annulées ({bookings.filter(b => b.status === 'cancelled').length})
+          </button>
+        </div>
+      </div>
+
+      {/* Liste des réservations */}
+      {filteredBookings.length === 0 ? (
+        <div className="text-center py-16 px-6">
+          <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-black text-gray-900 mb-3">
+            Aucune réservation
+          </h3>
+          <p className="text-gray-600 mb-6">
+            {selectedFilter === 'tous' 
+              ? "Vous n'avez pas encore de réservation" 
+              : `Aucune réservation ${selectedFilter === 'a-venir' ? 'à venir' : selectedFilter === 'passees' ? 'passée' : 'annulée'}`}
+          </p>
+          <Link href="/player/clubs">
+            <button className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all">
+              Réserver un terrain
+            </button>
+          </Link>
+        </div>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {bookings.map((booking) => (
-            <li
+        <div className="grid gap-5 mb-16 md:mb-8">
+          {filteredBookings.map((booking) => (
+            <div
               key={booking.id}
-              style={{
-                padding: 16,
-                marginBottom: 12,
-                background: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                opacity: booking.status === 'cancelled' ? 0.6 : 1
-              }}
+              className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all"
             >
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>
-                {new Date(booking.slot_start).toLocaleString('fr-FR')}
+              {/* Image club */}
+              <div className="w-full md:w-64 h-48 md:h-44 rounded-xl md:rounded-2xl overflow-hidden flex-shrink-0">
+                <img
+                  src={booking.clubImage || '/images/clubs/default.jpg'}
+                  alt={booking.clubName}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
               </div>
-              <div style={{ fontSize: 14, color: '#666' }}>
-                Date: {booking.booking_date} | Slot #{booking.slot_id}
-              </div>
-              <div style={{ fontSize: 14, color: '#666', marginBottom: 8 }}>
-                Statut: <span style={{ 
-                  fontWeight: 600,
-                  color: booking.status === 'confirmed' ? '#16a34a' : booking.status === 'cancelled' ? '#dc2626' : '#6b7280'
-                }}>
-                  {booking.status === 'confirmed' ? '✅ Confirmée' : booking.status === 'cancelled' ? '❌ Annulée' : booking.status}
-                </span>
-              </div>
-              <div style={{ fontSize: 12, color: '#999', marginBottom: 12 }}>
-                Créée: {new Date(booking.created_at).toLocaleString('fr-FR')}
-              </div>
-              
-              {/* Bouton Annuler */}
-              {booking.status === 'confirmed' && (
-                <button
-                  onClick={() => cancelBooking(booking.id)}
-                  disabled={cancellingId === booking.id}
-                  style={{
-                    padding: '8px 16px',
-                    background: cancellingId === booking.id ? '#9ca3af' : '#dc2626',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 6,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: cancellingId === booking.id ? 'not-allowed' : 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    if (cancellingId !== booking.id) {
-                      e.currentTarget.style.background = '#b91c1c'
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    if (cancellingId !== booking.id) {
-                      e.currentTarget.style.background = '#dc2626'
-                    }
-                  }}
-                >
-                  {cancellingId === booking.id ? 'Annulation...' : 'Annuler la réservation'}
-                </button>
-              )}
-              
-              {booking.status === 'cancelled' && (
-                <div style={{ 
-                  padding: '8px 12px',
-                  background: '#fee2e2',
-                  color: '#991b1b',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 600
-                }}>
-                  Cette réservation a été annulée
+
+              {/* Infos */}
+              <div className="flex-1 flex flex-col gap-3">
+                <div>
+                  <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-1 line-clamp-1">
+                    {booking.clubName}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-1">{booking.clubCity}</p>
                 </div>
-              )}
-            </li>
+
+                {/* Date & heure */}
+                <div className="flex items-center gap-2 text-gray-700">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="font-semibold text-sm md:text-base">
+                    {formatDate(booking.slot_start)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-700">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="font-semibold text-sm md:text-base">
+                    {formatTime(booking.slot_start)} - {formatTime(booking.slot_end)}
+                  </span>
+                </div>
+
+                {/* Terrain */}
+                <div className="flex items-center gap-2 text-gray-600 text-sm">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  <span>{booking.courtName}</span>
+                </div>
+
+                {/* Badge statut */}
+                <div>
+                  <StatusBadge booking={booking} />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex md:flex-col gap-2 md:justify-center">
+                {booking.status === 'confirmed' && new Date(booking.slot_start) > new Date() && (
+                  <button
+                    onClick={() => handleCancelClick(booking)}
+                    disabled={cancellingId === booking.id}
+                    className="flex-1 md:w-auto px-5 py-3 md:px-6 md:py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-500 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md:text-base"
+                  >
+                    {cancellingId === booking.id ? 'Annulation...' : 'Annuler'}
+                  </button>
+                )}
+                {booking.clubId && (
+                  <Link href={`/player/clubs/${booking.clubId}/reserver`} className="flex-1 md:w-auto">
+                    <button className="w-full px-5 py-3 md:px-6 md:py-2.5 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-all text-sm md:text-base">
+                      Voir le club
+                    </button>
+                  </Link>
+                )}
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
+      )}
+
+      {/* Modale de confirmation d'annulation */}
+      {showCancelModal && bookingToCancel && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowCancelModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-black text-gray-900 mb-2">
+                Annuler cette réservation ?
+              </h3>
+              <p className="text-gray-600 mb-2">
+                {bookingToCancel.clubName}
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                {formatDate(bookingToCancel.slot_start)} à {formatTime(bookingToCancel.slot_start)}
+              </p>
+              <p className="text-sm text-red-600 font-semibold mb-6">
+                Cette action est irréversible
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="flex-1 px-6 py-3 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-all"
+                >
+                  Retour
+                </button>
+                <button
+                  onClick={confirmCancel}
+                  className="flex-1 px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-500 transition-all"
+                >
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
