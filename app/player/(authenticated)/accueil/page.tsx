@@ -92,7 +92,7 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       {/* Hero - PREMIUM */}
-      <section className="px-6 pt-32 pb-20">
+      <section className="px-6 pt-20 md:pt-32 pb-20">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <div className="inline-block mb-6">
