@@ -44,7 +44,8 @@ export default function TournoisPage() {
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'ouverts' | 'inscrits'>('ouverts')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
-  const [selectedCity, setSelectedCity] = useState<string>('')
+  const [cityClubFilter, setCityClubFilter] = useState<string>('')
+  const [radiusKm, setRadiusKm] = useState<number>(50)
   const [sortBy, setSortBy] = useState<'date' | 'distance'>('date')
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [selectedTournoi, setSelectedTournoi] = useState<Tournoi | null>(null)
@@ -234,16 +235,27 @@ export default function TournoisPage() {
   const inscritsCount = useMemo(() => tournois.filter(t => t.inscrit).length, [tournois])
   const ouvertsCount = useMemo(() => tournois.filter(t => t.statut === 'Ouvert').length, [tournois])
 
-  // Obtenir la liste unique des villes
-  const availableCities = useMemo(() => {
-    const cities = tournois.map(t => t.clubAdresse).filter(Boolean)
-    return Array.from(new Set(cities)).sort()
-  }, [tournois])
+  // Trouver les coordonnées de référence pour le filtre "Autour de"
+  const referenceCoords = useMemo(() => {
+    if (!cityClubFilter) return null
+    
+    // Chercher un tournoi correspondant au filtre (ville ou club)
+    const matchingTournoi = tournois.find(t => 
+      t.clubAdresse.toLowerCase().includes(cityClubFilter.toLowerCase()) ||
+      t.club.toLowerCase().includes(cityClubFilter.toLowerCase())
+    )
+    
+    if (matchingTournoi && matchingTournoi.lat && matchingTournoi.lng) {
+      return { lat: matchingTournoi.lat, lng: matchingTournoi.lng }
+    }
+    
+    return null
+  }, [cityClubFilter, tournois])
 
   // Mémoïser le filtrage et le tri (évite recalcul inutile)
   const filteredTournois = useMemo(() => {
     let result = tournoisWithDistance.filter(t => {
-      // Recherche
+      // Recherche principale
       const clubName = t.club.toLowerCase()
       const tournoiName = t.nom.toLowerCase()
       const searchLower = searchTerm.toLowerCase()
@@ -251,8 +263,17 @@ export default function TournoisPage() {
       
       if (searchTerm && !matchSearch) return false
 
-      // Filtre ville
-      const matchesCity = !selectedCity || t.clubAdresse === selectedCity
+      // Filtre "Autour de" avec rayon
+      let matchesCityClubRadius = true
+      if (cityClubFilter && referenceCoords && t.lat && t.lng) {
+        const distanceKm = haversineKm(
+          referenceCoords.lat,
+          referenceCoords.lng,
+          t.lat,
+          t.lng
+        )
+        matchesCityClubRadius = distanceKm <= radiusKm
+      }
 
       // Filtre statut
       let matchesStatut = true
@@ -265,7 +286,7 @@ export default function TournoisPage() {
       // Filtre genre (multi-sélection)
       const matchesGenre = selectedGenres.length === 0 || selectedGenres.includes(t.genre)
 
-      return matchesCity && matchesStatut && matchesCategorie && matchesGenre
+      return matchesCityClubRadius && matchesStatut && matchesCategorie && matchesGenre
     })
 
     // Tri
@@ -276,7 +297,7 @@ export default function TournoisPage() {
     }
 
     return result
-  }, [tournoisWithDistance, searchTerm, selectedFilter, selectedCategories, selectedGenres, sortBy, userCoords, selectedCity])
+  }, [tournoisWithDistance, searchTerm, selectedFilter, selectedCategories, selectedGenres, sortBy, userCoords, cityClubFilter, referenceCoords, radiusKm])
 
   return (
     <div className="min-h-screen bg-white">
@@ -400,34 +421,37 @@ export default function TournoisPage() {
             </div>
           </div>
 
-          {/* Filtre Ville */}
+          {/* Filtre Autour de (Ville ou Club) */}
           <div className="mb-3 md:mb-4">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Autour de :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
-              <button
-                onClick={() => setSelectedCity('')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                  !selectedCity
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                Toutes les villes
-              </button>
-              {availableCities.map((city) => (
-                <button
-                  key={city}
-                  onClick={() => setSelectedCity(city)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                    selectedCity === city
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                  }`}
-                >
-                  {city}
-                </button>
-              ))}
-            </div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
+            <input
+              type="text"
+              placeholder="Ville ou club"
+              value={cityClubFilter}
+              onChange={(e) => setCityClubFilter(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
+            />
+            
+            {cityClubFilter && (
+              <div className="mt-2">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Rayon :</span>
+                <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+                  {[5, 10, 20, 50, 100].map((km) => (
+                    <button
+                      key={km}
+                      onClick={() => setRadiusKm(km)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                        radiusKm === km
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                      }`}
+                    >
+                      {km} km
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Filtres Statut */}
