@@ -151,7 +151,7 @@ export default function AccueilPage() {
       </section>
 
       {/* Clubs - CAROUSEL CARDS STYLE */}
-      <section className="pt-3 pb-20 px-6 bg-white">
+      <section className="pt-1.5 pb-20 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-6">
             <div>
