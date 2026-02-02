@@ -153,7 +153,7 @@ export default function AccueilPage() {
       </section>
 
       {/* Clubs - CAROUSEL CARDS STYLE */}
-      <section className="pt-8 pb-16 px-6 bg-white">
+      <section className="pt-12 pb-20 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -280,7 +280,7 @@ export default function AccueilPage() {
       </section>
 
       {/* POURQUOI PAD'UP - CARDS ÉLÉGANTES */}
-      <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 px-6 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-black text-gray-900 mb-4">Rappels automatiques par e-mail</h2>
@@ -319,7 +319,7 @@ export default function AccueilPage() {
       </section>
 
       {/* CTA - PREMIUM */}
-      <section className="py-16 px-6 bg-white">
+      <section className="py-20 px-6 bg-white">
         <div className="container mx-auto max-w-5xl">
           <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100">
             <div className="relative px-12 py-16 text-center">
@@ -345,7 +345,7 @@ export default function AccueilPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-6 bg-gray-50">
+      <section className="py-20 px-6 bg-gray-50">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-black text-gray-900 mb-3">Questions fréquentes</h2>
