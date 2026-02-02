@@ -34,7 +34,6 @@ export default function TournoisPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [tournoiToConfirm, setTournoiToConfirm] = useState<Tournoi | null>(null)
-  const [showFilters, setShowFilters] = useState(false)
 
   const [tournois, setTournois] = useState<Tournoi[]>([
     {
@@ -237,185 +236,110 @@ export default function TournoisPage() {
             />
           </div>
 
-          {/* Filtres statut */}
-          <div className="flex items-center gap-2 flex-wrap mb-3 md:mb-3">
-            <button
-              onClick={() => setSelectedFilter('ouverts')}
-              className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                selectedFilter === 'ouverts'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Ouverts ({ouvertsCount})
-            </button>
-            <button
-              onClick={() => setSelectedFilter('inscrits')}
-              className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                selectedFilter === 'inscrits'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              Mes inscriptions ({inscritsCount})
-            </button>
-            <button
-              onClick={() => setSelectedFilter('tous')}
-              className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                selectedFilter === 'tous'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              Tous ({tournois.length})
-            </button>
-          </div>
-
-          {/* Accordion Filtres (mobile) */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-all"
-            >
-              <span className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          {/* Filtres Statut */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Statut :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedFilter('ouverts')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  selectedFilter === 'ouverts'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Filtrer les tournois
-              </span>
-              <svg className={`w-5 h-5 transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            
-            {showFilters && (
-              <div className="mt-3 space-y-3">
-                {/* Filtres niveau (scroll horizontal) */}
-                <div>
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Niveau</span>
-                  <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-                    <button
-                      onClick={() => setSelectedCategories([])}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                        selectedCategories.length === 0
-                          ? 'bg-gray-900 text-white'
-                          : 'bg-white text-gray-700 border border-gray-200'
-                      }`}
-                    >
-                      Tous
-                    </button>
-                    {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => toggleCategorie(cat)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
-                          selectedCategories.includes(cat)
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-700 border border-gray-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Filtres genre (compacts) */}
-                <div>
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Genre</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setSelectedGenres([])}
-                      className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                        selectedGenres.length === 0
-                          ? 'bg-gray-900 text-white'
-                          : 'bg-white text-gray-700 border border-gray-200'
-                      }`}
-                    >
-                      Tous
-                    </button>
-                    {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
-                      <button
-                        key={genre}
-                        onClick={() => toggleGenre(genre)}
-                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
-                          selectedGenres.includes(genre)
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white text-gray-700 border border-gray-200'
-                        }`}
-                      >
-                        {genre}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Filtres niveau (desktop) */}
-          <div className="hidden md:flex items-center gap-2 flex-wrap mb-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Niveau :</span>
-            <button
-              onClick={() => setSelectedCategories([])}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedCategories.length === 0
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              Tous
-            </button>
-            {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
+                Ouverts ({ouvertsCount})
+              </button>
               <button
-                key={cat}
-                onClick={() => toggleCategorie(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  selectedCategories.includes(cat)
+                onClick={() => setSelectedFilter('inscrits')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  selectedFilter === 'inscrits'
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
-                {cat}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Mes inscriptions ({inscritsCount})
               </button>
-            ))}
-          </div>
-
-          {/* Filtres genre (desktop) */}
-          <div className="hidden md:flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Genre :</span>
-            <button
-              onClick={() => setSelectedGenres([])}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                selectedGenres.length === 0
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-              }`}
-            >
-              Tous
-            </button>
-            {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
               <button
-                key={genre}
-                onClick={() => toggleGenre(genre)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  selectedGenres.includes(genre)
+                onClick={() => setSelectedFilter('tous')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  selectedFilter === 'tous'
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
-                {genre}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Tous ({tournois.length})
               </button>
-            ))}
+            </div>
+          </div>
+
+          {/* Filtres Niveau */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Niveau :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedCategories([])}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  selectedCategories.length === 0
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                Tous
+              </button>
+              {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => toggleCategorie(cat)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                    selectedCategories.includes(cat)
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filtres Genre */}
+          <div className="mb-0">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Genre :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedGenres([])}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  selectedGenres.length === 0
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                Tous
+              </button>
+              {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
+                <button
+                  key={genre}
+                  onClick={() => toggleGenre(genre)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                    selectedGenres.includes(genre)
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
