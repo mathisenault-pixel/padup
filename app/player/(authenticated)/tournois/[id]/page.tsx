@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, use, useMemo } from 'react'
+import { useState, use, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -184,11 +184,29 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
   
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isInscrit, setIsInscrit] = useState(false)
   
   // Trouver le tournoi
   const tournoi = useMemo(() => {
-    return TOURNOIS_DATA.find(t => t.id === tournoiId)
+    const t = TOURNOIS_DATA.find(t => t.id === tournoiId)
+    if (t) {
+      // Vérifier dans localStorage si déjà inscrit
+      const storedRegistrations = localStorage.getItem('tournamentRegistrations')
+      if (storedRegistrations) {
+        const registrations = JSON.parse(storedRegistrations)
+        const isRegistered = registrations.some((r: any) => r.id === tournoiId)
+        return { ...t, inscrit: isRegistered }
+      }
+    }
+    return t
   }, [tournoiId])
+
+  // Synchroniser l'état local avec le tournoi
+  useEffect(() => {
+    if (tournoi) {
+      setIsInscrit(tournoi.inscrit)
+    }
+  }, [tournoi])
 
   if (!tournoi) {
     return (
@@ -204,12 +222,40 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const handleInscription = async () => {
-    if (isSubmitting || tournoi.inscrit || tournoi.statut !== 'Ouvert') return
+    if (isSubmitting || isInscrit || tournoi.statut !== 'Ouvert') return
     
     setIsSubmitting(true)
     
     // Simuler un délai d'inscription
     await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Sauvegarder l'inscription dans localStorage
+    const registration = {
+      id: tournoi.id,
+      type: 'tournament' as const,
+      nom: tournoi.nom,
+      club: tournoi.club,
+      clubAdresse: tournoi.clubAdresse,
+      date: tournoi.date,
+      heureDebut: tournoi.heureDebut,
+      categorie: tournoi.categorie,
+      genre: tournoi.genre,
+      prixInscription: tournoi.prixInscription,
+      image: tournoi.image,
+      inscriptionDate: new Date().toISOString()
+    }
+    
+    // Récupérer les inscriptions existantes
+    const storedRegistrations = localStorage.getItem('tournamentRegistrations')
+    const registrations = storedRegistrations ? JSON.parse(storedRegistrations) : []
+    
+    // Vérifier si déjà inscrit
+    const alreadyRegistered = registrations.find((r: any) => r.id === tournoi.id)
+    if (!alreadyRegistered) {
+      registrations.push(registration)
+      localStorage.setItem('tournamentRegistrations', JSON.stringify(registrations))
+      setIsInscrit(true)
+    }
     
     setShowSuccessModal(true)
     setIsSubmitting(false)
@@ -244,12 +290,12 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
                   <span className="px-3 py-1.5 bg-blue-600 text-white text-sm font-bold rounded-lg">
                     {tournoi.categorie}
                   </span>
-                  {tournoi.inscrit && (
+                  {isInscrit && (
                     <span className="px-3 py-1.5 bg-green-600 text-white text-sm font-bold rounded-lg">
                       ✓ Inscrit
                     </span>
                   )}
-                  {tournoi.statut === 'Complet' && !tournoi.inscrit && (
+                  {tournoi.statut === 'Complet' && !isInscrit && (
                     <span className="px-3 py-1.5 bg-gray-900 text-white text-sm font-bold rounded-lg">
                       Complet
                     </span>
@@ -463,7 +509,7 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
               <p className="text-gray-600 text-lg">par personne</p>
             </div>
 
-              {tournoi.inscrit ? (
+              {isInscrit ? (
                 <div className="px-6 py-4 bg-blue-50 border-2 border-blue-600 text-blue-700 text-center font-semibold rounded-xl mb-4">
                   ✓ Vous êtes inscrit à ce tournoi
                 </div>

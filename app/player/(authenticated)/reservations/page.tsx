@@ -28,24 +28,44 @@ type EnrichedBooking = Booking & {
   clubImage?: string
   clubId?: string
   courtName?: string
+  clubTelephone?: string
+}
+
+type TournamentRegistration = {
+  id: number
+  type: 'tournament'
+  nom: string
+  club: string
+  clubAdresse: string
+  date: string
+  heureDebut: string
+  categorie: string
+  genre: string
+  prixInscription: number
+  image: string
+  inscriptionDate: string
+}
+
+type MixedEvent = (EnrichedBooking | TournamentRegistration) & {
+  eventType: 'booking' | 'tournament'
+  eventDate: Date
 }
 
 export default function ReservationsPage() {
   const [bookings, setBookings] = useState<EnrichedBooking[]>([])
+  const [tournaments, setTournaments] = useState<TournamentRegistration[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'a-venir' | 'passees' | 'annulees'>('tous')
-  const [showCancelModal, setShowCancelModal] = useState(false)
-  const [bookingToCancel, setBookingToCancel] = useState<EnrichedBooking | null>(null)
+  const [selectedType, setSelectedType] = useState<'tous' | 'parties' | 'tournois'>('tous')
 
   useEffect(() => {
-    async function loadBookings() {
+    async function loadBookingsAndTournaments() {
       try {
         setLoading(true)
         setError(null)
 
-        // Charger les réservations
+        // Charger les réservations de terrains
         const { data: bookingsData, error: queryError } = await supabase
           .from('bookings')
           .select('*')
@@ -70,7 +90,7 @@ export default function ReservationsPage() {
               // Récupérer le club
               const { data: club } = await supabase
                 .from('clubs')
-                .select('name, city')
+                .select('name, city, phone')
                 .eq('id', court.club_id)
                 .maybeSingle()
 
@@ -80,7 +100,8 @@ export default function ReservationsPage() {
                 clubCity: club?.city || '',
                 clubImage: getClubImage(court.club_id),
                 clubId: court.club_id,
-                courtName: court?.name || 'Terrain'
+                courtName: court?.name || 'Terrain',
+                clubTelephone: club?.phone || ''
               }
             })
           )
@@ -90,6 +111,14 @@ export default function ReservationsPage() {
 
           setBookings(filteredEnriched)
         }
+
+        // Charger les inscriptions aux tournois depuis localStorage
+        const storedTournaments = localStorage.getItem('tournamentRegistrations')
+        if (storedTournaments) {
+          const tournamentsData = JSON.parse(storedTournaments) as TournamentRegistration[]
+          setTournaments(tournamentsData)
+        }
+
       } catch (err: any) {
         console.error('[RESERVATIONS ERROR]', err)
         setError(err.message)
@@ -98,66 +127,69 @@ export default function ReservationsPage() {
       }
     }
 
-    loadBookings()
+    loadBookingsAndTournaments()
   }, [])
 
-  // Filtrage des réservations
-  const filteredBookings = useMemo(() => {
-    let filtered = bookings
-
+  // Combiner et filtrer les réservations et tournois
+  const filteredEvents = useMemo(() => {
     const now = new Date()
 
+    // Convertir les bookings en MixedEvent
+    let bookingEvents: MixedEvent[] = bookings.map(b => ({
+      ...b,
+      eventType: 'booking' as const,
+      eventDate: new Date(b.slot_start)
+    }))
+
+    // Convertir les tournois en MixedEvent
+    let tournamentEvents: MixedEvent[] = tournaments.map(t => ({
+      ...t,
+      eventType: 'tournament' as const,
+      eventDate: new Date(t.date)
+    }))
+
+    // Filtre par type (parties/tournois)
+    let events: MixedEvent[] = []
+    if (selectedType === 'parties') {
+      events = bookingEvents
+    } else if (selectedType === 'tournois') {
+      events = tournamentEvents
+    } else {
+      events = [...bookingEvents, ...tournamentEvents]
+    }
+
+    // Filtre par statut
     if (selectedFilter === 'a-venir') {
-      filtered = filtered.filter(b => 
-        b.status === 'confirmed' && new Date(b.slot_start) > now
-      )
+      events = events.filter(e => {
+        if (e.eventType === 'booking') {
+          const booking = e as EnrichedBooking & { eventType: 'booking'; eventDate: Date }
+          return booking.status === 'confirmed' && e.eventDate > now
+        }
+        return e.eventDate > now
+      })
     } else if (selectedFilter === 'passees') {
-      filtered = filtered.filter(b => 
-        b.status === 'confirmed' && new Date(b.slot_start) < now
-      )
+      events = events.filter(e => {
+        if (e.eventType === 'booking') {
+          const booking = e as EnrichedBooking & { eventType: 'booking'; eventDate: Date }
+          return booking.status === 'confirmed' && e.eventDate < now
+        }
+        return e.eventDate < now
+      })
     } else if (selectedFilter === 'annulees') {
-      filtered = filtered.filter(b => b.status === 'cancelled')
+      events = events.filter(e => {
+        if (e.eventType === 'booking') {
+          const booking = e as EnrichedBooking & { eventType: 'booking'; eventDate: Date }
+          return booking.status === 'cancelled'
+        }
+        return false
+      })
     }
 
-    return filtered
-  }, [bookings, selectedFilter])
+    // Trier par date (du plus récent au moins récent)
+    events.sort((a, b) => b.eventDate.getTime() - a.eventDate.getTime())
 
-  // Annuler une réservation
-  const handleCancelClick = (booking: EnrichedBooking) => {
-    setBookingToCancel(booking)
-    setShowCancelModal(true)
-  }
-
-  const confirmCancel = async () => {
-    if (!bookingToCancel) return
-
-    setCancellingId(bookingToCancel.id)
-    setShowCancelModal(false)
-
-    try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ status: 'cancelled' })
-        .eq('id', bookingToCancel.id)
-
-      if (error) {
-        console.error('[CANCEL ERROR]', error)
-        alert(`Erreur: ${error.message}`)
-      } else {
-        setBookings(prev => 
-          prev.map(b => 
-            b.id === bookingToCancel.id ? { ...b, status: 'cancelled' } : b
-          )
-        )
-      }
-    } catch (err: any) {
-      console.error('[CANCEL ERROR]', err)
-      alert(`Erreur: ${err.message}`)
-    } finally {
-      setCancellingId(null)
-      setBookingToCancel(null)
-    }
-  }
+    return events
+  }, [bookings, tournaments, selectedFilter, selectedType])
 
   // Format de date
   const formatDate = (dateString: string) => {
@@ -242,6 +274,44 @@ export default function ReservationsPage() {
     <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
       {/* Filtres */}
       <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6">
+        {/* Filtre par type */}
+        <div className="mb-6">
+          <h3 className="text-sm font-bold text-gray-900 mb-3">Type d'événement</h3>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <button
+              onClick={() => setSelectedType('tous')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedType === 'tous'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Tout ({bookings.length + tournaments.length})
+            </button>
+            <button
+              onClick={() => setSelectedType('parties')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedType === 'parties'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Parties ({bookings.length})
+            </button>
+            <button
+              onClick={() => setSelectedType('tournois')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedType === 'tournois'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Tournois ({tournaments.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Filtre par statut */}
         <h3 className="text-sm font-bold text-gray-900 mb-3">Filtrer par statut</h3>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
           <button
@@ -287,8 +357,8 @@ export default function ReservationsPage() {
         </div>
       </div>
 
-      {/* Liste des réservations */}
-      {filteredBookings.length === 0 ? (
+      {/* Liste des événements */}
+      {filteredEvents.length === 0 ? (
         <div className="text-center py-16 px-6">
           <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
             <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +381,104 @@ export default function ReservationsPage() {
         </div>
       ) : (
         <div className="grid gap-5 mb-16 md:mb-8">
-          {filteredBookings.map((booking) => (
+          {filteredEvents.map((event) => {
+            // Affichage pour les tournois
+            if (event.eventType === 'tournament') {
+              const tournament = event as TournamentRegistration & { eventType: 'tournament'; eventDate: Date }
+              const isPast = tournament.eventDate < new Date()
+
+              return (
+                <div
+                  key={`tournament-${tournament.id}`}
+                  className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border-2 border-blue-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all"
+                >
+                  {/* Image tournoi */}
+                  <div className="w-full md:w-64 h-48 md:h-44 rounded-xl md:rounded-2xl overflow-hidden flex-shrink-0 relative">
+                    <img
+                      src={tournament.image}
+                      alt={tournament.nom}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg">
+                      🏆 TOURNOI
+                    </div>
+                  </div>
+
+                  {/* Infos */}
+                  <div className="flex-1 flex flex-col gap-3">
+                    <div>
+                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-1 line-clamp-1">
+                        {tournament.nom}
+                      </h3>
+                      <p className="text-sm text-gray-600 line-clamp-1">{tournament.club} · {tournament.clubAdresse}</p>
+                    </div>
+
+                    {/* Date & heure */}
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="font-semibold text-sm md:text-base">
+                        {formatDate(tournament.date)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-gray-700">
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="font-semibold text-sm md:text-base">
+                        Début à {tournament.heureDebut}
+                      </span>
+                    </div>
+
+                    {/* Infos tournoi */}
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold">
+                        {tournament.categorie}
+                      </span>
+                      <span className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold">
+                        {tournament.genre}
+                      </span>
+                      <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-xs font-semibold">
+                        {tournament.prixInscription}€/pers
+                      </span>
+                    </div>
+
+                    {/* Badge statut */}
+                    <div>
+                      {isPast ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
+                          ⏱️ Passé
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-semibold">
+                          ✅ Inscrit
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2 md:justify-center">
+                    <Link href={`/player/tournois/${tournament.id}`} className="w-full">
+                      <button className="w-full px-5 py-3 md:px-6 md:py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all text-sm md:text-base">
+                        Voir le tournoi
+                      </button>
+                    </Link>
+                    {!isPast && (
+                      <p className="text-xs text-gray-500 text-center mt-1 px-2">
+                        Pour vous désinscrire, contactez le club organisateur
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            }
+
+            // Affichage pour les parties (bookings)
+            const booking = event as EnrichedBooking & { eventType: 'booking'; eventDate: Date }
+            return (
             <div
               key={booking.id}
               className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all"
@@ -368,73 +535,33 @@ export default function ReservationsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex md:flex-col gap-2 md:justify-center">
-                {booking.status === 'confirmed' && new Date(booking.slot_start) > new Date() && (
-                  <button
-                    onClick={() => handleCancelClick(booking)}
-                    disabled={cancellingId === booking.id}
-                    className="flex-1 md:w-auto px-5 py-3 md:px-6 md:py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-500 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md:text-base"
-                  >
-                    {cancellingId === booking.id ? 'Annulation...' : 'Annuler'}
-                  </button>
-                )}
+              <div className="flex flex-col gap-2 md:justify-center">
                 {booking.clubId && (
-                  <Link href={`/player/clubs/${booking.clubId}/reserver`} className="flex-1 md:w-auto">
-                    <button className="w-full px-5 py-3 md:px-6 md:py-2.5 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-all text-sm md:text-base">
+                  <Link href={`/player/clubs/${booking.clubId}/reserver`} className="w-full">
+                    <button className="w-full px-5 py-3 md:px-6 md:py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all text-sm md:text-base">
                       Voir le club
                     </button>
                   </Link>
                 )}
+                {booking.status === 'confirmed' && new Date(booking.slot_start) > new Date() && booking.clubTelephone && (
+                  <a href={`tel:${booking.clubTelephone}`} className="w-full">
+                    <button className="w-full px-5 py-3 md:px-6 md:py-2.5 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-all text-sm md:text-base flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      Contacter le club
+                    </button>
+                  </a>
+                )}
+                {booking.status === 'confirmed' && new Date(booking.slot_start) > new Date() && (
+                  <p className="text-xs text-gray-500 text-center mt-1 px-2">
+                    Pour annuler, contactez le club
+                  </p>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Modale de confirmation d'annulation */}
-      {showCancelModal && bookingToCancel && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowCancelModal(false)}
-        >
-          <div 
-            className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-black text-gray-900 mb-2">
-                Annuler cette réservation ?
-              </h3>
-              <p className="text-gray-600 mb-2">
-                {bookingToCancel.clubName}
-              </p>
-              <p className="text-sm text-gray-500 mb-6">
-                {formatDate(bookingToCancel.slot_start)} à {formatTime(bookingToCancel.slot_start)}
-              </p>
-              <p className="text-sm text-red-600 font-semibold mb-6">
-                Cette action est irréversible
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowCancelModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-all"
-                >
-                  Retour
-                </button>
-                <button
-                  onClick={confirmCancel}
-                  className="flex-1 px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-500 transition-all"
-                >
-                  Confirmer
-                </button>
-              </div>
-            </div>
-          </div>
+            )
+          })}
         </div>
       )}
     </div>

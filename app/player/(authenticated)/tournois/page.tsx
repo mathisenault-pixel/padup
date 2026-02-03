@@ -56,6 +56,23 @@ export default function TournoisPage() {
   // Géolocalisation
   const { coords: userCoords, status: locationStatus, error: locationError, requestLocation } = useUserLocation()
 
+  // Charger les inscriptions depuis localStorage
+  useEffect(() => {
+    const storedRegistrations = localStorage.getItem('tournamentRegistrations')
+    if (storedRegistrations) {
+      const registrations = JSON.parse(storedRegistrations)
+      const registeredIds = registrations.map((r: any) => r.id)
+      
+      // Mettre à jour les tournois avec l'état inscrit
+      setTournois(prevTournois => 
+        prevTournois.map(t => ({
+          ...t,
+          inscrit: registeredIds.includes(t.id)
+        }))
+      )
+    }
+  }, [])
+
   const [tournois, setTournois] = useState<Tournoi[]>([
     {
       id: 1,
