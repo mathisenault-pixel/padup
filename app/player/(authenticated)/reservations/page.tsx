@@ -58,6 +58,9 @@ export default function ReservationsPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'a-venir' | 'passees' | 'annulees'>('tous')
   const [selectedType, setSelectedType] = useState<'tous' | 'parties' | 'tournois'>('tous')
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [selectedBooking, setSelectedBooking] = useState<EnrichedBooking | null>(null)
+  const [clubDetails, setClubDetails] = useState<any>(null)
 
   useEffect(() => {
     async function loadBookingsAndTournaments() {
@@ -190,6 +193,27 @@ export default function ReservationsPage() {
 
     return events
   }, [bookings, tournaments, selectedFilter, selectedType])
+
+  // Ouvrir le modal de détails
+  const handleBookingClick = async (booking: EnrichedBooking) => {
+    setSelectedBooking(booking)
+    setShowDetailsModal(true)
+    
+    // Charger les détails complets du club
+    if (booking.clubId) {
+      try {
+        const { data: club } = await supabase
+          .from('clubs')
+          .select('*')
+          .eq('id', booking.clubId)
+          .maybeSingle()
+        
+        setClubDetails(club)
+      } catch (err) {
+        console.error('[CLUB DETAILS ERROR]', err)
+      }
+    }
+  }
 
   // Format de date
   const formatDate = (dateString: string) => {
@@ -481,7 +505,8 @@ export default function ReservationsPage() {
             return (
             <div
               key={booking.id}
-              className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all"
+              onClick={() => handleBookingClick(booking)}
+              className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all cursor-pointer"
             >
               {/* Image club */}
               <div className="w-full md:w-64 h-48 md:h-44 rounded-xl md:rounded-2xl overflow-hidden flex-shrink-0">
@@ -535,7 +560,7 @@ export default function ReservationsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col gap-2 md:justify-center">
+              <div className="flex flex-col gap-2 md:justify-center" onClick={(e) => e.stopPropagation()}>
                 {booking.clubId && (
                   <Link href={`/player/clubs/${booking.clubId}/reserver`} className="w-full">
                     <button className="w-full px-5 py-3 md:px-6 md:py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all text-sm md:text-base">
@@ -562,6 +587,171 @@ export default function ReservationsPage() {
             </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Modal de détails de la réservation */}
+      {showDetailsModal && selectedBooking && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowDetailsModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header avec image */}
+            <div className="relative h-48 md:h-64 bg-gray-900">
+              <img
+                src={selectedBooking.clubImage || '/images/clubs/default.jpg'}
+                alt={selectedBooking.clubName}
+                className="w-full h-full object-cover opacity-70"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+              
+              {/* Bouton fermer */}
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="absolute top-4 right-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-all shadow-lg"
+              >
+                <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Titre et badge */}
+              <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-8 md:right-8">
+                <div className="flex items-center gap-2 mb-2">
+                  <StatusBadge booking={selectedBooking} />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-black text-white mb-1">{selectedBooking.clubName}</h2>
+                <p className="text-white/90 text-lg">{selectedBooking.clubCity}</p>
+              </div>
+            </div>
+
+            {/* Contenu */}
+            <div className="p-6 md:p-8">
+              {/* Informations de la réservation */}
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Votre réservation</h3>
+                <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Date</p>
+                      <p className="text-gray-900 font-semibold">{formatDate(selectedBooking.slot_start)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Horaire</p>
+                      <p className="text-gray-900 font-semibold">{formatTime(selectedBooking.slot_start)} - {formatTime(selectedBooking.slot_end)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Terrain</p>
+                      <p className="text-gray-900 font-semibold">{selectedBooking.courtName}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Informations du club */}
+              {clubDetails && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Informations du club</h3>
+                  <div className="space-y-4">
+                    {clubDetails.address && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Adresse</p>
+                          <p className="text-gray-900 font-semibold">{clubDetails.address}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {clubDetails.phone && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Téléphone</p>
+                          <a href={`tel:${clubDetails.phone}`} className="text-blue-600 font-semibold hover:text-blue-700">{clubDetails.phone}</a>
+                        </div>
+                      </div>
+                    )}
+
+                    {clubDetails.email && (
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Email</p>
+                          <a href={`mailto:${clubDetails.email}`} className="text-blue-600 font-semibold hover:text-blue-700">{clubDetails.email}</a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex flex-col md:flex-row gap-3">
+                {selectedBooking.clubId && (
+                  <Link href={`/player/clubs/${selectedBooking.clubId}/reserver`} className="flex-1">
+                    <button className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all">
+                      Voir le club
+                    </button>
+                  </Link>
+                )}
+                {selectedBooking.status === 'confirmed' && new Date(selectedBooking.slot_start) > new Date() && selectedBooking.clubTelephone && (
+                  <a href={`tel:${selectedBooking.clubTelephone}`} className="flex-1">
+                    <button className="w-full px-6 py-3 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      Contacter le club
+                    </button>
+                  </a>
+                )}
+              </div>
+
+              {selectedBooking.status === 'confirmed' && new Date(selectedBooking.slot_start) > new Date() && (
+                <p className="text-sm text-gray-500 text-center mt-4">
+                  Pour annuler cette réservation, veuillez contacter le club
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
