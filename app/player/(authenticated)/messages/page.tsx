@@ -108,7 +108,7 @@ export default function MessagesPage() {
     }
   ])
 
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(conversations[0])
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [newMessage, setNewMessage] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
