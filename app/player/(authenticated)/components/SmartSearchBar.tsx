@@ -83,13 +83,13 @@ export default function SmartSearchBar({
     const filteredSuggestions = query.trim()
       ? suggestions.filter(s => 
           s.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 3)
-      : suggestions.slice(0, 3)
+        ).slice(0, 20) // Afficher jusqu'à 20 résultats
+      : suggestions.slice(0, 20) // Par défaut, montrer les 20 premières
 
     return [
       ...history.map(h => ({ icon: '🕐', text: h, type: 'history' as const })),
       ...filteredSuggestions.map(s => ({ icon: '💡', text: s, type: 'suggestion' as const }))
-    ].slice(0, 5)
+    ].slice(0, 25) // Maximum 25 suggestions (3 historique + 22 suggestions)
   }, [query, suggestions, history])
 
   // Fermer le dropdown quand on clique ailleurs
@@ -178,9 +178,7 @@ export default function SmartSearchBar({
             onChange={(e) => {
               setQuery(e.target.value)
               setSelectedIndex(-1)
-              if (e.target.value.length > 0) {
-                setShowDropdown(true)
-              }
+              setShowDropdown(true) // Toujours afficher le dropdown quand on tape
             }}
             onFocus={() => {
               setIsFocused(true)
@@ -212,7 +210,7 @@ export default function SmartSearchBar({
       {showDropdown && allSuggestions.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-fade-in">
           {/* Liste des suggestions - Version compacte */}
-          <div className="max-h-64 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto">
             {allSuggestions.map((suggestion, index) => (
               <button
                 key={`${suggestion.type}-${index}`}
