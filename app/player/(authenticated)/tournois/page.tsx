@@ -668,113 +668,123 @@ export default function TournoisPage() {
       {/* Modal Détails */}
       {showDetailsModal && selectedTournoi && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowDetailsModal(false)}>
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="relative h-48 overflow-hidden rounded-t-2xl">
-              <img 
-                src={selectedTournoi.image} 
-                alt={selectedTournoi.nom}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-lg flex items-center justify-center transition-all"
-              >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="absolute bottom-4 left-6 text-white">
-                <h2 className="text-2xl font-bold mb-1">{selectedTournoi.nom}</h2>
-                <p className="text-white/90">{selectedTournoi.club}</p>
+          <div className="bg-white rounded-2xl max-w-5xl w-full shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            
+            {/* Badge Inscrit en haut */}
+            {selectedTournoi.inscrit && (
+              <div className="m-6 mb-0 px-4 py-3 bg-blue-600 text-white text-center font-semibold rounded-lg">
+                ✓ Vous êtes inscrit à ce tournoi
               </div>
-            </div>
+            )}
 
-            <div className="p-6">
-              {/* Badge Inscrit */}
-              {selectedTournoi.inscrit && (
-                <div className="mb-6 px-4 py-3 bg-blue-600 text-white text-center font-semibold rounded-lg">
-                  ✓ Vous êtes inscrit à ce tournoi
-                </div>
-              )}
-
-              {/* Description du tournoi */}
-              {selectedTournoi.description && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">À propos du tournoi</h3>
-                  <p className="text-gray-700">{selectedTournoi.description}</p>
-                </div>
-              )}
-
-              {/* Informations du tournoi */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Détails du tournoi</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: 'Date', value: new Date(selectedTournoi.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) },
-                    { label: 'Heure', value: selectedTournoi.heureDebut },
-                    { label: 'Niveau', value: selectedTournoi.categorie },
-                    { label: 'Genre', value: selectedTournoi.genre },
-                    { label: 'Format', value: selectedTournoi.format },
-                    { label: 'Inscription', value: `${selectedTournoi.prixInscription}€ par personne` },
-                    { label: 'Dotation', value: selectedTournoi.dotation },
-                    { label: 'Places', value: `${selectedTournoi.nombreEquipes}/${selectedTournoi.nombreEquipesMax}` },
-                  ].map((item, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">{item.label}</p>
-                      <p className="font-bold text-gray-900">{item.value}</p>
-                    </div>
-                  ))}
+            {/* Layout horizontal comme les cartes de clubs */}
+            <div className="flex flex-col md:flex-row gap-6 p-6">
+              
+              {/* Image à gauche */}
+              <div className="relative w-full md:w-80 h-64 md:h-96 flex-shrink-0 rounded-xl overflow-hidden">
+                <img
+                  src={selectedTournoi.image}
+                  alt={selectedTournoi.nom}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="absolute top-3 right-3 w-10 h-10 bg-white/90 hover:bg-white rounded-lg flex items-center justify-center transition-all shadow-lg"
+                >
+                  <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-white text-gray-900 text-sm font-bold rounded-lg">
+                  {selectedTournoi.categorie}
                 </div>
               </div>
 
-              {/* Informations du club */}
-              <div className="mb-6 border-t pt-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Informations du club</h3>
+              {/* Contenu à droite */}
+              <div className="flex-1 flex flex-col gap-4">
                 
-                {/* Nom et adresse */}
-                <div className="mb-4">
-                  <p className="font-bold text-lg text-gray-900">{selectedTournoi.club}</p>
-                  <p className="text-gray-600 flex items-center gap-2 mt-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {/* En-tête */}
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{selectedTournoi.nom}</h2>
+                  <p className="text-gray-600 flex items-center gap-2 flex-wrap">
+                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
-                    {selectedTournoi.clubAdresse}
+                    <span className="font-semibold">{selectedTournoi.club}</span>
+                    <span>·</span>
+                    <span>{selectedTournoi.clubAdresse}</span>
                   </p>
                 </div>
 
-                {/* Description du club */}
-                {selectedTournoi.clubDescription && (
-                  <p className="text-gray-700 mb-4">{selectedTournoi.clubDescription}</p>
+                {/* Description du tournoi */}
+                {selectedTournoi.description && (
+                  <div>
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">À propos du tournoi</h3>
+                    <p className="text-gray-700 text-sm">{selectedTournoi.description}</p>
+                  </div>
                 )}
 
-                {/* Contact */}
-                <div className="space-y-2">
-                  {selectedTournoi.clubTelephone && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      {selectedTournoi.clubTelephone}
-                    </p>
-                  )}
-                  {selectedTournoi.clubEmail && (
-                    <p className="text-gray-600 flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      {selectedTournoi.clubEmail}
-                    </p>
-                  )}
+                {/* Détails du tournoi en grille */}
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Détails du tournoi</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'Date', value: new Date(selectedTournoi.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) },
+                      { label: 'Heure', value: selectedTournoi.heureDebut },
+                      { label: 'Genre', value: selectedTournoi.genre },
+                      { label: 'Format', value: selectedTournoi.format },
+                      { label: 'Inscription', value: `${selectedTournoi.prixInscription}€/pers` },
+                      { label: 'Dotation', value: selectedTournoi.dotation },
+                      { label: 'Places', value: `${selectedTournoi.nombreEquipes}/${selectedTournoi.nombreEquipesMax}` },
+                      { label: 'Statut', value: selectedTournoi.statut },
+                    ].map((item, i) => (
+                      <div key={i} className="bg-gray-50 rounded-lg p-3">
+                        <p className="text-xs font-semibold text-gray-500 mb-0.5">{item.label}</p>
+                        <p className="font-semibold text-gray-900 text-sm">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="w-full px-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-semibold transition-colors"
-              >
-                Fermer
-              </button>
+                {/* Informations du club */}
+                <div className="border-t pt-4">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Informations du club</h3>
+                  
+                  {/* Description du club */}
+                  {selectedTournoi.clubDescription && (
+                    <p className="text-gray-700 text-sm mb-3">{selectedTournoi.clubDescription}</p>
+                  )}
+
+                  {/* Contact */}
+                  <div className="space-y-1.5">
+                    {selectedTournoi.clubTelephone && (
+                      <p className="text-gray-600 flex items-center gap-2 text-sm">
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        {selectedTournoi.clubTelephone}
+                      </p>
+                    )}
+                    {selectedTournoi.clubEmail && (
+                      <p className="text-gray-600 flex items-center gap-2 text-sm">
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {selectedTournoi.clubEmail}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bouton Fermer */}
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="w-full px-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-semibold transition-colors mt-auto"
+                >
+                  Fermer
+                </button>
+
+              </div>
             </div>
           </div>
         </div>
