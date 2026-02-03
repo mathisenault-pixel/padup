@@ -7,6 +7,7 @@ import PlayerSelectionModal from './PlayerSelectionModal'
 import PremiumModal from './PremiumModal'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import { getClubImage } from '@/lib/clubImages'
+import { getClubById } from '@/lib/data/clubs'
 
 type Club = {
   id: string
@@ -169,23 +170,26 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       console.log('[CLUB FETCH] ✅ Club loaded successfully:', data)
       
-      // Transformer les données Supabase en format UI avec image mappée
+      // Récupérer les données complètes depuis CLUBS_DATA
+      const clubDetails = getClubById(data.id)
+      
+      // Transformer les données Supabase en format UI avec les vraies données
       const club: Club = {
         id: data.id,
-        name: data.name || 'Club sans nom',
-        city: data.city || 'Ville non spécifiée',
-        imageUrl: getClubImage(data.id), // ✅ Image par clubId
-        prix: 12, // TODO: Depuis DB
-        adresse: '123 Avenue du Padel', // TODO: Depuis DB
-        telephone: '+33 4 90 00 00 00', // TODO: Depuis DB
-        email: 'contact@club.fr', // TODO: Depuis DB
+        name: data.name || clubDetails?.name || 'Club sans nom',
+        city: data.city || clubDetails?.city || 'Ville non spécifiée',
+        imageUrl: getClubImage(data.id),
+        prix: clubDetails?.prixMin || 12,
+        adresse: clubDetails?.address || '123 Avenue du Padel',
+        telephone: clubDetails?.phone || '+33 4 90 00 00 00',
+        email: clubDetails?.email || 'contact@club.fr',
         horaires: {
-          semaine: '08h00 - 23h00',
-          weekend: '08h00 - 23h00'
+          semaine: '09h00 - 00h00',
+          weekend: '09h00 - 20h00'
         },
-        description: 'Club de padel moderne avec terrains de qualité professionnelle.',
-        equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
-        nombreTerrains: 2 // TODO: Compter depuis public.courts
+        description: clubDetails?.description || 'Club de padel moderne avec terrains de qualité professionnelle.',
+        equipements: clubDetails?.equipements || ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
+        nombreTerrains: clubDetails?.courts?.length || 2
       }
       
       setClubData(club)

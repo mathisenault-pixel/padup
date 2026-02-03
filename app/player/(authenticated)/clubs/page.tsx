@@ -8,6 +8,7 @@ import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
 import { getCitySuggestions, getCityCoordinates } from '@/lib/cities'
+import { CLUBS_DATA, getClubById } from '@/lib/data/clubs'
 
 // ✅ Force dynamic rendering (pas de pre-render statique)
 // Nécessaire car supabaseBrowser accède à document.cookie
@@ -80,24 +81,26 @@ export default function ClubsPage() {
       console.log('[CLUBS] ✅ Clubs loaded:', data?.length || 0, 'clubs')
       console.log('[CLUBS] Data:', data)
       
-      // Transformer les données Supabase en format UI
+      // Transformer les données Supabase en format UI avec les vraies données de CLUBS_DATA
       const clubsWithUI = (data || []).map(club => {
+        // Récupérer les données complètes depuis CLUBS_DATA
+        const clubData = getClubById(club.id)
         const coordinates = CLUB_COORDINATES[club.id]
         
         return {
           id: club.id,
-          name: club.name || 'Club sans nom',
-          city: club.city || 'Ville non spécifiée',
-          lat: coordinates?.lat || 0,
-          lng: coordinates?.lng || 0,
-          nombreTerrains: 2, // TODO: Compter depuis public.courts
-          note: 4.5,
-          avis: 0,
-          imageUrl: getClubImage(club.id), // ✅ Image par clubId
-          prixMin: 12,
-          equipements: ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'], // TODO: Depuis DB
+          name: club.name || clubData?.name || 'Club sans nom',
+          city: club.city || clubData?.city || 'Ville non spécifiée',
+          lat: coordinates?.lat || clubData?.lat || 0,
+          lng: coordinates?.lng || clubData?.lng || 0,
+          nombreTerrains: clubData?.courts?.length || 2,
+          note: clubData?.note || 4.5,
+          avis: clubData?.avis || 0,
+          imageUrl: getClubImage(club.id),
+          prixMin: clubData?.prixMin || 12,
+          equipements: clubData?.equipements || ['Bar', 'Vestiaires', 'Douches', 'Parking', 'WiFi'],
           favoris: false,
-          disponible: true
+          disponible: clubData?.isActive ?? true
         }
       })
       
