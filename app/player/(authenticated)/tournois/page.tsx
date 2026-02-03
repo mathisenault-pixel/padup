@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
+import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
@@ -51,12 +52,6 @@ export default function TournoisPage() {
   const [cityClubFilter, setCityClubFilter] = useState<string>('')
   const [radiusKm, setRadiusKm] = useState<number>(50)
   const [sortBy, setSortBy] = useState<'date'>('date')
-  const [showDetailsModal, setShowDetailsModal] = useState(false)
-  const [selectedTournoi, setSelectedTournoi] = useState<Tournoi | null>(null)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
-  const [tournoiToConfirm, setTournoiToConfirm] = useState<Tournoi | null>(null)
 
   // Géolocalisation
   const { coords: userCoords, status: locationStatus, error: locationError, requestLocation } = useUserLocation()
@@ -205,43 +200,6 @@ export default function TournoisPage() {
     })
   }, [tournois, userCoords])
 
-  const handleInscrire = (tournoi: Tournoi) => {
-    setTournoiToConfirm(tournoi)
-    setShowConfirmModal(true)
-  }
-
-  const confirmInscription = () => {
-    if (tournoiToConfirm) {
-      setTournois(tournois.map(t => 
-        t.id === tournoiToConfirm.id 
-          ? { ...t, inscrit: true, nombreEquipes: t.nombreEquipes + 1 } 
-          : t
-      ))
-      setSuccessMessage(`Inscription confirmée au ${tournoiToConfirm.nom} !`)
-      setShowConfirmModal(false)
-      setShowSuccessModal(true)
-      setTournoiToConfirm(null)
-    }
-  }
-
-  const handleDesinscrire = (tournoi: Tournoi) => {
-    setTournoiToConfirm(tournoi)
-    setShowConfirmModal(true)
-  }
-
-  const confirmDesinscription = () => {
-    if (tournoiToConfirm) {
-      setTournois(tournois.map(t => 
-        t.id === tournoiToConfirm.id 
-          ? { ...t, inscrit: false, nombreEquipes: t.nombreEquipes - 1 } 
-          : t
-      ))
-      setSuccessMessage(`Désinscription confirmée du ${tournoiToConfirm.nom}`)
-      setShowConfirmModal(false)
-      setShowSuccessModal(true)
-      setTournoiToConfirm(null)
-    }
-  }
 
   const toggleCategorie = (cat: string) => {
     setSelectedCategories(prev => 
@@ -509,15 +467,10 @@ export default function TournoisPage() {
               const pourcentageRempli = (tournoi.nombreEquipes / tournoi.nombreEquipesMax) * 100
 
               return (
-                <div
+                <Link
                   key={tournoi.id}
-                  onClick={() => {
-                    debug.log('🔘 [CLICK] Tournoi clicked:', tournoi.id, tournoi.nom, Date.now())
-                    debug.time('tournoi-modal')
-                    setSelectedTournoi(tournoi)
-                    setShowDetailsModal(true)
-                  }}
-                  className={`group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border-2 rounded-xl p-3 md:p-5 transition-all cursor-pointer ${
+                  href={`/player/tournois/${tournoi.id}`}
+                  className={`group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border-2 rounded-xl p-3 md:p-5 transition-all ${
                     tournoi.inscrit
                       ? 'border-blue-200 bg-blue-50'
                       : isComplet
@@ -637,7 +590,7 @@ export default function TournoisPage() {
                       </div>
                     )}
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -664,192 +617,6 @@ export default function TournoisPage() {
           </div>
         )}
       </div>
-
-      {/* Modal Détails */}
-      {showDetailsModal && selectedTournoi && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowDetailsModal(false)}>
-          <div className="bg-white rounded-2xl max-w-5xl w-full shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            
-            {/* Badge Inscrit en haut */}
-            {selectedTournoi.inscrit && (
-              <div className="m-6 mb-0 px-4 py-3 bg-blue-600 text-white text-center font-semibold rounded-lg">
-                ✓ Vous êtes inscrit à ce tournoi
-              </div>
-            )}
-
-            {/* Layout horizontal comme les cartes de clubs */}
-            <div className="flex flex-col md:flex-row gap-6 p-6">
-              
-              {/* Image à gauche */}
-              <div className="relative w-full md:w-80 h-64 md:h-96 flex-shrink-0 rounded-xl overflow-hidden">
-                <img
-                  src={selectedTournoi.image}
-                  alt={selectedTournoi.nom}
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="absolute top-3 right-3 w-10 h-10 bg-white/90 hover:bg-white rounded-lg flex items-center justify-center transition-all shadow-lg"
-                >
-                  <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-white text-gray-900 text-sm font-bold rounded-lg">
-                  {selectedTournoi.categorie}
-                </div>
-              </div>
-
-              {/* Contenu à droite */}
-              <div className="flex-1 flex flex-col gap-4">
-                
-                {/* En-tête */}
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{selectedTournoi.nom}</h2>
-                  <p className="text-gray-600 flex items-center gap-2 flex-wrap">
-                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    </svg>
-                    <span className="font-semibold">{selectedTournoi.club}</span>
-                    <span>·</span>
-                    <span>{selectedTournoi.clubAdresse}</span>
-                  </p>
-                </div>
-
-                {/* Description du tournoi */}
-                {selectedTournoi.description && (
-                  <div>
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">À propos du tournoi</h3>
-                    <p className="text-gray-700 text-sm">{selectedTournoi.description}</p>
-                  </div>
-                )}
-
-                {/* Détails du tournoi en grille */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Détails du tournoi</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { label: 'Date', value: new Date(selectedTournoi.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) },
-                      { label: 'Heure', value: selectedTournoi.heureDebut },
-                      { label: 'Genre', value: selectedTournoi.genre },
-                      { label: 'Format', value: selectedTournoi.format },
-                      { label: 'Inscription', value: `${selectedTournoi.prixInscription}€/pers` },
-                      { label: 'Dotation', value: selectedTournoi.dotation },
-                      { label: 'Places', value: `${selectedTournoi.nombreEquipes}/${selectedTournoi.nombreEquipesMax}` },
-                      { label: 'Statut', value: selectedTournoi.statut },
-                    ].map((item, i) => (
-                      <div key={i} className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-gray-500 mb-0.5">{item.label}</p>
-                        <p className="font-semibold text-gray-900 text-sm">{item.value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Informations du club */}
-                <div className="border-t pt-4">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Informations du club</h3>
-                  
-                  {/* Description du club */}
-                  {selectedTournoi.clubDescription && (
-                    <p className="text-gray-700 text-sm mb-3">{selectedTournoi.clubDescription}</p>
-                  )}
-
-                  {/* Contact */}
-                  <div className="space-y-1.5">
-                    {selectedTournoi.clubTelephone && (
-                      <p className="text-gray-600 flex items-center gap-2 text-sm">
-                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        {selectedTournoi.clubTelephone}
-                      </p>
-                    )}
-                    {selectedTournoi.clubEmail && (
-                      <p className="text-gray-600 flex items-center gap-2 text-sm">
-                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        {selectedTournoi.clubEmail}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Bouton Fermer */}
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="w-full px-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-semibold transition-colors mt-auto"
-                >
-                  Fermer
-                </button>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Confirmation */}
-      {showConfirmModal && tournoiToConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowConfirmModal(false)}>
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">
-              {tournoiToConfirm.inscrit ? 'Confirmer la désinscription' : 'Confirmer l\'inscription'}
-            </h3>
-            <p className="text-gray-600 mb-6 text-center">
-              {tournoiToConfirm.inscrit 
-                ? `Êtes-vous sûr de vouloir vous désinscrire du tournoi "${tournoiToConfirm.nom}" ?`
-                : `Confirmer votre inscription au tournoi "${tournoiToConfirm.nom}" pour ${tournoiToConfirm.prixInscription}€ par personne ?`
-              }
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowConfirmModal(false)}
-                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg font-semibold transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={tournoiToConfirm.inscrit ? confirmDesinscription : confirmInscription}
-                className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-colors ${
-                  tournoiToConfirm.inscrit
-                    ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                Confirmer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Succès */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowSuccessModal(false)}>
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-xl text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Succès !</h3>
-            <p className="text-gray-600 mb-6">{successMessage}</p>
-            <button
-              onClick={() => setShowSuccessModal(false)}
-              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
-            >
-              Fermer
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
