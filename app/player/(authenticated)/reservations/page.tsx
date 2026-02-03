@@ -279,6 +279,13 @@ export default function ReservationsPage() {
   if (loading) {
     return (
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
+        
+        {/* Header */}
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Mes réservations</h1>
+          <p className="text-gray-600">Vos parties et tournois à venir</p>
+        </div>
+
         <div className="grid gap-5">
           {[1, 2, 3].map(i => (
             <div key={i} className="bg-white border border-gray-200 rounded-3xl p-5 animate-pulse">
@@ -300,6 +307,13 @@ export default function ReservationsPage() {
   if (error) {
     return (
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
+        
+        {/* Header */}
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Mes réservations</h1>
+          <p className="text-gray-600">Vos parties et tournois à venir</p>
+        </div>
+
         <div className="p-6 bg-red-50 border border-red-200 rounded-2xl">
           <p className="text-red-700 font-semibold">Erreur : {error}</p>
         </div>
@@ -309,6 +323,13 @@ export default function ReservationsPage() {
 
   return (
     <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
+      
+      {/* Header */}
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Mes réservations</h1>
+        <p className="text-gray-600">Vos parties et tournois à venir</p>
+      </div>
+
       {/* Filtres */}
       <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6">
         {/* Filtre par type */}

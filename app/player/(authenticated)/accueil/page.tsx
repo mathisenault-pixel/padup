@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic'
 import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
+import { getCitySuggestions } from '@/lib/cities'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
@@ -121,8 +122,8 @@ export default function AccueilPage() {
                   'Le Hangar Sport & Co',
                   'Paul & Louis Sport',
                   'ZE Padel',
-                  'Rochefort-du-Gard',
-                  'Clubs avec restaurant'
+                  'QG Padel Club',
+                  ...getCitySuggestions()
                 ]}
                 storageKey="search-history-accueil"
                 compact={true}

@@ -305,6 +305,11 @@ export default function TournoisPage() {
     <div className="min-h-screen bg-white">
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         
+        {/* Header */}
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Tournois</h1>
+          <p className="text-gray-600">Découvrez et participez aux tournois de padel</p>
+        </div>
 
         {/* Barre de recherche + Filtres */}
         <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200">
@@ -318,7 +323,7 @@ export default function TournoisPage() {
                 'Paul & Louis Sport',
                 'ZE Padel',
                 'QG Padel Club',
-                ...getCitySuggestions().slice(0, 15)
+                ...getCitySuggestions()
               ]}
               storageKey="search-history-tournois"
               compact={false}
