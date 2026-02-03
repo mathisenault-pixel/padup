@@ -62,7 +62,7 @@ export default function RootLayout({
             style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
-        
+
         <ReservationProvider>
           {children}
         </ReservationProvider>
