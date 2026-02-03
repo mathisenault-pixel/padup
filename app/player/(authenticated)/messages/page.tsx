@@ -116,10 +116,6 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [selectedConversation])
-
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return
 
@@ -138,6 +134,9 @@ export default function MessagesPage() {
 
     setSelectedConversation(prev => prev ? { ...prev, messages: [...prev.messages, newMsg] } : null)
     setNewMessage('')
+    
+    // Scroll uniquement après l'envoi d'un message
+    setTimeout(() => scrollToBottom(), 100)
   }
 
   const handleSelectConversation = (conv: Conversation) => {
