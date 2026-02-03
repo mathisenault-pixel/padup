@@ -1467,8 +1467,6 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                             >
                               <div className="text-center">
                                 <div className="text-base">{formatTime(slot.start_time)}</div>
-                                <div className="text-xs text-gray-500">→</div>
-                                <div className="text-base">{formatTime(slot.end_time)}</div>
                               </div>
                               {!available && (
                                 <div className="text-xs mt-1 text-red-500 font-semibold">Réservé</div>
