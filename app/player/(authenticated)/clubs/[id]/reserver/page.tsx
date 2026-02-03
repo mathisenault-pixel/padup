@@ -1441,7 +1441,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-bold text-gray-500 uppercase tracking-wide">Disponibilité</div>
+                          <div className="text-sm font-bold text-gray-900 uppercase tracking-wide">Disponibilité</div>
                         </div>
                       </div>
                     </div>
