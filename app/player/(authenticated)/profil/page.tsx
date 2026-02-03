@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
 type ProfilInfo = {
   nom: string
@@ -17,6 +19,7 @@ type ProfilInfo = {
 }
 
 export default function ProfilPage() {
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [profil, setProfil] = useState<ProfilInfo>({
@@ -74,6 +77,22 @@ export default function ProfilPage() {
       case 'Avancé': return 'from-blue-500 to-blue-600'
       case 'Expert': return 'from-blue-500 to-blue-600'
       default: return 'from-gray-500 to-gray-600'
+    }
+  }
+
+  const handleSignOut = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+      return
+    }
+
+    const { error } = await supabase.auth.signOut()
+    
+    if (error) {
+      console.error('[PROFIL] Error signing out:', error)
+      alert('Erreur lors de la déconnexion')
+    } else {
+      console.log('[PROFIL] ✅ Signed out successfully')
+      router.push('/player/accueil')
     }
   }
 
@@ -395,6 +414,19 @@ export default function ProfilPage() {
             </div>
           </div>
         )}
+
+        {/* Bouton Déconnexion en bas - Visible uniquement sur mobile */}
+        <div className="md:hidden mt-12 pb-8">
+          <button
+            onClick={handleSignOut}
+            className="w-full px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span className="text-lg">Se déconnecter</span>
+          </button>
+        </div>
       </div>
     </div>
   )
