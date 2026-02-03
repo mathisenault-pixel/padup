@@ -134,9 +134,6 @@ export default function MessagesPage() {
 
     setSelectedConversation(prev => prev ? { ...prev, messages: [...prev.messages, newMsg] } : null)
     setNewMessage('')
-    
-    // Scroll uniquement après l'envoi d'un message
-    setTimeout(() => scrollToBottom(), 100)
   }
 
   const handleSelectConversation = (conv: Conversation) => {
