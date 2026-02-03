@@ -83,13 +83,13 @@ export default function SmartSearchBar({
     const filteredSuggestions = query.trim()
       ? suggestions.filter(s => 
           s.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 20) // Afficher jusqu'à 20 résultats
-      : suggestions.slice(0, 20) // Par défaut, montrer les 20 premières
+        ) // Afficher TOUS les résultats qui correspondent
+      : suggestions // Par défaut, montrer TOUTES les suggestions
 
     return [
       ...history.map(h => ({ icon: '🕐', text: h, type: 'history' as const })),
       ...filteredSuggestions.map(s => ({ icon: '💡', text: s, type: 'suggestion' as const }))
-    ].slice(0, 25) // Maximum 25 suggestions (3 historique + 22 suggestions)
+    ] // Pas de limite - TOUTES les suggestions
   }, [query, suggestions, history])
 
   // Fermer le dropdown quand on clique ailleurs
@@ -209,8 +209,8 @@ export default function SmartSearchBar({
       {/* Dropdown compact avec historique et suggestions */}
       {showDropdown && allSuggestions.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-fade-in">
-          {/* Liste des suggestions - Version compacte */}
-          <div className="max-h-96 overflow-y-auto">
+          {/* Liste des suggestions - Affiche 4 suggestions à la fois */}
+          <div className="max-h-[220px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             {allSuggestions.map((suggestion, index) => (
               <button
                 key={`${suggestion.type}-${index}`}
