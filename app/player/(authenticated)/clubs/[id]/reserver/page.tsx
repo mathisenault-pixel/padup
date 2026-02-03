@@ -1373,9 +1373,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         
         {/* Terrains et créneaux horaires */}
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            {formatDate(selectedDate).full}
-          </h2>
+          <div className="mb-4"></div>
           
           {/* ✅ Affichage de chargement courts */}
           {isLoadingCourts ? (
