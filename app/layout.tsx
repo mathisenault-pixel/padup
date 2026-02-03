@@ -16,21 +16,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Pad'Up - Réservez vos terrains de padel",
-    template: "%s | Pad'Up"
+    default: "Pad'up | Réservez votre terrain de padel",
+    template: "%s | Pad'up",
   },
-  description: "Réservez facilement vos terrains de padel. Trouvez les meilleurs clubs autour de vous et gérez vos réservations en ligne.",
-  keywords: ["padel", "réservation", "terrain", "club", "sport"],
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icon.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/icon.png" }],
-  },
+  description:
+    "Réservez votre terrain de padel en quelques clics. Disponibilités en temps réel, réservation rapide, clubs partout en France.",
 };
 
 export default function RootLayout({
