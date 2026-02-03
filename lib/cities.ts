@@ -1,6 +1,7 @@
 /**
- * Base de données des villes de la région (Gard, Vaucluse, Bouches-du-Rhône)
- * avec coordonnées GPS pour le calcul de distance
+ * Base de données des villes de la région Sud (150+ villes)
+ * Départements couverts : Gard (30), Vaucluse (84), Bouches-du-Rhône (13), Hérault (34), Drôme (26), Ardèche (07)
+ * Avec coordonnées GPS précises pour le calcul de distance
  */
 
 export type City = {
@@ -33,6 +34,16 @@ export const CITIES: City[] = [
   { name: 'Milhaud', postalCode: '30540', department: 'Gard', lat: 43.7928, lng: 4.3136 },
   { name: 'Redessan', postalCode: '30129', department: 'Gard', lat: 43.8339, lng: 4.5022 },
   { name: 'Sommières', postalCode: '30250', department: 'Gard', lat: 43.7831, lng: 4.0900 },
+  { name: 'Caveirac', postalCode: '30820', department: 'Gard', lat: 43.8333, lng: 4.2667 },
+  { name: 'Calvisson', postalCode: '30420', department: 'Gard', lat: 43.7850, lng: 4.1908 },
+  { name: 'Saint-Christol-lès-Alès', postalCode: '30380', department: 'Gard', lat: 44.0514, lng: 4.0986 },
+  { name: 'Bellegarde', postalCode: '30127', department: 'Gard', lat: 43.7500, lng: 4.5167 },
+  { name: 'Générac', postalCode: '30510', department: 'Gard', lat: 43.7333, lng: 4.3500 },
+  { name: 'Aimargues', postalCode: '30470', department: 'Gard', lat: 43.6833, lng: 4.2000 },
+  { name: 'Vergèze', postalCode: '30310', department: 'Gard', lat: 43.7444, lng: 4.2281 },
+  { name: 'Roquemaure', postalCode: '30150', department: 'Gard', lat: 44.0533, lng: 4.7761 },
+  { name: 'Jonquières-Saint-Vincent', postalCode: '30300', department: 'Gard', lat: 43.8167, lng: 4.6000 },
+  { name: 'Bernis', postalCode: '30620', department: 'Gard', lat: 43.7667, lng: 4.2833 },
 
   // VAUCLUSE (84)
   { name: 'Avignon', postalCode: '84000', department: 'Vaucluse', lat: 43.9493, lng: 4.8055 },
@@ -50,6 +61,16 @@ export const CITIES: City[] = [
   { name: 'Pernes-les-Fontaines', postalCode: '84210', department: 'Vaucluse', lat: 43.9989, lng: 5.0578 },
   { name: 'Monteux', postalCode: '84170', department: 'Vaucluse', lat: 44.0358, lng: 4.9978 },
   { name: 'Entraigues-sur-la-Sorgue', postalCode: '84320', department: 'Vaucluse', lat: 43.9831, lng: 4.9281 },
+  { name: 'Sarrians', postalCode: '84260', department: 'Vaucluse', lat: 44.0833, lng: 4.9667 },
+  { name: 'Morières-lès-Avignon', postalCode: '84310', department: 'Vaucluse', lat: 43.9381, lng: 4.9031 },
+  { name: 'Châteauneuf-du-Pape', postalCode: '84230', department: 'Vaucluse', lat: 44.0556, lng: 4.8306 },
+  { name: 'Malaucène', postalCode: '84340', department: 'Vaucluse', lat: 44.1747, lng: 5.1322 },
+  { name: 'Mazan', postalCode: '84380', department: 'Vaucluse', lat: 44.0575, lng: 5.1222 },
+  { name: 'Bédarrides', postalCode: '84370', department: 'Vaucluse', lat: 44.0417, lng: 4.8969 },
+  { name: 'Althen-des-Paluds', postalCode: '84210', department: 'Vaucluse', lat: 43.9833, lng: 4.9667 },
+  { name: 'Vaison-la-Romaine', postalCode: '84110', department: 'Vaucluse', lat: 44.2408, lng: 5.0733 },
+  { name: 'Courthézon', postalCode: '84350', department: 'Vaucluse', lat: 44.0875, lng: 4.8897 },
+  { name: 'Cadenet', postalCode: '84160', department: 'Vaucluse', lat: 43.7344, lng: 5.3747 },
 
   // BOUCHES-DU-RHÔNE (13)
   { name: 'Marseille', postalCode: '13000', department: 'Bouches-du-Rhône', lat: 43.2965, lng: 5.3698 },
@@ -76,6 +97,61 @@ export const CITIES: City[] = [
   { name: 'Lambesc', postalCode: '13410', department: 'Bouches-du-Rhône', lat: 43.6544, lng: 5.2622 },
   { name: 'Pélissanne', postalCode: '13330', department: 'Bouches-du-Rhône', lat: 43.6347, lng: 5.1500 },
   { name: 'Rognes', postalCode: '13840', department: 'Bouches-du-Rhône', lat: 43.6642, lng: 5.3461 },
+  { name: 'Cassis', postalCode: '13260', department: 'Bouches-du-Rhône', lat: 43.2147, lng: 5.5381 },
+  { name: 'Allauch', postalCode: '13190', department: 'Bouches-du-Rhône', lat: 43.3364, lng: 5.4803 },
+  { name: 'Bouc-Bel-Air', postalCode: '13320', department: 'Bouches-du-Rhône', lat: 43.4528, lng: 5.4161 },
+  { name: 'Peyrolles-en-Provence', postalCode: '13860', department: 'Bouches-du-Rhône', lat: 43.6417, lng: 5.5833 },
+  { name: 'Rognac', postalCode: '13340', department: 'Bouches-du-Rhône', lat: 43.4883, lng: 5.2311 },
+  { name: 'Carry-le-Rouet', postalCode: '13620', department: 'Bouches-du-Rhône', lat: 43.3317, lng: 5.1556 },
+  { name: 'Venelles', postalCode: '13770', department: 'Bouches-du-Rhône', lat: 43.5981, lng: 5.4794 },
+  { name: 'Graveson', postalCode: '13690', department: 'Bouches-du-Rhône', lat: 43.8508, lng: 4.7731 },
+  { name: 'Cabriès', postalCode: '13480', department: 'Bouches-du-Rhône', lat: 43.4431, lng: 5.3794 },
+  { name: 'Plan-de-Cuques', postalCode: '13380', department: 'Bouches-du-Rhône', lat: 43.3483, lng: 5.4622 },
+  { name: 'Meyrargues', postalCode: '13650', department: 'Bouches-du-Rhône', lat: 43.6381, lng: 5.5194 },
+
+  // HÉRAULT (34)
+  { name: 'Montpellier', postalCode: '34000', department: 'Hérault', lat: 43.6108, lng: 3.8767 },
+  { name: 'Béziers', postalCode: '34500', department: 'Hérault', lat: 43.3444, lng: 3.2150 },
+  { name: 'Sète', postalCode: '34200', department: 'Hérault', lat: 43.4028, lng: 3.6972 },
+  { name: 'Lunel', postalCode: '34400', department: 'Hérault', lat: 43.6753, lng: 4.1361 },
+  { name: 'Agde', postalCode: '34300', department: 'Hérault', lat: 43.3097, lng: 3.4742 },
+  { name: 'Frontignan', postalCode: '34110', department: 'Hérault', lat: 43.4489, lng: 3.7553 },
+  { name: 'Castelnau-le-Lez', postalCode: '34170', department: 'Hérault', lat: 43.6342, lng: 3.8989 },
+  { name: 'Mauguio', postalCode: '34130', department: 'Hérault', lat: 43.6169, lng: 4.0119 },
+  { name: 'Lattes', postalCode: '34970', department: 'Hérault', lat: 43.5669, lng: 3.9000 },
+  { name: 'Pérols', postalCode: '34470', department: 'Hérault', lat: 43.5619, lng: 3.9556 },
+  { name: 'Lodève', postalCode: '34700', department: 'Hérault', lat: 43.7319, lng: 3.3194 },
+  { name: 'Palavas-les-Flots', postalCode: '34250', department: 'Hérault', lat: 43.5322, lng: 3.9311 },
+  { name: 'Marseillan', postalCode: '34340', department: 'Hérault', lat: 43.3572, lng: 3.5289 },
+  { name: 'Juvignac', postalCode: '34990', department: 'Hérault', lat: 43.6122, lng: 3.8047 },
+  { name: 'Villeneuve-lès-Maguelone', postalCode: '34750', department: 'Hérault', lat: 43.5328, lng: 3.8597 },
+  { name: 'Pignan', postalCode: '34570', department: 'Hérault', lat: 43.5808, lng: 3.7589 },
+  { name: 'Baillargues', postalCode: '34670', department: 'Hérault', lat: 43.6597, lng: 4.0089 },
+  { name: 'Vendargues', postalCode: '34740', department: 'Hérault', lat: 43.6572, lng: 3.9667 },
+  { name: 'Saint-Jean-de-Védas', postalCode: '34430', department: 'Hérault', lat: 43.5764, lng: 3.8339 },
+  { name: 'Clermont-l\'Hérault', postalCode: '34800', department: 'Hérault', lat: 43.6286, lng: 3.4319 },
+
+  // DRÔME (26)
+  { name: 'Valence', postalCode: '26000', department: 'Drôme', lat: 44.9333, lng: 4.8919 },
+  { name: 'Montélimar', postalCode: '26200', department: 'Drôme', lat: 44.5583, lng: 4.7511 },
+  { name: 'Romans-sur-Isère', postalCode: '26100', department: 'Drôme', lat: 45.0444, lng: 5.0514 },
+  { name: 'Bourg-lès-Valence', postalCode: '26500', department: 'Drôme', lat: 44.9467, lng: 4.8936 },
+  { name: 'Pierrelatte', postalCode: '26700', department: 'Drôme', lat: 44.3769, lng: 4.6989 },
+  { name: 'Bourg-de-Péage', postalCode: '26300', department: 'Drôme', lat: 45.0372, lng: 5.0517 },
+  { name: 'Livron-sur-Drôme', postalCode: '26250', department: 'Drôme', lat: 44.7739, lng: 4.8422 },
+  { name: 'Portes-lès-Valence', postalCode: '26800', department: 'Drôme', lat: 44.8747, lng: 4.8775 },
+  { name: 'Saint-Paul-Trois-Châteaux', postalCode: '26130', department: 'Drôme', lat: 44.3506, lng: 4.7681 },
+  { name: 'Crest', postalCode: '26400', department: 'Drôme', lat: 44.7283, lng: 5.0208 },
+
+  // ARDÈCHE (07)
+  { name: 'Annonay', postalCode: '07100', department: 'Ardèche', lat: 45.2397, lng: 4.6697 },
+  { name: 'Aubenas', postalCode: '07200', department: 'Ardèche', lat: 44.6200, lng: 4.3903 },
+  { name: 'Tournon-sur-Rhône', postalCode: '07300', department: 'Ardèche', lat: 45.0683, lng: 4.8331 },
+  { name: 'Privas', postalCode: '07000', department: 'Ardèche', lat: 44.7350, lng: 4.5989 },
+  { name: 'Guilherand-Granges', postalCode: '07500', department: 'Ardèche', lat: 44.9333, lng: 4.8750 },
+  { name: 'Le Teil', postalCode: '07400', department: 'Ardèche', lat: 44.5500, lng: 4.6833 },
+  { name: 'Bourg-Saint-Andéol', postalCode: '07700', department: 'Ardèche', lat: 44.3736, lng: 4.6436 },
+  { name: 'Saint-Péray', postalCode: '07130', department: 'Ardèche', lat: 44.9503, lng: 4.8514 },
 ]
 
 /**

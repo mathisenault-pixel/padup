@@ -30,8 +30,10 @@ export default function SmartSearchBar({
   const [showDropdown, setShowDropdown] = useState(false)
   const [history, setHistory] = useState<string[]>([])
   const [isFocused, setIsFocused] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const suggestionRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   // Debug: compteur de renders
   debug.count('🔄 SmartSearchBar render')
@@ -96,6 +98,7 @@ export default function SmartSearchBar({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false)
         setIsFocused(false)
+        setSelectedIndex(-1)
       }
     }
 
@@ -103,21 +106,60 @@ export default function SmartSearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Gestion du clavier
+  // Réinitialiser l'index quand les suggestions changent
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setShowDropdown(false)
-        setIsFocused(false)
-        inputRef.current?.blur()
+    setSelectedIndex(-1)
+  }, [query])
+
+  // Scroll automatique vers la suggestion sélectionnée
+  useEffect(() => {
+    if (selectedIndex >= 0 && suggestionRefs.current[selectedIndex]) {
+      suggestionRefs.current[selectedIndex]?.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth'
+      })
+    }
+  }, [selectedIndex])
+
+  // Gestion du clavier (flèches + Escape)
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showDropdown || allSuggestions.length === 0) {
+      if (e.key === 'Enter') {
+        handleSearch(query)
       }
+      return
     }
 
-    if (showDropdown) {
-      document.addEventListener('keydown', handleKeyDown)
-      return () => document.removeEventListener('keydown', handleKeyDown)
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setSelectedIndex(prev => 
+          prev < allSuggestions.length - 1 ? prev + 1 : prev
+        )
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1)
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (selectedIndex >= 0 && selectedIndex < allSuggestions.length) {
+          const selected = allSuggestions[selectedIndex]
+          setQuery(selected.text)
+          handleSearch(selected.text)
+        } else {
+          handleSearch(query)
+        }
+        break
+      case 'Escape':
+        e.preventDefault()
+        setShowDropdown(false)
+        setIsFocused(false)
+        setSelectedIndex(-1)
+        inputRef.current?.blur()
+        break
     }
-  }, [showDropdown])
+  }, [showDropdown, allSuggestions, selectedIndex, query, handleSearch])
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
@@ -135,6 +177,7 @@ export default function SmartSearchBar({
             value={query}
             onChange={(e) => {
               setQuery(e.target.value)
+              setSelectedIndex(-1)
               if (e.target.value.length > 0) {
                 setShowDropdown(true)
               }
@@ -145,17 +188,14 @@ export default function SmartSearchBar({
                 setShowDropdown(true)
               }
             }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSearch(query)
-              }
-            }}
+            onKeyDown={handleKeyDown}
             className="flex-1 py-3 text-base focus:outline-none bg-transparent placeholder:text-gray-400"
           />
           {query && (
             <button
               onClick={() => {
                 setQuery('')
+                setSelectedIndex(-1)
                 inputRef.current?.focus()
               }}
               className="flex-shrink-0 w-7 h-7 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all"
@@ -176,19 +216,34 @@ export default function SmartSearchBar({
             {allSuggestions.map((suggestion, index) => (
               <button
                 key={`${suggestion.type}-${index}`}
+                ref={(el) => { suggestionRefs.current[index] = el }}
                 onClick={() => {
                   setQuery(suggestion.text)
+                  setSelectedIndex(-1)
                   handleSearch(suggestion.text)
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-all group text-left"
+                onMouseEnter={() => setSelectedIndex(index)}
+                className={`w-full flex items-center gap-3 px-4 py-3 transition-all group text-left ${
+                  selectedIndex === index 
+                    ? 'bg-blue-50' 
+                    : 'hover:bg-blue-50'
+                }`}
               >
                 <span className="text-lg flex-shrink-0">{suggestion.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate text-sm">
+                  <p className={`font-semibold transition-colors truncate text-sm ${
+                    selectedIndex === index
+                      ? 'text-blue-600'
+                      : 'text-gray-900 group-hover:text-blue-600'
+                  }`}>
                     {suggestion.text}
                   </p>
                 </div>
-                <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 transition-colors flex-shrink-0 ${
+                  selectedIndex === index
+                    ? 'text-blue-600'
+                    : 'text-gray-400 group-hover:text-blue-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
