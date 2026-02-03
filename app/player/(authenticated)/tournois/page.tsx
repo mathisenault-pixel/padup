@@ -11,6 +11,10 @@ type Tournoi = {
   nom: string
   club: string
   clubAdresse: string
+  clubDescription?: string
+  clubTelephone?: string
+  clubEmail?: string
+  description?: string
   date: string
   heureDebut: string
   categorie: 'P25' | 'P100' | 'P250' | 'P500' | 'P1000' | 'P1500' | 'P2000'
@@ -63,6 +67,10 @@ export default function TournoisPage() {
       nom: 'Tournoi P1000 Hommes',
       club: 'Le Hangar Sport & Co',
       clubAdresse: 'Rochefort-du-Gard',
+      clubDescription: 'Club premium avec 6 terrains couverts et éclairés, bar restaurant, pro shop et parking gratuit.',
+      clubTelephone: '04 66 57 12 34',
+      clubEmail: 'contact@lehangar-padel.fr',
+      description: 'Grand tournoi P1000 hommes avec dotation de 500€. Format B1, inscription par équipe de 2. Ambiance conviviale et compétitive garantie !',
       date: '2026-01-25',
       heureDebut: '09:00',
       categorie: 'P1000',
@@ -83,6 +91,10 @@ export default function TournoisPage() {
       nom: 'Tournoi P500 Femmes',
       club: 'Paul & Louis Sport',
       clubAdresse: 'Le Pontet',
+      clubDescription: 'Complexe sportif moderne avec 4 terrains indoor et outdoor, vestiaires, espace détente et boutique.',
+      clubTelephone: '04 90 32 45 67',
+      clubEmail: 'info@paullouis-sport.fr',
+      description: 'Tournoi P500 féminin dans une ambiance chaleureuse. Format C2, dotation de 300€ et nombreux lots à gagner.',
       date: '2026-01-28',
       heureDebut: '10:00',
       categorie: 'P500',
@@ -103,6 +115,10 @@ export default function TournoisPage() {
       nom: 'Tournoi P100 Mixte',
       club: 'ZE Padel',
       clubAdresse: 'Boulbon',
+      clubDescription: 'Club familial avec 3 terrains panoramiques, ambiance conviviale et petite restauration sur place.',
+      clubTelephone: '04 90 95 78 90',
+      clubEmail: 'contact@zepadel.fr',
+      description: 'Tournoi P100 mixte idéal pour débuter en compétition. Ambiance familiale et décontractée avec de nombreux lots.',
       date: '2026-02-01',
       heureDebut: '14:00',
       categorie: 'P100',
@@ -123,6 +139,10 @@ export default function TournoisPage() {
       nom: 'Tournoi P2000 Hommes',
       club: 'QG Padel Club',
       clubAdresse: 'Saint-Laurent-des-Arbres',
+      clubDescription: 'Club haut de gamme avec 5 terrains premium, coaching professionnel, salle de sport et restaurant gastronomique.',
+      clubTelephone: '04 66 50 23 45',
+      clubEmail: 'info@qgpadel.com',
+      description: 'Tournoi P2000 de haut niveau avec dotation de 1000€. Format A1, réservé aux meilleurs joueurs de la région.',
       date: '2026-02-05',
       heureDebut: '08:00',
       categorie: 'P2000',
@@ -143,6 +163,10 @@ export default function TournoisPage() {
       nom: 'Tournoi P250 Femmes',
       club: 'Le Hangar Sport & Co',
       clubAdresse: 'Rochefort-du-Gard',
+      clubDescription: 'Club premium avec 6 terrains couverts et éclairés, bar restaurant, pro shop et parking gratuit.',
+      clubTelephone: '04 66 57 12 34',
+      clubEmail: 'contact@lehangar-padel.fr',
+      description: 'Tournoi P250 féminin dans un cadre exceptionnel. Format D1 accessible à tous les niveaux.',
       date: '2026-02-08',
       heureDebut: '14:00',
       categorie: 'P250',
@@ -604,30 +628,12 @@ export default function TournoisPage() {
                       </div>
                     </div>
 
-                    {/* CTA - Pleine largeur sur mobile */}
-                    {tournoi.statut === 'Ouvert' && (
+                    {/* Badge Inscrit */}
+                    {tournoi.inscrit && (
                       <div className="mt-auto pt-3 md:pt-4 border-t border-gray-100">
-                        {tournoi.inscrit ? (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDesinscrire(tournoi)
-                            }}
-                            className="w-full md:w-auto px-5 py-3 md:py-2 bg-gray-900 hover:bg-gray-800 text-white text-base md:text-sm font-semibold rounded-lg transition-colors"
-                          >
-                            Se désinscrire
-                          </button>
-                        ) : (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleInscrire(tournoi)
-                            }}
-                            className="w-full md:w-auto px-5 py-3 md:py-2 bg-blue-600 hover:bg-blue-700 text-white text-base md:text-sm font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
-                          >
-                            S'inscrire
-                          </button>
-                        )}
+                        <div className="w-full md:w-auto px-5 py-3 md:py-2 bg-blue-600 text-white text-base md:text-sm font-semibold rounded-lg text-center">
+                          ✓ Inscrit
+                        </div>
                       </div>
                     )}
                   </div>
@@ -685,22 +691,82 @@ export default function TournoisPage() {
             </div>
 
             <div className="p-6">
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {[
-                  { label: 'Date', value: new Date(selectedTournoi.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) },
-                  { label: 'Heure', value: selectedTournoi.heureDebut },
-                  { label: 'Niveau', value: selectedTournoi.categorie },
-                  { label: 'Genre', value: selectedTournoi.genre },
-                  { label: 'Format', value: selectedTournoi.format },
-                  { label: 'Inscription', value: `${selectedTournoi.prixInscription}€ par personne` },
-                  { label: 'Dotation', value: selectedTournoi.dotation },
-                  { label: 'Places', value: `${selectedTournoi.nombreEquipes}/${selectedTournoi.nombreEquipesMax}` },
-                ].map((item, i) => (
-                  <div key={i} className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">{item.label}</p>
-                    <p className="font-bold text-gray-900">{item.value}</p>
-                  </div>
-                ))}
+              {/* Badge Inscrit */}
+              {selectedTournoi.inscrit && (
+                <div className="mb-6 px-4 py-3 bg-blue-600 text-white text-center font-semibold rounded-lg">
+                  ✓ Vous êtes inscrit à ce tournoi
+                </div>
+              )}
+
+              {/* Description du tournoi */}
+              {selectedTournoi.description && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">À propos du tournoi</h3>
+                  <p className="text-gray-700">{selectedTournoi.description}</p>
+                </div>
+              )}
+
+              {/* Informations du tournoi */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Détails du tournoi</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: 'Date', value: new Date(selectedTournoi.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) },
+                    { label: 'Heure', value: selectedTournoi.heureDebut },
+                    { label: 'Niveau', value: selectedTournoi.categorie },
+                    { label: 'Genre', value: selectedTournoi.genre },
+                    { label: 'Format', value: selectedTournoi.format },
+                    { label: 'Inscription', value: `${selectedTournoi.prixInscription}€ par personne` },
+                    { label: 'Dotation', value: selectedTournoi.dotation },
+                    { label: 'Places', value: `${selectedTournoi.nombreEquipes}/${selectedTournoi.nombreEquipesMax}` },
+                  ].map((item, i) => (
+                    <div key={i} className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">{item.label}</p>
+                      <p className="font-bold text-gray-900">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Informations du club */}
+              <div className="mb-6 border-t pt-6">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Informations du club</h3>
+                
+                {/* Nom et adresse */}
+                <div className="mb-4">
+                  <p className="font-bold text-lg text-gray-900">{selectedTournoi.club}</p>
+                  <p className="text-gray-600 flex items-center gap-2 mt-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    {selectedTournoi.clubAdresse}
+                  </p>
+                </div>
+
+                {/* Description du club */}
+                {selectedTournoi.clubDescription && (
+                  <p className="text-gray-700 mb-4">{selectedTournoi.clubDescription}</p>
+                )}
+
+                {/* Contact */}
+                <div className="space-y-2">
+                  {selectedTournoi.clubTelephone && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      {selectedTournoi.clubTelephone}
+                    </p>
+                  )}
+                  {selectedTournoi.clubEmail && (
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      {selectedTournoi.clubEmail}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <button
