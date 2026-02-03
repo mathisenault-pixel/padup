@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import type { User } from '@supabase/supabase-js'
 
 type ProfilInfo = {
   nom: string
@@ -20,21 +21,79 @@ type ProfilInfo = {
 
 export default function ProfilPage() {
   const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [profil, setProfil] = useState<ProfilInfo>({
-    nom: 'Dupont',
-    prenom: 'Jean',
-    email: 'jean.dupont@email.com',
-    telephone: '+33 6 12 34 56 78',
-    dateNaissance: '1990-05-15',
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    dateNaissance: '',
     niveau: 'Intermédiaire',
-    coupPrefere: 'Vibora',
+    coupPrefere: '',
     mainDominante: 'Droitier',
     positionPreferee: 'Droite',
-    experience: '2 ans',
-    objectifs: 'Progresser en technique et participer à des tournois régionaux'
+    experience: '',
+    objectifs: ''
   })
+
+  // Vérifier l'authentification au chargement
+  useEffect(() => {
+    const checkAuth = async () => {
+      console.log('[PROFIL] Checking authentication...')
+      const { data: { session }, error } = await supabase.auth.getSession()
+      
+      if (error) {
+        console.error('[PROFIL] Error checking session:', error)
+        router.push('/login')
+        return
+      }
+
+      if (!session?.user) {
+        console.log('[PROFIL] No session found, redirecting to login')
+        router.push('/login')
+        return
+      }
+
+      console.log('[PROFIL] User authenticated:', session.user.email)
+      setUser(session.user)
+      
+      // Charger les données du profil depuis l'email de l'utilisateur
+      setProfil(prev => ({
+        ...prev,
+        email: session.user.email || '',
+        // Pour l'instant, on garde les valeurs par défaut pour les autres champs
+        // Plus tard, on pourra les charger depuis une table profiles dans Supabase
+        nom: 'Dupont',
+        prenom: 'Jean',
+        telephone: '+33 6 12 34 56 78',
+        dateNaissance: '1990-05-15',
+        coupPrefere: 'Vibora',
+        experience: '2 ans',
+        objectifs: 'Progresser en technique et participer à des tournois régionaux'
+      }))
+      
+      setIsLoadingAuth(false)
+    }
+
+    checkAuth()
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[PROFIL] Auth state changed:', event)
+      if (event === 'SIGNED_OUT' || !session) {
+        router.push('/login')
+      } else if (session?.user) {
+        setUser(session.user)
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [router])
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -94,6 +153,23 @@ export default function ProfilPage() {
       console.log('[PROFIL] ✅ Signed out successfully')
       router.push('/player/accueil')
     }
+  }
+
+  // Afficher un loader pendant la vérification d'authentification
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-semibold">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Ne rien afficher si pas d'utilisateur (redirection en cours)
+  if (!user) {
+    return null
   }
 
   return (
