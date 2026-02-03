@@ -712,7 +712,7 @@ export default function ReservationsPage() {
                 {selectedBooking.clubId && (
                   <Link href={`/player/clubs/${selectedBooking.clubId}/reserver`} className="flex-1">
                     <button className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all">
-                      Réserver à nouveau
+                      Voir partie
                     </button>
                   </Link>
                 )}
@@ -870,7 +870,7 @@ export default function ReservationsPage() {
               <div className="flex flex-col gap-3">
                 <Link href={`/player/tournois/${selectedTournament.id}`} className="w-full">
                   <button className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all">
-                    Voir tous les détails
+                    Voir tournoi
                   </button>
                 </Link>
               </div>
