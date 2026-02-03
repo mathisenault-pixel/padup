@@ -222,6 +222,12 @@ export default function ClubsPage() {
         return matchesCityClubRadius && matchesEquipements && matchesPrix
       })
       .sort((a, b) => {
+        // Si la géolocalisation est active, trier d'abord par distance
+        if (locationStatus === 'ready' && userCoords && a.distanceKm !== undefined && b.distanceKm !== undefined) {
+          return a.distanceKm - b.distanceKm
+        }
+        
+        // Sinon, utiliser le tri sélectionné par l'utilisateur
         switch (sortBy) {
           case 'prix-asc':
             return a.prixMin - b.prixMin

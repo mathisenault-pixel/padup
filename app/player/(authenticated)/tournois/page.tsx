@@ -295,8 +295,17 @@ export default function TournoisPage() {
       return matchesCityClubRadius && matchesStatut && matchesCategorie && matchesGenre
     })
 
-    // Tri par date
-    result = result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    // Tri : Si géolocalisation active, trier par distance, sinon par date
+    if (userCoords) {
+      result = result.sort((a, b) => {
+        if (a.distanceKm !== undefined && b.distanceKm !== undefined) {
+          return a.distanceKm - b.distanceKm
+        }
+        return 0
+      })
+    } else {
+      result = result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    }
 
     return result
   }, [tournoisWithDistance, searchTerm, selectedFilter, selectedCategories, selectedGenres, sortBy, userCoords, cityClubFilter, referenceCoords, radiusKm])

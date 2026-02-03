@@ -246,9 +246,9 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
         <div className="mt-8 text-center">
           <p className="text-xs text-white/60">
             En vous connectant, vous acceptez nos{' '}
-            <a href="#" className="underline hover:text-white/90">Conditions d&apos;utilisation</a>
+            <a href="/conditions-utilisation" target="_blank" className="underline hover:text-white/90 transition-colors">Conditions d&apos;utilisation</a>
             {' '}et notre{' '}
-            <a href="#" className="underline hover:text-white/90">Politique de confidentialité</a>
+            <a href="/politique-confidentialite" target="_blank" className="underline hover:text-white/90 transition-colors">Politique de confidentialité</a>
           </p>
         </div>
       </div>
