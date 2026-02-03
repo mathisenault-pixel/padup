@@ -1224,34 +1224,34 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
   
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-6 py-8 max-w-6xl">
+      <div className="container mx-auto px-3 md:px-6 py-4 md:py-8 max-w-6xl">
         
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-4 md:mb-8">
           <button
             type="button"
             onClick={() => router.push('/player/clubs')}
-            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
+            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block text-sm md:text-base"
           >
             ← Retour aux clubs
           </button>
           
           {/* Info principale du club */}
           <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-lg mt-4">
-            <div className="flex items-start gap-6 p-6">
+            <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-4 md:p-6">
               <img 
                 src={club.imageUrl} 
                 alt={club.name}
-                className="w-40 h-40 object-cover rounded-xl shadow-md"
+                className="w-full md:w-40 h-48 md:h-40 object-cover rounded-xl shadow-md"
               />
-              <div className="flex-1">
-                <h1 className="text-4xl font-black text-gray-900 mb-3">{club.name}</h1>
-                <p className="text-lg text-gray-600 mb-4">{club.description}</p>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold text-lg">
+              <div className="flex-1 w-full">
+                <h1 className="text-2xl md:text-4xl font-black text-gray-900 mb-2 md:mb-3">{club.name}</h1>
+                <p className="text-sm md:text-lg text-gray-600 mb-3 md:mb-4 line-clamp-3 md:line-clamp-none">{club.description}</p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
+                  <span className="w-full sm:w-auto text-center px-4 py-2 bg-blue-600 text-white rounded-lg font-bold text-base md:text-lg">
                     {club.prix}€ / pers pour 1h30
                   </span>
-                  <span className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">
+                  <span className="w-full sm:w-auto text-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold">
                     {club.nombreTerrains} terrains
                   </span>
                 </div>
@@ -1259,8 +1259,8 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             </div>
 
             {/* Informations détaillées */}
-            <div className="border-t-2 border-gray-100 bg-gray-50 p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="border-t-2 border-gray-100 bg-gray-50 p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {/* Adresse */}
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
