@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import SmartSearchBar from '../components/SmartSearchBar'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
@@ -39,7 +41,18 @@ const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
   'QG Padel Club': { lat: 44.0528, lng: 4.6981 }, // Saint-Laurent-des-Arbres
 }
 
+/**
+ * Mapping des noms de clubs vers leurs IDs (pour les liens de réservation)
+ */
+const CLUB_NAME_TO_ID: Record<string, string> = {
+  'Le Hangar Sport & Co': 'a1b2c3d4-e5f6-4789-a012-3456789abcde',
+  'Paul & Louis Sport': 'b2c3d4e5-f6a7-4890-b123-456789abcdef',
+  'ZE Padel': 'c3d4e5f6-a7b8-4901-c234-56789abcdef0',
+  'QG Padel Club': 'd4e5f6a7-b8c9-4012-d345-6789abcdef01',
+}
+
 export default function TournoisPage() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'ouverts' | 'inscrits'>('ouverts')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -182,8 +195,11 @@ export default function TournoisPage() {
   }, [tournois, userCoords])
 
   const handleInscrire = (tournoi: Tournoi) => {
-    setTournoiToConfirm(tournoi)
-    setShowConfirmModal(true)
+    // Rediriger vers la page de réservation du club
+    const clubId = CLUB_NAME_TO_ID[tournoi.club]
+    if (clubId) {
+      router.push(`/player/clubs/${clubId}/reserver`)
+    }
   }
 
   const confirmInscription = () => {
@@ -539,12 +555,16 @@ export default function TournoisPage() {
                     </div>
 
                     {/* Club + Ville */}
-                    <p className="text-sm md:text-base text-gray-600 flex items-center gap-1.5 -mt-1">
+                    <Link
+                      href={`/player/clubs/${CLUB_NAME_TO_ID[tournoi.club] || ''}/reserver`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-sm md:text-base text-gray-600 hover:text-blue-600 flex items-center gap-1.5 -mt-1 transition-colors w-fit"
+                    >
                       <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       </svg>
-                      <span className="line-clamp-1">{tournoi.club} · {tournoi.clubAdresse}</span>
-                    </p>
+                      <span className="line-clamp-1 underline">{tournoi.club} · {tournoi.clubAdresse}</span>
+                    </Link>
 
                     {/* Distance (si géolocalisation active) */}
                     {tournoi.distanceKm !== undefined && (
@@ -680,7 +700,12 @@ export default function TournoisPage() {
               </button>
               <div className="absolute bottom-4 left-6 text-white">
                 <h2 className="text-2xl font-bold mb-1">{selectedTournoi.nom}</h2>
-                <p className="text-white/90">{selectedTournoi.club}</p>
+                <Link
+                  href={`/player/clubs/${CLUB_NAME_TO_ID[selectedTournoi.club] || ''}/reserver`}
+                  className="text-white/90 hover:text-white underline transition-colors"
+                >
+                  {selectedTournoi.club}
+                </Link>
               </div>
             </div>
 
