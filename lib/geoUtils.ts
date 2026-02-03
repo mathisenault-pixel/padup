@@ -85,14 +85,25 @@ export function estimateMinutes(km: number): number {
 }
 
 /**
- * Formate le temps de trajet pour l'affichage
+ * Formate le temps de trajet pour l'affichage en voiture
  * 
  * @param minutes Temps en minutes
- * @returns Chaîne formatée (ex: "~15 min", "<1 min")
+ * @returns Chaîne formatée (ex: "🚗 ~15 min", "🚗 ~1h10", "🚗 <1 min")
  */
 export function formatTravelTime(minutes: number): string {
   if (minutes === 0) {
-    return '<1 min'
+    return '🚗 <1 min'
   }
-  return `~${minutes} min`
+  
+  // Si >= 60 minutes, afficher en heures et minutes
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    if (mins === 0) {
+      return `🚗 ~${hours}h`
+    }
+    return `🚗 ~${hours}h${mins.toString().padStart(2, '0')}`
+  }
+  
+  return `🚗 ~${minutes} min`
 }

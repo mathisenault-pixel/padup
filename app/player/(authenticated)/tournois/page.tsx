@@ -6,6 +6,7 @@ import SmartSearchBar from '../components/SmartSearchBar'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
+import { getCitySuggestions, getCityCoordinates } from '@/lib/cities'
 
 type Tournoi = {
   id: number
@@ -238,7 +239,13 @@ export default function TournoisPage() {
   const referenceCoords = useMemo(() => {
     if (!cityClubFilter) return null
     
-    // Chercher un tournoi correspondant au filtre (ville ou club)
+    // 1. D'abord chercher dans la base de villes
+    const cityCoords = getCityCoordinates(cityClubFilter)
+    if (cityCoords) {
+      return cityCoords
+    }
+    
+    // 2. Sinon, chercher un tournoi correspondant au filtre (ville ou club)
     const matchingTournoi = tournois.find(t => 
       t.clubAdresse.toLowerCase().includes(cityClubFilter.toLowerCase()) ||
       t.club.toLowerCase().includes(cityClubFilter.toLowerCase())
@@ -311,11 +318,7 @@ export default function TournoisPage() {
                 'Paul & Louis Sport',
                 'ZE Padel',
                 'QG Padel Club',
-                'Tournoi P1000',
-                'Tournoi P500',
-                'Tournois hommes',
-                'Tournois femmes',
-                'Tournois mixtes'
+                ...getCitySuggestions().slice(0, 15)
               ]}
               storageKey="search-history-tournois"
               compact={false}
@@ -346,17 +349,25 @@ export default function TournoisPage() {
           <div className="mb-3 md:mb-4">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
             <div className="flex items-center gap-2">
-              <input
-                type="text"
-                placeholder="Ville ou club"
-                value={cityClubFilter}
-                onChange={(e) => setCityClubFilter(e.target.value)}
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex-1">
+                <SmartSearchBar
+                  placeholder="Sélectionner une ville..."
+                  onSearch={(query) => setCityClubFilter(query)}
+                  suggestions={[
+                    ...getCitySuggestions(),
+                    'Le Hangar Sport & Co',
+                    'Paul & Louis Sport',
+                    'ZE Padel',
+                    'QG Padel Club'
+                  ]}
+                  storageKey="search-history-city-tournois"
+                  compact={true}
+                />
+              </div>
               <select
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white whitespace-nowrap"
               >
                 <option value={10}>10 km</option>
                 <option value={20}>20 km</option>

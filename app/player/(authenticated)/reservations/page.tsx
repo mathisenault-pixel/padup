@@ -135,12 +135,17 @@ export default function ReservationsPage() {
     loadBookingsAndTournaments()
   }, [])
 
+  // Filtrer les réservations pour exclure les clubs inconnus
+  const validBookings = useMemo(() => {
+    return bookings.filter(b => b.clubName !== 'Club inconnu')
+  }, [bookings])
+
   // Combiner et filtrer les réservations et tournois
   const filteredEvents = useMemo(() => {
     const now = new Date()
 
     // Convertir les bookings en MixedEvent
-    let bookingEvents: MixedEvent[] = bookings.map(b => ({
+    let bookingEvents: MixedEvent[] = validBookings.map(b => ({
       ...b,
       eventType: 'booking' as const,
       eventDate: new Date(b.slot_start)
@@ -194,7 +199,7 @@ export default function ReservationsPage() {
     events.sort((a, b) => b.eventDate.getTime() - a.eventDate.getTime())
 
     return events
-  }, [bookings, tournaments, selectedFilter, selectedType])
+  }, [validBookings, tournaments, selectedFilter, selectedType])
 
   // Ouvrir le modal de détails pour une réservation
   const handleBookingClick = async (booking: EnrichedBooking) => {
@@ -310,26 +315,26 @@ export default function ReservationsPage() {
         <div className="mb-6">
           <h3 className="text-sm font-bold text-gray-900 mb-3">Type d'événement</h3>
           <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-            <button
-              onClick={() => setSelectedType('tous')}
-              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
-                selectedType === 'tous'
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Tout ({bookings.length + tournaments.length})
-            </button>
-            <button
-              onClick={() => setSelectedType('parties')}
-              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
-                selectedType === 'parties'
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Parties ({bookings.length})
-            </button>
+          <button
+            onClick={() => setSelectedType('tous')}
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+              selectedType === 'tous'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Tout ({validBookings.length + tournaments.length})
+          </button>
+          <button
+            onClick={() => setSelectedType('parties')}
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+              selectedType === 'parties'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Parties ({validBookings.length})
+          </button>
             <button
               onClick={() => setSelectedType('tournois')}
               className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
@@ -354,7 +359,7 @@ export default function ReservationsPage() {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            Toutes ({bookings.length})
+            Toutes ({validBookings.length})
           </button>
           <button
             onClick={() => setSelectedFilter('a-venir')}
@@ -364,7 +369,7 @@ export default function ReservationsPage() {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            À venir ({bookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})
+            À venir ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})
           </button>
           <button
             onClick={() => setSelectedFilter('passees')}
@@ -374,7 +379,7 @@ export default function ReservationsPage() {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            Passées ({bookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})
+            Passées ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})
           </button>
           <button
             onClick={() => setSelectedFilter('annulees')}
@@ -384,7 +389,7 @@ export default function ReservationsPage() {
                 : 'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
-            Annulées ({bookings.filter(b => b.status === 'cancelled').length})
+            Annulées ({validBookings.filter(b => b.status === 'cancelled').length})
           </button>
         </div>
       </div>
