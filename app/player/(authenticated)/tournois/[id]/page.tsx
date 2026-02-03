@@ -9,9 +9,15 @@ type TournoiDetail = {
   nom: string
   club: string
   clubAdresse: string
+  clubAdresseComplete?: string
   clubDescription?: string
   clubTelephone?: string
   clubEmail?: string
+  clubNombreTerrains?: number
+  clubHoraires?: {
+    semaine: string
+    weekend: string
+  }
   description?: string
   date: string
   heureDebut: string
@@ -34,9 +40,15 @@ const TOURNOIS_DATA: TournoiDetail[] = [
     nom: 'Tournoi P1000 Hommes',
     club: 'Le Hangar Sport & Co',
     clubAdresse: 'Rochefort-du-Gard',
+    clubAdresseComplete: '123 Avenue du Sport, 30650 Rochefort-du-Gard',
     clubDescription: 'Club premium avec 6 terrains couverts et éclairés, bar restaurant, pro shop et parking gratuit.',
     clubTelephone: '04 66 57 12 34',
     clubEmail: 'contact@lehangar-padel.fr',
+    clubNombreTerrains: 6,
+    clubHoraires: {
+      semaine: '08h00 - 23h00',
+      weekend: '08h00 - 23h00'
+    },
     description: 'Grand tournoi P1000 hommes avec dotation de 500€. Format B1, inscription par équipe de 2. Ambiance conviviale et compétitive garantie !',
     date: '2026-01-25',
     heureDebut: '09:00',
@@ -56,9 +68,15 @@ const TOURNOIS_DATA: TournoiDetail[] = [
     nom: 'Tournoi P500 Femmes',
     club: 'Paul & Louis Sport',
     clubAdresse: 'Le Pontet',
+    clubAdresseComplete: '45 Rue du Padel, 84130 Le Pontet',
     clubDescription: 'Complexe sportif moderne avec 4 terrains indoor et outdoor, vestiaires, espace détente et boutique.',
     clubTelephone: '04 90 32 45 67',
     clubEmail: 'info@paullouis-sport.fr',
+    clubNombreTerrains: 4,
+    clubHoraires: {
+      semaine: '09h00 - 22h00',
+      weekend: '09h00 - 20h00'
+    },
     description: 'Tournoi P500 féminin dans une ambiance chaleureuse. Format C2, dotation de 300€ et nombreux lots à gagner.',
     date: '2026-01-28',
     heureDebut: '10:00',
@@ -78,9 +96,15 @@ const TOURNOIS_DATA: TournoiDetail[] = [
     nom: 'Tournoi P100 Mixte',
     club: 'ZE Padel',
     clubAdresse: 'Boulbon',
+    clubAdresseComplete: '78 Route des Alpilles, 13150 Boulbon',
     clubDescription: 'Club familial avec 3 terrains panoramiques, ambiance conviviale et petite restauration sur place.',
     clubTelephone: '04 90 95 78 90',
     clubEmail: 'contact@zepadel.fr',
+    clubNombreTerrains: 3,
+    clubHoraires: {
+      semaine: '10h00 - 21h00',
+      weekend: '10h00 - 19h00'
+    },
     description: 'Tournoi P100 mixte idéal pour débuter en compétition. Ambiance familiale et décontractée avec de nombreux lots.',
     date: '2026-02-01',
     heureDebut: '14:00',
@@ -100,9 +124,15 @@ const TOURNOIS_DATA: TournoiDetail[] = [
     nom: 'Tournoi P2000 Hommes',
     club: 'QG Padel Club',
     clubAdresse: 'Saint-Laurent-des-Arbres',
+    clubAdresseComplete: '12 Chemin des Vignes, 30126 Saint-Laurent-des-Arbres',
     clubDescription: 'Club haut de gamme avec 5 terrains premium, coaching professionnel, salle de sport et restaurant gastronomique.',
     clubTelephone: '04 66 50 23 45',
     clubEmail: 'info@qgpadel.com',
+    clubNombreTerrains: 5,
+    clubHoraires: {
+      semaine: '07h00 - 23h00',
+      weekend: '08h00 - 22h00'
+    },
     description: 'Tournoi P2000 de haut niveau avec dotation de 1000€. Format A1, réservé aux meilleurs joueurs de la région.',
     date: '2026-02-05',
     heureDebut: '08:00',
@@ -122,9 +152,15 @@ const TOURNOIS_DATA: TournoiDetail[] = [
     nom: 'Tournoi P250 Femmes',
     club: 'Le Hangar Sport & Co',
     clubAdresse: 'Rochefort-du-Gard',
+    clubAdresseComplete: '123 Avenue du Sport, 30650 Rochefort-du-Gard',
     clubDescription: 'Club premium avec 6 terrains couverts et éclairés, bar restaurant, pro shop et parking gratuit.',
     clubTelephone: '04 66 57 12 34',
     clubEmail: 'contact@lehangar-padel.fr',
+    clubNombreTerrains: 6,
+    clubHoraires: {
+      semaine: '08h00 - 23h00',
+      weekend: '08h00 - 23h00'
+    },
     description: 'Tournoi P250 féminin dans un cadre exceptionnel. Format D1 accessible à tous les niveaux.',
     date: '2026-02-08',
     heureDebut: '14:00',
@@ -300,7 +336,7 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                 </div>
 
-                {/* Lieu */}
+                {/* Adresse */}
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,8 +345,8 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
                     </svg>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Lieu</p>
-                    <p className="text-gray-900 font-semibold">{tournoi.clubAdresse}</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Adresse</p>
+                    <p className="text-gray-900 font-semibold">{tournoi.clubAdresseComplete || tournoi.clubAdresse}</p>
                   </div>
                 </div>
 
@@ -340,6 +376,37 @@ export default function TournoiDetailPage({ params }: { params: Promise<{ id: st
                     <div>
                       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Email</p>
                       <a href={`mailto:${tournoi.clubEmail}`} className="text-gray-900 font-semibold hover:text-blue-600">{tournoi.clubEmail}</a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Nombre de terrains */}
+                {tournoi.clubNombreTerrains && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Nombre de terrains</p>
+                      <p className="text-gray-900 font-semibold">{tournoi.clubNombreTerrains} terrain{tournoi.clubNombreTerrains > 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Horaires */}
+                {tournoi.clubHoraires && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Horaires</p>
+                      <p className="text-gray-900 font-semibold">Lun-Ven : {tournoi.clubHoraires.semaine}</p>
+                      <p className="text-gray-900 font-semibold">Sam-Dim : {tournoi.clubHoraires.weekend}</p>
                     </div>
                   </div>
                 )}
