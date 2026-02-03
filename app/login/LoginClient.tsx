@@ -121,8 +121,12 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-10 animate-scale-in">
           {/* Logo et titre premium */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-xl">
-              <span className="text-white font-bold text-2xl">P</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-xl p-2">
+              <img 
+                src="/icon.png" 
+                alt="Pad'Up Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-3">Bienvenue</h1>
             <p className="text-gray-600 text-lg">Connectez-vous à votre espace</p>
