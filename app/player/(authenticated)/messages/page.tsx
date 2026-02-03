@@ -162,9 +162,9 @@ export default function MessagesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-3 md:px-6 py-4 md:py-8 max-w-[1400px]">
+      <div className="container mx-auto px-3 md:px-6 py-1 md:py-3 max-w-[1400px]">
         {/* En-tête */}
-        <div className="mb-4 md:mb-6">
+        <div className="mb-3 md:mb-4">
           <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Messages</h1>
           <p className="text-gray-600">Discutez avec les clubs et consultez vos notifications</p>
         </div>
