@@ -67,32 +67,11 @@ export default function PlayerNav() {
   const isActive = (href: string) => pathname === href
 
   return (
-    <nav className="flex items-center gap-3">
-      {/* Navigation principale */}
-      <div className="flex items-center gap-2">
-        {mainNavItems.map((item) => {
-          // Sur mobile (< lg), filtrer les items desktopOnly
-          if (item.desktopOnly) {
-            return (
-              <button
-                key={item.href}
-                type="button"
-                onClick={() => router.push(item.href)}
-                className={`group relative hidden lg:inline-flex items-center px-3 md:px-5 py-2 md:py-3 text-sm md:text-[15px] font-semibold rounded-xl md:rounded-2xl transition-all duration-300 whitespace-nowrap ${
-                  isActive(item.href)
-                    ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                <span className="whitespace-nowrap">{item.label}</span>
-                {isActive(item.href) && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl md:rounded-2xl blur-xl opacity-30 -z-10"></div>
-                )}
-              </button>
-            )
-          }
-          
-          return (
+    <>
+      {/* Navigation mobile - Sans Messages */}
+      <nav className="lg:hidden flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {mainNavItems.filter(item => !item.desktopOnly).map((item) => (
             <button
               key={item.href}
               type="button"
@@ -108,11 +87,32 @@ export default function PlayerNav() {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl md:rounded-2xl blur-xl opacity-30 -z-10"></div>
               )}
             </button>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      </nav>
 
-      {/* Navigation compte - Désactivée, accessible via bouton dans AuthStatus */}
-    </nav>
+      {/* Navigation desktop - Avec tous les items */}
+      <nav className="hidden lg:flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {mainNavItems.map((item) => (
+            <button
+              key={item.href}
+              type="button"
+              onClick={() => router.push(item.href)}
+              className={`group relative inline-flex items-center px-3 md:px-5 py-2 md:py-3 text-sm md:text-[15px] font-semibold rounded-xl md:rounded-2xl transition-all duration-300 whitespace-nowrap ${
+                isActive(item.href)
+                  ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg shadow-blue-500/30'
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <span className="whitespace-nowrap">{item.label}</span>
+              {isActive(item.href) && (
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl md:rounded-2xl blur-xl opacity-30 -z-10"></div>
+              )}
+            </button>
+          ))}
+        </div>
+      </nav>
+    </>
   )
 }
