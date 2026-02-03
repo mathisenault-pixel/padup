@@ -1374,7 +1374,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
         {/* Terrains et créneaux horaires */}
         <div>
           <h2 className="text-xl font-bold text-gray-900 mb-4">
-            Choisir un terrain et un créneau - {formatDate(selectedDate).full}
+            {formatDate(selectedDate).full}
           </h2>
           
           {/* ✅ Affichage de chargement courts */}
