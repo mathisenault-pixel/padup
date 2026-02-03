@@ -1441,11 +1441,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1">Disponibilité</div>
-                          <div className={`text-2xl font-black ${availabilityPercent > 50 ? 'text-blue-600' : availabilityPercent > 30 ? 'text-yellow-600' : 'text-red-600'}`}>
-                            {availableCount}/{totalCount}
-                          </div>
-                          <div className="text-xs text-gray-600">({availabilityPercent}%)</div>
+                          <div className="text-sm font-bold text-gray-500 uppercase tracking-wide">Disponibilité</div>
                         </div>
                       </div>
                     </div>
