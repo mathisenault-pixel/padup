@@ -51,6 +51,16 @@ type Booking = {
 // ============================================
 
 /**
+ * Formater une heure pour enlever les secondes
+ * Ex: "08:00:00" => "08:00", "09:30:00" => "09:30"
+ */
+function formatTime(timeStr: string): string {
+  if (!timeStr) return ''
+  // Enlever les secondes si présentes
+  return timeStr.substring(0, 5)
+}
+
+/**
  * Combiner une date (YYYY-MM-DD) et une heure (HH:MM:SS) en timestamp ISO UTC
  * ✅ IMPORTANT: Retourne toujours format ISO avec timezone Z pour cohérence avec Supabase
  * Ex: combineDateAndTime("2026-01-23", "14:00:00") => "2026-01-23T14:00:00.000Z"
@@ -614,7 +624,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
     console.log('[INVITE] Sending invitations to:', invitedEmails)
 
     try {
-      const dateFormatted = `${formatDate(selectedDate).day} ${formatDate(selectedDate).date} ${formatDate(selectedDate).month} à ${selectedSlot?.start_time}`
+      const dateFormatted = `${formatDate(selectedDate).day} ${formatDate(selectedDate).date} ${formatDate(selectedDate).month} à ${formatTime(selectedSlot?.start_time || '')}`
       const bookingUrl = `${window.location.origin}/player/reservations`
 
       const response = await fetch('/api/invite', {
@@ -1462,9 +1472,9 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
                               }`}
                             >
                               <div className="text-center">
-                                <div className="text-base font-black">{slot.start_time}</div>
+                                <div className="text-base font-black">{formatTime(slot.start_time)}</div>
                                 <div className="text-xs text-gray-500">→</div>
-                                <div className="text-base font-black">{slot.end_time}</div>
+                                <div className="text-base font-black">{formatTime(slot.end_time)}</div>
                               </div>
                               {!available && (
                                 <div className="text-xs mt-1 text-red-500 font-semibold">Réservé</div>
@@ -1492,7 +1502,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
           onClose={() => setShowPlayerModal(false)}
           onContinue={handlePlayersContinue}
           clubName={`${club.name} - Terrain ${selectedTerrain}`}
-          timeSlot={`${selectedSlot.start_time} - ${selectedSlot.end_time}`}
+          timeSlot={`${formatTime(selectedSlot.start_time)} - ${formatTime(selectedSlot.end_time)}`}
         />
       )}
       
