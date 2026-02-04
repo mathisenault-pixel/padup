@@ -16,12 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "Pad'up | Réservez votre terrain de padel",
-    template: "%s | Pad'up",
-  },
-  description:
-    "Réservez votre terrain de padel en quelques clics. Disponibilités en temps réel, réservation rapide, clubs partout en France.",
+  title: "Pad'Up",
+  description: "Plateforme de réservation de terrain de padel en France",
 };
 
 export default function RootLayout({
