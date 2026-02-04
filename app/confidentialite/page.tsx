@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-6 py-16">
-        <Link
-          href="/"
+        <button
+          onClick={() => router.back()}
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-8"
         >
-          ← Retour à l'accueil
-        </Link>
+          ← Retour
+        </button>
 
         <h1 className="text-4xl font-bold text-gray-900 mb-8">Politique de confidentialité</h1>
 
