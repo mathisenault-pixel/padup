@@ -1,229 +1,133 @@
-import Link from 'next/link'
+import Link from "next/link";
 
-export default function ConditionsUtilisationPage() {
+export default function Page() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-8 md:p-12">
-        {/* Bouton retour */}
-        <Link 
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-6 py-16">
+        <Link
           href="/"
-          className="group inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-all mb-8"
+          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-8"
         >
-          <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Retour
+          ← Retour à l'accueil
         </Link>
 
-        {/* En-tête */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-xl p-2">
-            <img 
-              src="/icon.png" 
-              alt="Pad'Up Logo" 
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-            Conditions d&apos;utilisation
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Dernière mise à jour : 22 janvier 2026
+        <h1 className="text-4xl font-bold text-gray-900 mb-8">CGU / CGV</h1>
+
+        <div className="space-y-8">
+          {/* Intro */}
+          <p className="text-lg text-gray-700 leading-relaxed">
+            Les présentes Conditions Générales encadrent l&apos;accès et l&apos;utilisation de la plateforme Pad&apos;Up. En naviguant sur le site ou en utilisant les services, vous acceptez ces conditions.
           </p>
-        </div>
 
-        {/* Contenu */}
-        <div className="prose prose-lg max-w-none">
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Acceptation des conditions</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              En accédant et en utilisant Pad&apos;Up (&quot;le Service&quot;), vous acceptez d&apos;être lié par ces conditions d&apos;utilisation. 
-              Si vous n&apos;acceptez pas ces conditions, veuillez ne pas utiliser notre service.
-            </p>
+          {/* 1. Objet */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Objet</h2>
             <p className="text-gray-700 leading-relaxed">
-              Pad&apos;Up est une plateforme de réservation de terrains de padel qui permet aux utilisateurs de réserver 
-              des créneaux horaires dans différents clubs partenaires et de participer à des tournois.
+              Pad&apos;Up met à disposition une plateforme permettant de consulter des disponibilités de terrains de padel et d&apos;effectuer des réservations auprès de clubs.
             </p>
           </section>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Inscription et compte utilisateur</h2>
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-4">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Création de compte</h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-700">
-                <li>Vous devez fournir des informations exactes et à jour lors de votre inscription</li>
-                <li>Vous êtes responsable de la confidentialité de votre mot de passe</li>
-                <li>Vous devez avoir au moins 16 ans pour créer un compte</li>
-                <li>Un compte par personne est autorisé</li>
-              </ul>
-            </div>
+          {/* 2. Accès au service */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Accès au service</h2>
             <p className="text-gray-700 leading-relaxed">
-              Vous êtes responsable de toutes les activités effectuées sous votre compte. En cas d&apos;utilisation 
-              non autorisée de votre compte, vous devez nous en informer immédiatement à l&apos;adresse : 
-              <a href="mailto:contact@padup.fr" className="text-blue-600 hover:underline font-semibold"> contact@padup.fr</a>
+              Certaines fonctionnalités nécessitent la création d&apos;un compte (ex : gérer vos réservations). L&apos;utilisateur s&apos;engage à fournir des informations exactes et à conserver la confidentialité de ses accès.
             </p>
           </section>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Réservations et paiements</h2>
-            <div className="space-y-4">
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Réservation de terrains</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Les réservations sont confirmées après paiement</li>
-                  <li>Vous recevrez un email de confirmation avec les détails de votre réservation</li>
-                  <li>Les tarifs affichés sont par personne pour la durée indiquée (généralement 1h30)</li>
-                  <li>Les disponibilités sont mises à jour en temps réel</li>
-                </ul>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Politique d&apos;annulation</h3>
-                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Annulation gratuite jusqu&apos;à <span className="font-bold">24 heures</span> avant le créneau</li>
-                  <li>Remboursement intégral si annulation dans les délais</li>
-                  <li>Aucun remboursement pour annulation moins de 24h avant le créneau</li>
-                  <li>Les conditions d&apos;annulation des tournois peuvent varier</li>
-                </ul>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Paiements</h3>
-                <p className="text-gray-700 leading-relaxed">
-                  Les paiements sont sécurisés et traités par nos partenaires de paiement certifiés. 
-                  Nous acceptons les cartes bancaires (Visa, Mastercard, American Express). 
-                  Aucune information de carte bancaire n&apos;est stockée sur nos serveurs.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Tournois</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              L&apos;inscription aux tournois est soumise aux règles spécifiques de chaque événement. 
-              Les détails (format, catégorie, niveau requis, prix) sont clairement indiqués sur chaque page de tournoi.
-            </p>
-            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-lg">
-              <p className="text-gray-700 font-semibold">
-                ⚠️ Important : Une fois inscrit, l&apos;annulation d&apos;un tournoi peut entraîner des frais ou être impossible 
-                selon les conditions spécifiques de l&apos;événement.
-              </p>
-            </div>
-          </section>
-
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Comportement et règles</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              En utilisant Pad&apos;Up, vous vous engagez à :
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
-              <li>Respecter les autres utilisateurs et le personnel des clubs</li>
-              <li>Arriver à l&apos;heure pour vos réservations</li>
-              <li>Respecter les règles et le matériel des clubs partenaires</li>
-              <li>Ne pas revendre vos réservations</li>
-              <li>Signaler tout comportement inapproprié</li>
-            </ul>
+          {/* 3. Réservations */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Réservations</h2>
             <p className="text-gray-700 leading-relaxed">
-              Nous nous réservons le droit de suspendre ou supprimer votre compte en cas de non-respect 
-              de ces règles ou de comportement inapproprié.
+              Les créneaux affichés sont fournis par les clubs. Pad&apos;Up met en œuvre des mécanismes techniques pour afficher des disponibilités à jour et limiter les doubles réservations. En cas d&apos;écart ou de modification, le club reste la source de référence.
             </p>
           </section>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Propriété intellectuelle</h2>
+          {/* 4. Prix, paiement et frais */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Prix, paiement et frais</h2>
             <p className="text-gray-700 leading-relaxed">
-              Tous les contenus présents sur Pad&apos;Up (logo, textes, images, design, code source) sont protégés 
-              par les droits de propriété intellectuelle et appartiennent à Pad&apos;Up ou à ses partenaires. 
-              Toute reproduction, modification ou exploitation non autorisée est interdite.
+              La réservation via Pad&apos;Up est sans frais pour les joueurs. Les conditions de paiement (montant, modalités, éventuels remboursements) dépendent du club concerné et des informations affichées lors de la réservation.
             </p>
           </section>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Limitation de responsabilité</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Pad&apos;Up agit en tant qu&apos;intermédiaire entre les utilisateurs et les clubs de padel. 
-              Nous mettons tout en œuvre pour assurer la qualité du service, mais nous ne pouvons être tenus 
-              responsables de :
+          {/* 5. Annulation et modification */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Annulation et modification</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Les règles d&apos;annulation et de modification peuvent varier selon les clubs (délais, conditions, avoirs, etc.). L&apos;utilisateur est invité à consulter les règles affichées au moment de la réservation et, si nécessaire, à contacter le club.
             </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>La qualité des installations des clubs partenaires</li>
-              <li>Les blessures survenues lors de la pratique du padel</li>
-              <li>Les différends entre utilisateurs</li>
-              <li>Les interruptions temporaires du service pour maintenance</li>
-              <li>Les pertes ou dommages indirects</li>
+          </section>
+
+          {/* 6. Responsabilités */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Responsabilités</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Pad&apos;Up fournit une plateforme technique de consultation et de réservation. L&apos;accès aux installations, les prestations sportives et le règlement intérieur relèvent du club. Pad&apos;Up ne peut être tenu responsable des indisponibilités, annulations, incidents sur place ou litiges entre utilisateur et club.
+            </p>
+          </section>
+
+          {/* 7. Usage acceptable */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Usage acceptable</h2>
+            <p className="text-gray-700 leading-relaxed mb-3">
+              L&apos;utilisateur s&apos;engage à utiliser Pad&apos;Up de manière loyale et à ne pas :
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+              <li>perturber le fonctionnement du service,</li>
+              <li>tenter d&apos;accéder à des données non autorisées,</li>
+              <li>utiliser la plateforme à des fins frauduleuses.</li>
             </ul>
           </section>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Modification des conditions</h2>
+          {/* 8. Propriété intellectuelle */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Propriété intellectuelle</h2>
             <p className="text-gray-700 leading-relaxed">
-              Nous nous réservons le droit de modifier ces conditions d&apos;utilisation à tout moment. 
-              Les modifications entreront en vigueur dès leur publication sur le site. Nous vous encourageons 
-              à consulter régulièrement cette page. L&apos;utilisation continue du service après modification 
-              vaut acceptation des nouvelles conditions.
+              Le contenu, la marque, les logos et l&apos;identité visuelle Pad&apos;Up sont protégés. Toute reproduction ou utilisation non autorisée est interdite.
             </p>
           </section>
 
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Résiliation</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              Vous pouvez supprimer votre compte à tout moment depuis les paramètres de votre profil. 
-              Nous nous réservons le droit de suspendre ou supprimer votre compte en cas de :
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>Violation de ces conditions d&apos;utilisation</li>
-              <li>Activité frauduleuse ou suspecte</li>
-              <li>Comportement inapproprié envers les autres utilisateurs ou les clubs</li>
-              <li>Non-paiement de réservations confirmées</li>
-            </ul>
-          </section>
-
-          <section className="mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Droit applicable et juridiction</h2>
+          {/* 9. Données personnelles */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Données personnelles</h2>
             <p className="text-gray-700 leading-relaxed">
-              Ces conditions d&apos;utilisation sont régies par le droit français. En cas de litige, 
-              et après tentative de résolution amiable, les tribunaux français seront seuls compétents.
+              Les règles de traitement des données sont décrites dans la page{" "}
+              <Link href="/politique-confidentialite" className="text-blue-600 hover:underline">
+                Confidentialité
+              </Link>
+              .
             </p>
           </section>
 
-          <section className="mb-10">
+          {/* 10. Évolution des conditions */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Évolution des conditions</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Pad&apos;Up peut faire évoluer ces conditions pour refléter les mises à jour du service. La version publiée en ligne au moment de l&apos;utilisation s&apos;applique.
+            </p>
+          </section>
+
+          {/* 11. Contact */}
+          <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Contact</h2>
-            <div className="bg-blue-50 p-6 rounded-xl">
-              <p className="text-gray-700 leading-relaxed mb-4">
-                Pour toute question concernant ces conditions d&apos;utilisation, vous pouvez nous contacter :
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <a href="mailto:contact@padup.fr" className="text-blue-600 hover:underline font-semibold">
-                    contact@padup.fr
-                  </a>
-                </li>
-                <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span className="font-semibold">Pad&apos;Up, 123 Avenue du Padel, 84000 Avignon, France</span>
-                </li>
-              </ul>
-            </div>
+            <p className="text-gray-700 leading-relaxed">
+              Pour toute question concernant ces conditions, vous pouvez nous contacter via la page{" "}
+              <Link href="/contact" className="text-blue-600 hover:underline">
+                Contact
+              </Link>
+              .
+            </p>
           </section>
-        </div>
 
-        {/* Footer */}
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-          <Link
-            href="/politique-confidentialite"
-            className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-all"
-          >
-            Voir notre Politique de confidentialité →
-          </Link>
+          {/* Phrase de fin */}
+          <div className="pt-8 border-t border-gray-200">
+            <p className="text-xl font-semibold text-gray-900 text-center">
+              Notre objectif : une expérience de réservation simple, claire et fiable.
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
