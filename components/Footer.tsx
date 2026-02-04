@@ -90,8 +90,8 @@ export default function Footer() {
               <FooterCol
                 title="Support"
                 links={[
-                  { label: "Contact", href: "#" },
-                  { label: "FAQ", href: "#" },
+                  { label: "Contact", href: "/contact" },
+                  { label: "FAQ", href: "/faq" },
                   { label: "Conditions", href: "/conditions-utilisation" },
                 ]}
               />
@@ -100,7 +100,7 @@ export default function Footer() {
                 links={[
                   { label: "Confidentialité", href: "/politique-confidentialite" },
                   { label: "CGU / CGV", href: "/conditions-utilisation" },
-                  { label: "Mentions légales", href: "#" },
+                  { label: "Mentions légales", href: "/mentions-legales" },
                 ]}
               />
             </div>
