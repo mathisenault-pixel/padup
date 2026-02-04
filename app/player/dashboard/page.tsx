@@ -240,15 +240,6 @@ export default function PlayerDashboardPage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 mt-16">
-        <div className="max-w-7xl mx-auto px-8 py-8">
-          <div className="text-center text-slate-600">
-            <p>© 2025 Pad&apos;Up. Tous droits réservés.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
