@@ -6,7 +6,7 @@ export default function PolitiqueConfidentialitePage() {
       <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl p-8 md:p-12">
         {/* Bouton retour */}
         <Link 
-          href="/login"
+          href="/"
           className="group inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 font-semibold transition-all mb-8"
         >
           <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
