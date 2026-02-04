@@ -19,7 +19,7 @@ export default function Footer() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/clubs"
+                href="/player/clubs"
                 className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-white/90"
               >
                 Trouver un club
@@ -74,8 +74,8 @@ export default function Footer() {
               <FooterCol
                 title="Padel"
                 links={[
-                  { label: "Trouver un club", href: "/clubs" },
-                  { label: "Tournois", href: "/tournois" },
+                  { label: "Trouver un club", href: "/player/clubs" },
+                  { label: "Tournois", href: "/player/tournois" },
                   { label: "Mes réservations", href: "/player/reservations" },
                 ]}
               />
@@ -90,17 +90,17 @@ export default function Footer() {
               <FooterCol
                 title="Support"
                 links={[
-                  { label: "Contact", href: "/contact" },
-                  { label: "FAQ", href: "/faq" },
-                  { label: "Conditions", href: "/conditions" },
+                  { label: "Contact", href: "#" },
+                  { label: "FAQ", href: "#" },
+                  { label: "Conditions", href: "/conditions-utilisation" },
                 ]}
               />
               <FooterCol
                 title="Légal"
                 links={[
-                  { label: "Confidentialité", href: "/confidentialite" },
-                  { label: "CGU / CGV", href: "/cgu-cgv" },
-                  { label: "Mentions légales", href: "/mentions-legales" },
+                  { label: "Confidentialité", href: "/politique-confidentialite" },
+                  { label: "CGU / CGV", href: "/conditions-utilisation" },
+                  { label: "Mentions légales", href: "#" },
                 ]}
               />
             </div>
@@ -113,8 +113,8 @@ export default function Footer() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Pad&apos;Up. Tous droits réservés.</p>
           <div className="flex gap-4">
-            <Link className="hover:text-white" href="/confidentialite">Confidentialité</Link>
-            <Link className="hover:text-white" href="/mentions-legales">Mentions légales</Link>
+            <Link className="hover:text-white" href="/politique-confidentialite">Confidentialité</Link>
+            <Link className="hover:text-white" href="/conditions-utilisation">Conditions</Link>
           </div>
         </div>
       </div>
