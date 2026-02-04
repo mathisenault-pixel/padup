@@ -248,7 +248,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
             En vous connectant, vous acceptez nos{' '}
             <a href="/conditions-utilisation" target="_blank" className="underline hover:text-white/90 transition-colors">Conditions d&apos;utilisation</a>
             {' '}et notre{' '}
-            <a href="/politique-confidentialite" target="_blank" className="underline hover:text-white/90 transition-colors">Politique de confidentialité</a>
+            <a href="/confidentialite" target="_blank" className="underline hover:text-white/90 transition-colors">Politique de confidentialité</a>
           </p>
         </div>
       </div>

@@ -93,7 +93,7 @@ export default function Page() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Données personnelles</h2>
             <p className="text-gray-700 leading-relaxed">
               Les règles de traitement des données sont décrites dans la page{" "}
-              <Link href="/politique-confidentialite" className="text-blue-600 hover:underline">
+              <Link href="/confidentialite" className="text-blue-600 hover:underline">
                 Confidentialité
               </Link>
               .

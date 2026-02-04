@@ -98,7 +98,7 @@ export default function Footer() {
               <FooterCol
                 title="Légal"
                 links={[
-                  { label: "Confidentialité", href: "/politique-confidentialite" },
+                  { label: "Confidentialité", href: "/confidentialite" },
                   { label: "CGU / CGV", href: "/conditions-utilisation" },
                   { label: "Mentions légales", href: "/mentions-legales" },
                 ]}
@@ -113,7 +113,7 @@ export default function Footer() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Pad&apos;Up. Tous droits réservés.</p>
           <div className="flex gap-4">
-            <Link className="hover:text-white" href="/politique-confidentialite">Confidentialité</Link>
+            <Link className="hover:text-white" href="/confidentialite">Confidentialité</Link>
             <Link className="hover:text-white" href="/conditions-utilisation">Conditions</Link>
           </div>
         </div>
