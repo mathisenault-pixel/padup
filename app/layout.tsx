@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pad'Up",
+  title: "Pad'up | Plateforme de réservation de terrain de padel en France",
   description: "Plateforme de réservation de terrain de padel en France",
 };
 
