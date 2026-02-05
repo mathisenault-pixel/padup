@@ -331,14 +331,14 @@ export default function AccueilPage() {
       </section>
 
       {/* RAPPELS AUTOMATIQUES - STYLE PRO */}
-      <section className="bg-slate-950 text-slate-300">
+      <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           {/* Header */}
           <div className="mb-12 max-w-2xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 leading-tight">
               Rappels automatiques par e-mail
             </h2>
-            <p className="text-base text-slate-400 leading-relaxed">
+            <p className="text-base text-slate-600 leading-relaxed">
               Ne manquez plus jamais vos réservations. Recevez des notifications automatiques à chaque étape.
             </p>
           </div>
@@ -364,29 +364,29 @@ export default function AccueilPage() {
             ].map((feature, i) => (
               <div 
                 key={i} 
-                className="group border border-white/10 rounded-xl p-6 hover:border-white/20 hover:bg-white/5 transition-all"
+                className="group border border-slate-200 rounded-xl p-6 hover:border-slate-300 hover:bg-slate-50 transition-all"
               >
                 <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{feature.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
 
           {/* CTA Footer */}
-          <div className="mt-10 pt-10 border-t border-white/10">
+          <div className="mt-10 pt-10 border-t border-slate-200">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-slate-900">
                   Gérez vos préférences de notification
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   Activez ou désactivez les rappels depuis votre profil
                 </p>
               </div>
               <Link
                 href="/player/profil"
-                className="text-sm text-slate-400 hover:text-white transition-colors font-medium inline-flex items-center gap-2 group"
+                className="text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium inline-flex items-center gap-2 group"
               >
                 Accéder aux paramètres
                 <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
