@@ -13,6 +13,7 @@ import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { getCitySuggestions } from '@/lib/cities'
 import { haversineKm, formatTravelTime, estimateMinutes, formatDistance } from '@/lib/geoUtils'
+import { SectionDivider } from '@/components/ui/SectionDivider'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
@@ -141,13 +142,13 @@ export default function AccueilPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50/30">
       {/* Hero - PREMIUM */}
       <section className="px-6 pt-6 md:pt-12 pb-16 md:pb-24">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <div className="inline-block mb-6">
-              <span className="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
+              <span className="px-6 py-2 bg-slate-900 text-white text-sm font-bold rounded-full shadow-lg">
                 Jouez plus, cherchez moins
               </span>
             </div>
@@ -185,13 +186,13 @@ export default function AccueilPage() {
                 <span className="text-sm text-gray-500 font-medium">🇫🇷 Made in France</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="font-medium">Disponibilités en temps réel</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="font-medium">Réservations sans frais</span>
@@ -212,7 +213,7 @@ export default function AccueilPage() {
             <button
               type="button"
               onClick={() => router.push('/player/clubs')}
-              className="hidden md:flex items-center gap-2 text-gray-900 font-bold hover:text-blue-600 transition-colors"
+              className="hidden md:flex items-center gap-2 text-gray-900 font-bold hover:text-slate-700 transition-colors"
             >
               Voir tout
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,13 +270,13 @@ export default function AccueilPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                   
                   {index === 0 && (
-                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg">
+                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-lg">
                       ⭐ Top choix
                     </div>
                   )}
 
                   <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg shadow-lg">
-                    <svg className="w-4 h-4 text-blue-600 fill-current" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-slate-900 fill-current" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                     <span className="text-sm font-black text-gray-900">{club.note.toFixed(1)}</span>
@@ -329,6 +330,8 @@ export default function AccueilPage() {
           </div>
         </div>
       </section>
+
+      <SectionDivider />
 
       {/* RAPPELS AUTOMATIQUES - STYLE PRO */}
       <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
@@ -398,6 +401,8 @@ export default function AccueilPage() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* CTA - STYLE PRO */}
       <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
         <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
@@ -415,7 +420,7 @@ export default function AccueilPage() {
               <button
                 type="button"
                 onClick={() => router.push('/player/clubs')}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl"
               >
                 Commencer maintenant
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -453,6 +458,8 @@ export default function AccueilPage() {
           </div>
         </div>
       </section>
+
+      <SectionDivider />
 
       {/* FAQ - STYLE PRO */}
       <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
@@ -549,8 +556,8 @@ export default function AccueilPage() {
                 <p className="text-xs font-bold text-gray-600 uppercase">Terrains</p>
               </div>
               <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-2xl font-black text-blue-600 mb-1">{selectedClub.note.toFixed(1)}★</p>
-                <p className="text-xs font-bold text-blue-700 uppercase">Note</p>
+                <p className="text-2xl font-black text-slate-900 mb-1">{selectedClub.note.toFixed(1)}★</p>
+                <p className="text-xs font-bold text-slate-700 uppercase">Note</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-4 text-center">
                 <p className="text-2xl font-black text-gray-900 mb-1">{selectedClub.prixMin}€</p>

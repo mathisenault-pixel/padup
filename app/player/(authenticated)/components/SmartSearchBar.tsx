@@ -164,7 +164,7 @@ export default function SmartSearchBar({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className={`relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 ${
-        isFocused ? 'ring-2 ring-blue-500 shadow-lg' : ''
+        isFocused ? 'ring-2 ring-slate-400 shadow-lg' : ''
       }`}>
         <div className={`flex items-center gap-3 ${compact ? 'px-4' : 'px-6'}`}>
           <svg className={`${compact ? 'w-5 h-5' : 'w-6 h-6'} text-gray-400 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,24 +223,24 @@ export default function SmartSearchBar({
                 onMouseEnter={() => setSelectedIndex(index)}
                 className={`w-full flex items-center gap-3 px-4 py-3 transition-all group text-left ${
                   selectedIndex === index 
-                    ? 'bg-blue-50' 
-                    : 'hover:bg-blue-50'
+                    ? 'bg-slate-50' 
+                    : 'hover:bg-slate-50'
                 }`}
               >
                 <span className="text-lg flex-shrink-0">{suggestion.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className={`font-semibold transition-colors truncate text-sm ${
                     selectedIndex === index
-                      ? 'text-blue-600'
-                      : 'text-gray-900 group-hover:text-blue-600'
+                      ? 'text-slate-900'
+                      : 'text-gray-900 group-hover:text-slate-900'
                   }`}>
                     {suggestion.text}
                   </p>
                 </div>
                 <svg className={`w-4 h-4 transition-colors flex-shrink-0 ${
                   selectedIndex === index
-                    ? 'text-blue-600'
-                    : 'text-gray-400 group-hover:text-blue-600'
+                    ? 'text-slate-900'
+                    : 'text-gray-400 group-hover:text-slate-900'
                 }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -258,7 +258,7 @@ export default function SmartSearchBar({
                   setHistory([])
                   localStorage.removeItem(storageKey)
                 }}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                className="text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors"
               >
                 Effacer
               </button>

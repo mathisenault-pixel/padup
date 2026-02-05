@@ -72,7 +72,7 @@ export default function AuthStatus() {
   if (isLoading) {
     return (
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }

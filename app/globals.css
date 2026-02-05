@@ -3,33 +3,9 @@
 /* Design System Premium - Padup.one */
 
 :root {
-  /* Palette Simplifiée - Noir, Blanc, Orange, Bleu */
-  --primary-orange: #ff6b35;
-  /* Orange principal */
-  --primary-blue: #2563eb;
-  /* Bleu principal */
-
-  --blue-50: #fff7ed;
-  --blue-100: #ffedd5;
-  --blue-200: #fed7aa;
-  --blue-300: #fdba74;
-  --blue-400: #fb923c;
-  --blue-500: #ff6b35;
-  --blue-600: #ea580c;
-  --blue-700: #c2410c;
-  --blue-800: #9a3412;
-  --blue-900: #7c2d12;
-
-  --blue-50: #eff6ff;
-  --blue-100: #dbeafe;
-  --blue-200: #bfdbfe;
-  --blue-300: #93c5fd;
-  --blue-400: #60a5fa;
-  --blue-500: #2563eb;
-  --blue-600: #1d4ed8;
-  --blue-700: #1e40af;
-  --blue-800: #1e3a8a;
-  --blue-900: #1e293b;
+  /* Palette Premium - Blanc, Gris, Noir */
+  --primary: #0f172a; /* slate-900 */
+  --primary-hover: #1e293b; /* slate-800 */
 
   /* Noirs et Blancs */
   --black: #000000;
@@ -172,13 +148,13 @@ h6 {
 
 /* Focus States Premium */
 *:focus-visible {
-  outline: 2px solid var(--primary-500);
+  outline: 2px solid #94a3b8; /* slate-400 */
   outline-offset: 2px;
   border-radius: 4px;
 }
 
 /* Selection Premium */
 ::selection {
-  background-color: var(--primary-200);
-  color: var(--neutral-900);
+  background-color: #e2e8f0; /* slate-200 */
+  color: #0f172a; /* slate-900 */
 }
