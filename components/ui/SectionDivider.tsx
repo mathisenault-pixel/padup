@@ -1,11 +1,11 @@
 /**
- * Séparateur visuel entre sections
- * Ligne fine, sobre, premium (sans bleu)
+ * Séparateur visuel vertical entre sections
+ * Barre courte, élégante, premium (sans bleu)
  */
 export function SectionDivider({ className = '' }: { className?: string }) {
   return (
-    <div className={`my-10 md:my-14 w-full flex justify-center px-6 ${className}`}>
-      <div className="h-px w-full max-w-5xl bg-slate-200" />
+    <div className={`my-14 md:my-16 flex justify-center ${className}`}>
+      <div className="w-[3px] h-14 bg-slate-400 rounded-full" />
     </div>
   )
 }
