@@ -398,27 +398,57 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* CTA - PREMIUM */}
-      <section className="py-20 px-6 bg-white">
-        <div className="container mx-auto max-w-5xl">
-          <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100">
-            <div className="relative px-12 py-16 text-center">
-              <h2 className="text-6xl font-black text-gray-900 mb-6">
-                Prêt à jouer ?
-              </h2>
-              <p className="text-2xl text-gray-600 mb-10">
-                Rejoignez plus de 10 000 joueurs sur Pad'Up
-              </p>
+      {/* CTA - STYLE PRO */}
+      <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
+          {/* Contenu centré */}
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
+              Prêt à jouer ?
+            </h2>
+            <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-10">
+              Rejoignez plus de 10 000 joueurs qui font confiance à Pad'Up pour réserver leurs terrains de padel partout en France.
+            </p>
+            
+            {/* CTA principal + lien secondaire */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 type="button"
                 onClick={() => router.push('/player/clubs')}
-                className="inline-flex items-center gap-3 px-12 py-5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all text-lg shadow-2xl shadow-blue-600/50"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
               >
                 Commencer maintenant
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
+              <Link
+                href="/a-propos"
+                className="text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium inline-flex items-center gap-2 group"
+              >
+                En savoir plus sur Pad'Up
+                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+
+          {/* Statistiques / Social proof */}
+          <div className="mt-14 pt-12 border-t border-slate-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
+              <div>
+                <p className="text-3xl font-bold text-slate-900 mb-2">10 000+</p>
+                <p className="text-sm text-slate-600">Joueurs actifs</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-slate-900 mb-2">50+</p>
+                <p className="text-sm text-slate-600">Clubs partenaires</p>
+              </div>
+              <div>
+                <p className="text-3xl font-bold text-slate-900 mb-2">4.8/5</p>
+                <p className="text-sm text-slate-600">Note moyenne</p>
+              </div>
             </div>
           </div>
         </div>
