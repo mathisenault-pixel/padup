@@ -375,29 +375,6 @@ export default function AccueilPage() {
               </div>
             ))}
           </div>
-
-          {/* CTA Footer */}
-          <div className="mt-16">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="max-w-md">
-                <p className="text-sm font-semibold text-slate-900">
-                  Gérez vos préférences de notification
-                </p>
-                <p className="text-xs text-slate-500 mt-1.5">
-                  Activez ou désactivez les rappels depuis votre profil
-                </p>
-              </div>
-              <Link
-                href="/player/profil"
-                className="text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium inline-flex items-center gap-2 group flex-shrink-0"
-              >
-                Accéder aux paramètres
-                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          </div>
         </div>
       </section>
 
