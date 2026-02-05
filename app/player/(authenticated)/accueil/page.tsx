@@ -202,7 +202,7 @@ export default function AccueilPage() {
       </section>
 
       {/* Clubs - CAROUSEL CARDS STYLE */}
-      <section className="pt-[3px] pb-20 px-6 bg-white">
+      <section className="pt-[3px] pb-8 md:pb-12 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -331,8 +331,8 @@ export default function AccueilPage() {
       </section>
 
       {/* RAPPELS AUTOMATIQUES - STYLE PRO */}
-      <section className="bg-white my-16 md:my-20">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-20 md:py-24">
+      <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
           {/* Header */}
           <div className="mb-16 max-w-3xl">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
