@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
@@ -12,18 +12,33 @@ import SmartSearchBar from '../components/SmartSearchBar'
 import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { getCitySuggestions } from '@/lib/cities'
+import { haversineKm, formatTravelTime, estimateMinutes } from '@/lib/geoUtils'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
   name: string // ✅ Correspond à public.clubs.name
   city: string // ✅ Correspond à public.clubs.city
+  lat: number // ✅ Latitude GPS
+  lng: number // ✅ Longitude GPS
   distance: string
+  distanceKm?: number // ✅ Distance calculée (si géoloc active)
   nombreTerrains: number
   note: number
   avis: number
   photo: string
   imageUrl: string
   prixMin: number
+}
+
+/**
+ * Coordonnées GPS des clubs (hardcodé pour MVP)
+ * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
+ */
+const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  'a1b2c3d4-e5f6-4789-a012-3456789abcde': { lat: 43.9781, lng: 4.6911 }, // Le Hangar - Rochefort-du-Gard
+  'b2c3d4e5-f6a7-4890-b123-456789abcdef': { lat: 43.9608, lng: 4.8583 }, // Paul & Louis - Le Pontet
+  'c3d4e5f6-a7b8-4901-c234-56789abcdef0': { lat: 43.8519, lng: 4.7111 }, // ZE Padel - Boulbon
+  'd4e5f6a7-b8c9-4012-d345-6789abcdef01': { lat: 44.0528, lng: 4.6981 }, // QG Padel - Saint-Laurent-des-Arbres
 }
 
 export default function AccueilPage() {
@@ -61,18 +76,23 @@ export default function AccueilPage() {
       console.log('[ACCUEIL] Data:', data)
       
       // Transformer les données Supabase en format UI
-      const clubsWithUI = (data || []).map((club, index) => ({
-        id: club.id,
-        name: club.name || 'Club sans nom',
-        city: club.city || 'Ville non spécifiée',
-        distance: `${5 + index * 5} min`, // TODO: Calculer avec géolocation
-        nombreTerrains: 6 + index * 2, // TODO: Compter depuis public.courts
-        note: 4.6 + (index * 0.1),
-        avis: 100 + index * 50,
-        photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
-        imageUrl: getClubImage(club.id), // ✅ Image par clubId
-        prixMin: 11 + index,
-      }))
+      const clubsWithUI = (data || []).map((club, index) => {
+        const coords = CLUB_COORDINATES[club.id] || { lat: 43.9, lng: 4.8 } // Fallback Avignon
+        return {
+          id: club.id,
+          name: club.name || 'Club sans nom',
+          city: club.city || 'Ville non spécifiée',
+          lat: coords.lat,
+          lng: coords.lng,
+          distance: `${5 + index * 5} min`, // Sera recalculé avec géoloc
+          nombreTerrains: 6 + index * 2, // TODO: Compter depuis public.courts
+          note: 4.6 + (index * 0.1),
+          avis: 100 + index * 50,
+          photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
+          imageUrl: getClubImage(club.id), // ✅ Image par clubId
+          prixMin: 11 + index,
+        }
+      })
       
       // ✅ Filtrer pour exclure le Club Démo
       const filteredClubs = filterOutDemoClub(clubsWithUI)
@@ -84,6 +104,36 @@ export default function AccueilPage() {
     
     loadClubs()
   }, [])
+
+  // ============================================
+  // CALCUL DES DISTANCES ET TRI
+  // ============================================
+  const clubsWithDistance = useMemo(() => {
+    if (!userCoords) {
+      // Pas de géoloc: retourner les clubs sans tri
+      return clubs
+    }
+
+    // Calculer la distance pour chaque club
+    const clubsWithDist = clubs.map(club => {
+      const distanceKm = haversineKm(
+        userCoords.lat,
+        userCoords.lng,
+        club.lat,
+        club.lng
+      )
+      const distanceMinutes = estimateMinutes(distanceKm)
+      
+      return {
+        ...club,
+        distanceKm,
+        distance: formatTravelTime(distanceMinutes)
+      }
+    })
+
+    // Trier du plus proche au plus éloigné
+    return clubsWithDist.sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0))
+  }, [clubs, userCoords])
 
   const handleReserver = (club: Club) => {
     setSelectedClub(club)
@@ -178,7 +228,7 @@ export default function AccueilPage() {
                 setUserCoords(coords);
                 setLocationStatus('success');
                 console.log('📍 Position détectée:', coords);
-                // TODO: Trier les clubs par distance réelle
+                console.log('✅ Les clubs vont être triés par distance réelle');
               }}
             />
             
@@ -189,14 +239,14 @@ export default function AccueilPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm font-medium text-green-800">
-                  📍 Position détectée ! Nous allons bientôt afficher les clubs les plus proches de vous.
+                  📍 Position détectée ! Les clubs sont maintenant triés du plus proche au plus éloigné.
                 </p>
               </div>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {clubs.map((club, index) => (
+            {clubsWithDistance.map((club, index) => (
               <Link
                 key={club.id}
                 href={`/player/clubs/${club.id}/reserver`}
