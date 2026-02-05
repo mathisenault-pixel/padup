@@ -86,7 +86,7 @@ export default function ParametresPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                   placeholder="votre-email@exemple.com"
                   required
                 />
@@ -94,7 +94,7 @@ export default function ParametresPage() {
               
               <button
                 type="submit"
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+                className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all"
               >
                 Enregistrer l'email
               </button>
@@ -118,7 +118,7 @@ export default function ParametresPage() {
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                     placeholder="••••••••"
                     required
                   />
@@ -132,7 +132,7 @@ export default function ParametresPage() {
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                     placeholder="••••••••"
                     required
                   />
@@ -147,7 +147,7 @@ export default function ParametresPage() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                     placeholder="••••••••"
                     required
                   />
@@ -156,7 +156,7 @@ export default function ParametresPage() {
               
               <button
                 type="submit"
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+                className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all"
               >
                 Changer le mot de passe
               </button>
@@ -174,8 +174,8 @@ export default function ParametresPage() {
               {/* Email */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -190,7 +190,7 @@ export default function ParametresPage() {
                     handleNotificationsChange()
                   }}
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    notifications.email ? 'bg-blue-600' : 'bg-gray-300'
+                    notifications.email ? 'bg-slate-900' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -204,8 +204,8 @@ export default function ParametresPage() {
               {/* SMS */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -220,7 +220,7 @@ export default function ParametresPage() {
                     handleNotificationsChange()
                   }}
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    notifications.sms ? 'bg-blue-600' : 'bg-gray-300'
+                    notifications.sms ? 'bg-slate-900' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -234,8 +234,8 @@ export default function ParametresPage() {
               {/* Push */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                   </div>
@@ -250,7 +250,7 @@ export default function ParametresPage() {
                     handleNotificationsChange()
                   }}
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    notifications.push ? 'bg-blue-600' : 'bg-gray-300'
+                    notifications.push ? 'bg-slate-900' : 'bg-gray-300'
                   }`}
                 >
                   <span

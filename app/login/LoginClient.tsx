@@ -98,11 +98,11 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
   const isRedirected = callbackUrl && callbackUrl !== '/player/accueil'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-blue-900 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-slate-900 flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Effets de fond premium */}
       <div className="absolute inset-0 bg-[url('/images/texture.png')] opacity-5"></div>
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-slate-500/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-600/20 rounded-full blur-3xl"></div>
       
       <div className="w-full max-w-md relative z-10">
         {/* Bouton retour premium */}
@@ -121,7 +121,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-10 animate-scale-in">
           {/* Logo et titre premium */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-xl p-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-800 rounded-2xl mb-6 shadow-xl p-2">
               <img 
                 src="/icon.png" 
                 alt="Pad'Up Logo" 
@@ -134,16 +134,16 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
 
           {/* Message si redirigé depuis une page protégée */}
           {isRedirected && (
-            <div className="mb-8 p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-2xl">
+            <div className="mb-8 p-4 bg-slate-100 border border-slate-300 rounded-2xl">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-blue-900 mb-1">Connexion requise</p>
-                  <p className="text-sm text-blue-800">Connectez-vous pour accéder à cette page</p>
+                  <p className="text-sm font-bold text-slate-900 mb-1">Connexion requise</p>
+                  <p className="text-sm text-slate-700">Connectez-vous pour accéder à cette page</p>
                 </div>
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 type="email"
                 required
                 disabled={isPending}
-                className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:opacity-50 text-gray-900 font-medium placeholder:text-gray-400"
+                className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none transition-all disabled:opacity-50 text-gray-900 font-medium placeholder:text-gray-400"
                 placeholder="vous@exemple.com"
               />
             </div>
@@ -189,7 +189,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 required
                 disabled={isPending}
                 minLength={6}
-                className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:opacity-50 text-gray-900 font-medium placeholder:text-gray-400"
+                className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none transition-all disabled:opacity-50 text-gray-900 font-medium placeholder:text-gray-400"
                 placeholder="••••••••"
               />
               <p className="mt-2 text-xs text-gray-500">Minimum 6 caractères</p>
@@ -217,7 +217,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 type="submit"
                 data-action="signup"
                 disabled={isPending}
-                className="flex-1 px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 hover:scale-105"
+                className="flex-1 px-6 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 hover:scale-105"
               >
                 Inscription
               </button>

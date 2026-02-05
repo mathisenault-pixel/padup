@@ -106,15 +106,15 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
         {/* Vous */}
         <div className="mb-6">
           <h4 className="text-sm font-bold text-gray-600 mb-3 uppercase">Organisateur</h4>
-          <div className="bg-blue-50 border-2 border-blue-600 rounded-xl p-4 flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
+          <div className="bg-slate-100 border-2 border-slate-300 rounded-xl p-4 flex items-center gap-3">
+            <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xl font-bold">
               M
             </div>
             <div className="flex-1">
               <div className="font-bold text-gray-900">Moi (Joueur Démo)</div>
               <div className="text-sm text-gray-600">Organisateur</div>
             </div>
-            <div className="px-3 py-1 bg-blue-600 text-white text-sm font-bold rounded-lg">
+            <div className="px-3 py-1 bg-slate-900 text-white text-sm font-bold rounded-lg">
               Confirmé
             </div>
           </div>
@@ -128,8 +128,8 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
               {selectedPlayers.map(playerId => {
                 const player = availablePlayers.find(p => p.id === playerId)
                 return player ? (
-                  <div key={player.id} className="bg-blue-50 border-2 border-blue-600 rounded-xl p-4 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                  <div key={player.id} className="bg-slate-100 border-2 border-slate-300 rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xl font-bold">
                       {player.name.charAt(0)}
                     </div>
                     <div className="flex-1">
@@ -188,7 +188,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleInvite()}
-                className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
               />
               <button
                 type="button"
@@ -216,7 +216,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                 placeholder="Rechercher un joueur..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900 placeholder-gray-400"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900 placeholder-gray-400"
               />
               {searchQuery && (
                 <button
@@ -241,7 +241,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
                     type="button"
                     key={player.id}
                     onClick={() => togglePlayer(player.id)}
-                    className="bg-white border-2 border-gray-200 hover:border-blue-600 rounded-xl p-4 flex items-center gap-3 transition-all text-left"
+                    className="bg-white border-2 border-gray-200 hover:border-slate-400 rounded-xl p-4 flex items-center gap-3 transition-all text-left"
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold ${
                       player.level === 'Invité' 
@@ -299,7 +299,7 @@ export default function PlayerSelectionModal({ onClose, onContinue, clubName, ti
             className={`flex-1 px-6 py-3 rounded-xl font-bold transition-all ${
               isProcessing
                 ? 'bg-gray-400 cursor-not-allowed text-gray-200'
-                : 'bg-blue-600 hover:bg-blue-500 text-white'
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
             }`}
           >
             {isProcessing ? '⏳ Traitement...' : 'Continuer'}

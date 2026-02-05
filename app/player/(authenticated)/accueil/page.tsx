@@ -143,10 +143,10 @@ export default function AccueilPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50/30">
-      {/* Hero - PREMIUM */}
-      <section className="px-6 pt-6 md:pt-12 pb-16 md:pb-24">
+      {/* Hero - PREMIUM - Full Screen */}
+      <section className="px-6 py-8 md:py-12 min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)] flex items-center justify-center">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
+          <div className="text-center">
             <div className="inline-block mb-6">
               <span className="px-6 py-2 bg-slate-900 text-white text-sm font-bold rounded-full shadow-lg">
                 Jouez plus, cherchez moins
@@ -202,13 +202,8 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* Séparation Hero → Clubs */}
-      <div className="mt-10 mb-10 w-full flex justify-center px-6">
-        <div className="h-px w-full max-w-5xl bg-slate-200" />
-      </div>
-
       {/* Clubs - CAROUSEL CARDS STYLE */}
-      <section className="pt-[3px] pb-8 md:pb-12 px-6 bg-white">
+      <section className="pt-12 md:pt-16 pb-8 md:pb-12 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-end justify-between mb-6">
             <div>
@@ -560,7 +555,7 @@ export default function AccueilPage() {
                 <p className="text-2xl font-black text-gray-900 mb-1">{selectedClub.nombreTerrains}</p>
                 <p className="text-xs font-bold text-gray-600 uppercase">Terrains</p>
               </div>
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
+              <div className="bg-slate-100 rounded-xl p-4 text-center">
                 <p className="text-2xl font-black text-slate-900 mb-1">{selectedClub.note.toFixed(1)}★</p>
                 <p className="text-xs font-bold text-slate-700 uppercase">Note</p>
               </div>

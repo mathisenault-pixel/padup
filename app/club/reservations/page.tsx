@@ -78,7 +78,7 @@ export default function ClubReservationsPage() {
           onClick={() => setActiveTab('reservations')}
           className={`px-6 py-3 font-semibold transition-all border-b-2 ${
             activeTab === 'reservations'
-              ? 'border-blue-600 text-blue-600'
+              ? 'border-slate-900 text-slate-700'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -126,8 +126,8 @@ export default function ClubReservationsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+                          <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
@@ -252,14 +252,14 @@ export default function ClubReservationsPage() {
       )}
 
       {/* Info Note */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div className="bg-slate-100 border border-slate-300 rounded-xl p-4">
         <div className="flex gap-3">
-          <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-blue-900 mb-1">Synchronisation en temps réel</p>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm font-semibold text-slate-900 mb-1">Synchronisation en temps réel</p>
+            <p className="text-sm text-slate-700">
               Les annulations sont instantanées. Les créneaux annulés redeviennent immédiatement disponibles côté joueur.
             </p>
           </div>

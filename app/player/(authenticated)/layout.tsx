@@ -25,7 +25,7 @@ export default function PlayerAuthLayout({
               onClick={() => router.push('/player/accueil')}
               className="group flex items-center gap-2 transition-all"
             >
-              <span className="text-lg md:text-xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">Pad&apos;Up</span>
+              <span className="text-lg md:text-xl font-bold text-gray-900 tracking-tight group-hover:text-slate-900 transition-colors">Pad&apos;Up</span>
             </button>
 
             {/* Navigation Center */}
@@ -38,7 +38,7 @@ export default function PlayerAuthLayout({
               {/* Messages - Visible uniquement sur mobile (icône seulement) */}
               <Link
                 href="/player/messages"
-                className="lg:hidden flex items-center gap-2 px-2 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                className="lg:hidden flex items-center gap-2 px-2 py-2 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -48,7 +48,7 @@ export default function PlayerAuthLayout({
               {/* Espace club - Visible desktop et mobile */}
               <Link
                 href="/club-access"
-                className="flex items-center gap-2 px-2 md:px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                className="flex items-center gap-2 px-2 md:px-4 py-2 text-sm font-medium text-gray-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />

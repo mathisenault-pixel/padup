@@ -82,7 +82,7 @@ export default function InviteButton({ clubName, dateText, bookingUrl }: InviteB
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg transition-colors shadow-sm hover:shadow-md"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -113,9 +113,9 @@ export default function InviteButton({ clubName, dateText, bookingUrl }: InviteB
             </div>
 
             {/* Info réservation */}
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm font-semibold text-blue-900 mb-1">{clubName}</p>
-              <p className="text-sm text-blue-700">{dateText}</p>
+            <div className="mb-6 p-4 bg-slate-100 border border-slate-300 rounded-lg">
+              <p className="text-sm font-semibold text-slate-900 mb-1">{clubName}</p>
+              <p className="text-sm text-slate-700">{dateText}</p>
             </div>
 
             {/* Success message */}
@@ -151,7 +151,7 @@ export default function InviteButton({ clubName, dateText, bookingUrl }: InviteB
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ami@example.com"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none transition-all"
                   disabled={isLoading || success}
                   required
                 />
@@ -168,7 +168,7 @@ export default function InviteButton({ clubName, dateText, bookingUrl }: InviteB
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Ajoute un message pour ton ami..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent outline-none transition-all resize-none"
                   disabled={isLoading || success}
                 />
               </div>
@@ -188,7 +188,7 @@ export default function InviteButton({ clubName, dateText, bookingUrl }: InviteB
                 type="button"
                 onClick={handleSendInvite}
                 disabled={isLoading || success || !email}
-                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
                   <>

@@ -35,7 +35,7 @@ export default function ClubBookingsPage() {
             </Link>
             <Link 
               href="/club/bookings" 
-              className="py-3 border-b-2 border-blue-600 text-blue-600 font-semibold text-sm"
+              className="py-3 border-b-2 border-slate-900 text-slate-700 font-semibold text-sm"
             >
               Planning
             </Link>
@@ -96,7 +96,7 @@ export default function ClubBookingsPage() {
               >
                 <div className="text-sm text-gray-900">{(i % 30) + 1}</div>
                 {i % 3 === 0 && (
-                  <div className="text-xs text-blue-600 mt-1">3 rés.</div>
+                  <div className="text-xs text-slate-700 mt-1">3 rés.</div>
                 )}
               </div>
             ))}
@@ -140,7 +140,7 @@ export default function ClubBookingsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <button className="text-blue-600 hover:text-blue-700 font-semibold">
+                    <button className="text-slate-700 hover:text-slate-700 font-semibold">
                       Voir détails
                     </button>
                   </td>

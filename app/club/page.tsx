@@ -42,7 +42,7 @@ export default function ClubDashboardPage() {
   if (!clubData) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
       </div>
     )
   }
@@ -50,9 +50,9 @@ export default function ClubDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl p-8 shadow-lg">
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-8 shadow-lg">
         <h1 className="text-3xl font-bold mb-2">Bienvenue ! 👋</h1>
-        <p className="text-blue-100 text-lg">Tableau de bord - {clubData.name}</p>
+        <p className="text-slate-100 text-lg">Tableau de bord - {clubData.name}</p>
       </div>
 
       {/* Stats Cards */}
@@ -60,8 +60,8 @@ export default function ClubDashboardPage() {
         {/* Réservations aujourd'hui */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
+              <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
@@ -114,10 +114,10 @@ export default function ClubDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link
           href="/club/courts"
-          className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
+          className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-slate-300 hover:shadow-lg transition-all group"
         >
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-all">
-            <svg className="w-6 h-6 text-blue-600 group-hover:text-white transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-slate-900 transition-all">
+            <svg className="w-6 h-6 text-slate-700 group-hover:text-white transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
             </svg>
           </div>
@@ -127,7 +127,7 @@ export default function ClubDashboardPage() {
 
         <Link
           href="/club/reservations"
-          className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
+          className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-slate-300 hover:shadow-lg transition-all group"
         >
           <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 transition-all">
             <svg className="w-6 h-6 text-green-600 group-hover:text-white transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +140,7 @@ export default function ClubDashboardPage() {
 
         <Link
           href="/club/settings"
-          className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
+          className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-slate-300 hover:shadow-lg transition-all group"
         >
           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-gray-600 transition-all">
             <svg className="w-6 h-6 text-gray-600 group-hover:text-white transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">

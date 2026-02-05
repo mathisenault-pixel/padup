@@ -41,7 +41,7 @@ export default function ClubProductsPage() {
             </Link>
             <Link 
               href="/club/products" 
-              className="py-3 border-b-2 border-blue-600 text-blue-600 font-semibold text-sm"
+              className="py-3 border-b-2 border-slate-900 text-slate-700 font-semibold text-sm"
             >
               Produits
             </Link>
@@ -56,7 +56,7 @@ export default function ClubProductsPage() {
             <h2 className="text-2xl font-black text-gray-900 mb-2">Gestion des produits</h2>
             <p className="text-gray-600">Gérez boissons, snacks et extras vendus au club</p>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
+          <button className="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
             + Ajouter un produit
           </button>
         </div>
@@ -69,7 +69,7 @@ export default function ClubProductsPage() {
                 key={cat}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                   cat === 'Tous' 
-                    ? 'bg-blue-600 text-white' 
+                    ? 'bg-slate-900 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >

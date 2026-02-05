@@ -53,7 +53,7 @@ export default function HealthPage() {
       <div className="max-w-2xl w-full">
         <div className={`rounded-lg p-8 shadow-lg border-2 ${
           status === 'loading' 
-            ? 'bg-blue-50 border-blue-200' 
+            ? 'bg-slate-100 border-slate-300' 
             : status === 'success' 
             ? 'bg-green-50 border-green-200' 
             : 'bg-red-50 border-red-200'
@@ -73,8 +73,8 @@ export default function HealthPage() {
           <div className="mb-6">
             {status === 'loading' && (
               <div className="flex items-center gap-3">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="text-lg font-semibold text-blue-900">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+                <span className="text-lg font-semibold text-slate-900">
                   Connexion en cours...
                 </span>
               </div>
@@ -142,7 +142,7 @@ export default function HealthPage() {
 
         {/* Navigation */}
         <div className="mt-6 text-center">
-          <a href="/" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <a href="/" className="text-slate-700 hover:text-slate-700 font-semibold">
             ← Retour à l'accueil
           </a>
         </div>

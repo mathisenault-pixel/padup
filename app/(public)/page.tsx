@@ -30,7 +30,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/book"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-lg transition-colors"
+              className="inline-block bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-3 rounded-lg transition-colors"
             >
               Réserver un terrain
             </Link>
@@ -54,7 +54,7 @@ export default function LandingPage() {
                 <p className="text-sm text-gray-600 mb-4">Adresse du club...</p>
                 <Link 
                   href={`/book/club-${i}`}
-                  className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
+                  className="text-slate-700 hover:text-slate-900 font-semibold text-sm"
                 >
                   Voir disponibilités →
                 </Link>

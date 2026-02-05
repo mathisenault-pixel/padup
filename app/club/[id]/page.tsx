@@ -82,7 +82,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ id:
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg border border-gray-200 p-8">
           <div className="mb-6">
-            <div className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full mb-4">
+            <div className="inline-block px-3 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-full mb-4">
               Club
             </div>
             <h2 className="text-3xl font-black text-gray-900 mb-2">{club.name}</h2>
@@ -107,7 +107,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ id:
                 <p className="text-sm font-semibold text-gray-500 mb-1">Téléphone</p>
                 <a 
                   href={`tel:${club.phone}`} 
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-slate-700 hover:text-slate-700 font-semibold"
                 >
                   {club.phone}
                 </a>
@@ -119,7 +119,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ id:
                 <p className="text-sm font-semibold text-gray-500 mb-1">Email</p>
                 <a 
                   href={`mailto:${club.email}`} 
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-slate-700 hover:text-slate-700 font-semibold"
                 >
                   {club.email}
                 </a>
@@ -137,7 +137,7 @@ export default async function ClubDetailPage({ params }: { params: Promise<{ id:
           <div className="mt-8 flex gap-4">
             <Link
               href="/player/clubs"
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg transition-colors"
             >
               Voir tous les clubs
             </Link>

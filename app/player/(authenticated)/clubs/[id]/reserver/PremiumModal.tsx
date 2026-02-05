@@ -130,8 +130,8 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
         {/* Abonnement Pad'up + - ULTRA ATTRACTIF */}
         <div className={`rounded-2xl p-6 mb-6 border-3 transition-all cursor-pointer relative overflow-hidden ${
           isPadupPlus 
-            ? 'bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 border-blue-600 shadow-2xl' 
-            : 'bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 hover:border-blue-500 shadow-xl hover:shadow-2xl'
+            ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 border-slate-900 shadow-2xl' 
+            : 'bg-gradient-to-br from-gray-900 to-gray-800 border-gray-700 hover:border-slate-600 shadow-xl hover:shadow-2xl'
         }`} onClick={() => setIsPadupPlus(!isPadupPlus)}>
           
           {/* Badge PROMO en haut à droite */}
@@ -142,9 +142,9 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4 flex-1">
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg ${
-                isPadupPlus ? 'bg-white' : 'bg-blue-600'
+                isPadupPlus ? 'bg-white' : 'bg-slate-900'
               }`}>
-                <svg className={`w-10 h-10 ${isPadupPlus ? 'text-blue-600' : 'text-white'}`} fill="currentColor" viewBox="0 0 20 20">
+                <svg className={`w-10 h-10 ${isPadupPlus ? 'text-slate-700' : 'text-white'}`} fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
@@ -155,30 +155,30 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                     Abonnement Pad'up +
                   </h4>
                   {isPadupPlus && (
-                    <span className="px-3 py-1 bg-white text-blue-600 text-sm rounded-full font-bold shadow-md">
+                    <span className="px-3 py-1 bg-white text-slate-700 text-sm rounded-full font-bold shadow-md">
                       ✓ Activé
                     </span>
                   )}
                 </div>
                 
-                <div className={`text-sm mb-3 ${isPadupPlus ? 'text-blue-100' : 'text-gray-300'}`}>
+                <div className={`text-sm mb-3 ${isPadupPlus ? 'text-slate-100' : 'text-gray-300'}`}>
                   Économisez sur tous vos repas au club 🍽️
                 </div>
                 
                 {/* Prix avec promo */}
                 <div className="flex items-baseline gap-3 mb-3">
-                  <div className={`text-lg line-through opacity-60 ${isPadupPlus ? 'text-blue-200' : 'text-gray-400'}`}>
+                  <div className={`text-lg line-through opacity-60 ${isPadupPlus ? 'text-slate-200' : 'text-gray-400'}`}>
                     12,49€
                   </div>
                   <div className={`text-4xl font-black ${isPadupPlus ? 'text-white' : 'text-yellow-400'}`}>
                     9,99€
                   </div>
-                  <div className={`text-sm ${isPadupPlus ? 'text-blue-100' : 'text-gray-300'}`}>
+                  <div className={`text-sm ${isPadupPlus ? 'text-slate-100' : 'text-gray-300'}`}>
                     /mois
                   </div>
                 </div>
                 
-                <div className={`text-xs font-semibold ${isPadupPlus ? 'text-blue-100' : 'text-gray-400'}`}>
+                <div className={`text-xs font-semibold ${isPadupPlus ? 'text-slate-100' : 'text-gray-400'}`}>
                   Sans engagement · Résiliable à tout moment
                 </div>
               </div>
@@ -189,14 +189,14 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
               <div className={`text-5xl font-black mb-1 ${isPadupPlus ? 'text-white' : 'text-yellow-400'}`}>
                 -20%
               </div>
-              <div className={`text-xs font-bold uppercase ${isPadupPlus ? 'text-blue-100' : 'text-gray-300'}`}>
+              <div className={`text-xs font-bold uppercase ${isPadupPlus ? 'text-slate-100' : 'text-gray-300'}`}>
                 Restauration
               </div>
             </div>
           </div>
           
           {/* Avantages mini-liste */}
-          <div className={`mt-4 pt-4 border-t ${isPadupPlus ? 'border-blue-400' : 'border-gray-600'}`}>
+          <div className={`mt-4 pt-4 border-t ${isPadupPlus ? 'border-slate-500' : 'border-gray-600'}`}>
             <div className="grid grid-cols-2 gap-2 text-sm">
               {[
                 { icon: '🍽️', text: '-20% sur tous les repas' },
@@ -243,7 +243,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                 onClick={() => setSelectedCategorie(cat)}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all ${
                   selectedCategorie === cat
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-slate-900 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -263,8 +263,8 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                   key={item.id}
                   className={`border-2 rounded-lg p-3 transition-all ${
                     qty > 0
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-gray-200 hover:border-blue-400'
+                      ? 'border-slate-900 bg-slate-100'
+                      : 'border-gray-200 hover:border-slate-400'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -276,7 +276,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                           {isPadupPlus && (
                             <span className="text-xs text-gray-400 line-through">{item.prix.toFixed(2)}€</span>
                           )}
-                          <span className={`font-bold text-sm ${isPadupPlus ? 'text-blue-600' : 'text-gray-900'}`}>
+                          <span className={`font-bold text-sm ${isPadupPlus ? 'text-slate-700' : 'text-gray-900'}`}>
                             {prixFinal.toFixed(2)}€
                           </span>
                         </div>
@@ -297,7 +297,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                           <button
                             type="button"
                             onClick={() => incrementItem(item.id)}
-                            className="w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center font-bold"
+                            className="w-7 h-7 bg-slate-900 hover:bg-slate-800 text-white rounded-lg flex items-center justify-center font-bold"
                           >
                             +
                           </button>
@@ -357,7 +357,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Restauration avec Pad'up +</span>
-                        <span className="font-bold text-blue-600 text-lg">{totalRestaurantFinal.toFixed(2)}€</span>
+                        <span className="font-bold text-slate-700 text-lg">{totalRestaurantFinal.toFixed(2)}€</span>
                       </div>
                     </>
                   ) : (
@@ -370,7 +370,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-xs text-yellow-700">Prix avec abonnement :</span>
-                            <span className="font-black text-blue-600">{totalRestaurantFinal.toFixed(2)}€</span>
+                            <span className="font-black text-slate-700">{totalRestaurantFinal.toFixed(2)}€</span>
                           </div>
                           <div className="text-xs text-green-600 font-bold mt-1">
                             ✓ Vous économisez {remiseRestaurant.toFixed(2)}€ sur ce repas !
@@ -393,7 +393,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-gray-400 line-through">12,49€</div>
-                    <span className="font-bold text-blue-600">9,99€</span>
+                    <span className="font-bold text-slate-700">9,99€</span>
                   </div>
                 </div>
               </div>
@@ -430,8 +430,8 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
               
               {/* Message incitatif si pas d'abonnement */}
               {!isPadupPlus && Object.keys(selectedItems).length > 0 && (
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-2">
-                  <div className="flex items-center gap-2 text-blue-700">
+                <div className="bg-slate-100 border-2 border-slate-300 rounded-lg p-3 mt-2">
+                  <div className="flex items-center gap-2 text-slate-700">
                     <span className="text-2xl">🎯</span>
                     <div className="flex-1">
                       <div className="font-black text-sm mb-1">
@@ -440,7 +440,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                       <div className="text-xs">
                         ✓ Économie immédiate de <span className="font-bold">{remiseRestaurant.toFixed(2)}€</span> sur ce repas<br/>
                         ✓ -20% sur tous vos futurs repas au club<br/>
-                        ✓ Abonnement à <span className="font-bold line-through">12,49€</span> <span className="font-bold text-blue-600">9,99€/mois</span>
+                        ✓ Abonnement à <span className="font-bold line-through">12,49€</span> <span className="font-bold text-slate-700">9,99€/mois</span>
                       </div>
                     </div>
                   </div>
@@ -459,7 +459,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
             className={`w-full px-6 py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${
               isProcessing
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
             }`}
           >
             {isProcessing ? '⏳ Traitement...' : '✅ Confirmer la réservation'}

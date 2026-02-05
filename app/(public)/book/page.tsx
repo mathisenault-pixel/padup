@@ -23,7 +23,7 @@ export default function BookPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <Link href="/" className="text-sm text-blue-600 hover:text-blue-700 mb-4 inline-block">
+          <Link href="/" className="text-sm text-slate-700 hover:text-slate-700 mb-4 inline-block">
             ← Retour à l'accueil
           </Link>
           <h1 className="text-3xl font-black text-gray-900 mb-2">
@@ -56,7 +56,7 @@ export default function BookPage() {
             <Link 
               key={i}
               href={`/book/club-${i}`}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-blue-500"
+              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-slate-400"
             >
               <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">
@@ -66,7 +66,7 @@ export default function BookPage() {
                 123 Rue Example, 75000 Paris
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-blue-600">
+                <span className="text-sm font-semibold text-slate-700">
                   À partir de 25€
                 </span>
                 <span className="text-sm text-gray-500">

@@ -80,7 +80,7 @@ export default function Page() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Vos droits</h2>
             <p className="text-gray-700 leading-relaxed">
               Conformément à la réglementation applicable, vous pouvez demander l&apos;accès, la rectification ou la suppression de vos données. Pour exercer vos droits, vous pouvez passer par la page{" "}
-              <Link href="/contact" className="text-blue-600 hover:underline">
+              <Link href="/contact" className="text-slate-700 hover:underline">
                 Contact
               </Link>
               .

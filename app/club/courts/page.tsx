@@ -30,7 +30,7 @@ export default function ClubCourtsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
       </div>
     )
   }
@@ -44,7 +44,7 @@ export default function ClubCourtsPage() {
           <p className="text-gray-600">Gérez les terrains de votre club</p>
         </div>
         <div className="text-right">
-          <p className="text-2xl font-bold text-blue-600">{courts.length}</p>
+          <p className="text-2xl font-bold text-slate-700">{courts.length}</p>
           <p className="text-sm text-gray-600">Terrains</p>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function ClubCourtsPage() {
                 <span
                   className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
                     court.type === 'indoor'
-                      ? 'bg-blue-100 text-blue-700'
+                      ? 'bg-slate-100 text-slate-700'
                       : 'bg-green-100 text-green-700'
                   }`}
                 >
@@ -116,14 +116,14 @@ export default function ClubCourtsPage() {
       </div>
 
       {/* Info Note (MVP) */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div className="bg-slate-100 border border-slate-300 rounded-xl p-4">
         <div className="flex gap-3">
-          <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-blue-900 mb-1">Mode MVP (front-only)</p>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm font-semibold text-slate-900 mb-1">Mode MVP (front-only)</p>
+            <p className="text-sm text-slate-700">
               Les modifications sont locales et temporaires. En production, les données seront sauvegardées dans Supabase.
             </p>
           </div>

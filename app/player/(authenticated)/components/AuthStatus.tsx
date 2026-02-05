@@ -121,7 +121,7 @@ export default function AuthStatus() {
       <button
         type="button"
         onClick={() => router.push('/login')}
-        className="hidden md:flex group relative px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-[14px] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+        className="hidden md:flex group relative px-6 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white text-[14px] font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
       >
         <span className="flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

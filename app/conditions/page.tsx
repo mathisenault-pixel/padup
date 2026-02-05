@@ -74,7 +74,7 @@ export default function Page() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Support et assistance</h2>
             <p className="text-gray-700 leading-relaxed">
               En cas de problème ou de question, l&apos;utilisateur peut contacter l&apos;équipe Pad&apos;Up via la page{" "}
-              <Link href="/contact" className="text-blue-600 hover:underline">
+              <Link href="/contact" className="text-slate-700 hover:underline">
                 Contact
               </Link>
               .

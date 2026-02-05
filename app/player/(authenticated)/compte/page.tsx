@@ -171,10 +171,10 @@ export default function AccountPage() {
 
   const getNiveauColor = (niveau: string) => {
     switch (niveau) {
-      case 'Débutant': return 'from-blue-500 to-blue-600'
-      case 'Intermédiaire': return 'from-blue-500 to-blue-600'
-      case 'Avancé': return 'from-blue-500 to-blue-600'
-      case 'Expert': return 'from-blue-500 to-blue-600'
+      case 'Débutant': return 'from-slate-700 to-slate-800'
+      case 'Intermédiaire': return 'from-slate-700 to-slate-800'
+      case 'Avancé': return 'from-slate-700 to-slate-800'
+      case 'Expert': return 'from-slate-700 to-slate-800'
       default: return 'from-gray-500 to-gray-600'
     }
   }
@@ -184,7 +184,7 @@ export default function AccountPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 font-semibold">Chargement...</p>
         </div>
       </div>
@@ -222,7 +222,7 @@ export default function AccountPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                className="px-8 py-4 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
               >
                 <span className="flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +235,7 @@ export default function AccountPage() {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="px-8 py-4 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               <span className="flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +282,7 @@ export default function AccountPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center text-white text-5xl font-bold shadow-xl relative group-hover:shadow-2xl group-hover:scale-105 transition-all">
+                      <div className="w-32 h-32 bg-gradient-to-br from-slate-700 to-slate-800 rounded-3xl flex items-center justify-center text-white text-5xl font-bold shadow-xl relative group-hover:shadow-2xl group-hover:scale-105 transition-all">
                         {profil.prenom[0]}{profil.nom[0]}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-3xl flex items-center justify-center">
                           <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,7 +293,7 @@ export default function AccountPage() {
                       </div>
                     )}
                   </label>
-                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full border-4 border-white flex items-center justify-center shadow-lg">
+                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-slate-700 rounded-full border-4 border-white flex items-center justify-center shadow-lg">
                     <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
@@ -307,7 +307,7 @@ export default function AccountPage() {
                 <p className="text-gray-600 mb-4">{profil.email}</p>
 
                 {/* Classement */}
-                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl font-bold shadow-lg mb-6">
+                <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-700 to-slate-800 text-white rounded-2xl font-bold shadow-lg mb-6">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                   </svg>
@@ -329,7 +329,7 @@ export default function AccountPage() {
                     <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Matchs</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-blue-600">{stats.tauxVictoire}%</p>
+                    <p className="text-3xl font-bold text-slate-700">{stats.tauxVictoire}%</p>
                     <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Victoires</p>
                   </div>
                 </div>
@@ -341,7 +341,7 @@ export default function AccountPage() {
               {/* Card Statistiques Détaillées */}
               <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-lg">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                   Statistiques détaillées
@@ -376,7 +376,7 @@ export default function AccountPage() {
             {/* Section Informations personnelles */}
             <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-lg">
               <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 Informations personnelles
@@ -389,7 +389,7 @@ export default function AccountPage() {
                     type="text"
                     value={profil.prenom}
                     onChange={(e) => setProfil({ ...profil, prenom: e.target.value })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   />
                 </div>
 
@@ -399,7 +399,7 @@ export default function AccountPage() {
                     type="text"
                     value={profil.nom}
                     onChange={(e) => setProfil({ ...profil, nom: e.target.value })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   />
                 </div>
 
@@ -409,7 +409,7 @@ export default function AccountPage() {
                     type="email"
                     value={profil.email}
                     onChange={(e) => setProfil({ ...profil, email: e.target.value })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   />
                 </div>
 
@@ -419,7 +419,7 @@ export default function AccountPage() {
                     type="tel"
                     value={profil.telephone}
                     onChange={(e) => setProfil({ ...profil, telephone: e.target.value })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   />
                 </div>
 
@@ -429,7 +429,7 @@ export default function AccountPage() {
                     type="date"
                     value={profil.dateNaissance}
                     onChange={(e) => setProfil({ ...profil, dateNaissance: e.target.value })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   />
                 </div>
 
@@ -440,7 +440,7 @@ export default function AccountPage() {
                     value={profil.experience}
                     onChange={(e) => setProfil({ ...profil, experience: e.target.value })}
                     placeholder="Ex: 2 ans"
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all placeholder:text-gray-400"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all placeholder:text-gray-400"
                   />
                 </div>
               </div>
@@ -449,7 +449,7 @@ export default function AccountPage() {
             {/* Section Profil de jeu */}
             <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 shadow-lg">
               <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
                 Profil de jeu
@@ -461,7 +461,7 @@ export default function AccountPage() {
                   <select
                     value={profil.niveau}
                     onChange={(e) => setProfil({ ...profil, niveau: e.target.value as ProfilInfo['niveau'] })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   >
                     <option value="Débutant">Débutant</option>
                     <option value="Intermédiaire">Intermédiaire</option>
@@ -477,7 +477,7 @@ export default function AccountPage() {
                     value={profil.coupPrefere}
                     onChange={(e) => setProfil({ ...profil, coupPrefere: e.target.value })}
                     placeholder="Ex: Vibora, Bandeja, Smash..."
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all placeholder:text-gray-400"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all placeholder:text-gray-400"
                   />
                 </div>
 
@@ -486,7 +486,7 @@ export default function AccountPage() {
                   <select
                     value={profil.mainDominante}
                     onChange={(e) => setProfil({ ...profil, mainDominante: e.target.value as ProfilInfo['mainDominante'] })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   >
                     <option value="Droitier">Droitier</option>
                     <option value="Gaucher">Gaucher</option>
@@ -499,7 +499,7 @@ export default function AccountPage() {
                   <select
                     value={profil.positionPreferee}
                     onChange={(e) => setProfil({ ...profil, positionPreferee: e.target.value as ProfilInfo['positionPreferee'] })}
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900 font-medium transition-all"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none text-gray-900 font-medium transition-all"
                   >
                     <option value="Gauche">Gauche (revers)</option>
                     <option value="Droite">Droite (coup droit)</option>
@@ -514,7 +514,7 @@ export default function AccountPage() {
                     onChange={(e) => setProfil({ ...profil, objectifs: e.target.value })}
                     rows={4}
                     placeholder="Quels sont vos objectifs au padel ?"
-                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-gray-900 font-medium transition-all placeholder:text-gray-400"
+                    className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none resize-none text-gray-900 font-medium transition-all placeholder:text-gray-400"
                   />
                 </div>
               </div>
@@ -546,7 +546,7 @@ export default function AccountPage() {
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                     placeholder="••••••••"
                     required
                   />
@@ -560,7 +560,7 @@ export default function AccountPage() {
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                     placeholder="••••••••"
                     required
                   />
@@ -575,7 +575,7 @@ export default function AccountPage() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 text-gray-900"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-slate-400 text-gray-900"
                     placeholder="••••••••"
                     required
                   />
@@ -584,7 +584,7 @@ export default function AccountPage() {
               
               <button
                 type="submit"
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+                className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all"
               >
                 Changer le mot de passe
               </button>
@@ -602,8 +602,8 @@ export default function AccountPage() {
               {/* Email */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -618,7 +618,7 @@ export default function AccountPage() {
                     handleNotificationsChange()
                   }}
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    notifications.email ? 'bg-blue-600' : 'bg-gray-300'
+                    notifications.email ? 'bg-slate-900' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -632,8 +632,8 @@ export default function AccountPage() {
               {/* SMS */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -648,7 +648,7 @@ export default function AccountPage() {
                     handleNotificationsChange()
                   }}
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    notifications.sms ? 'bg-blue-600' : 'bg-gray-300'
+                    notifications.sms ? 'bg-slate-900' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -662,8 +662,8 @@ export default function AccountPage() {
               {/* Push */}
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                   </div>
@@ -678,7 +678,7 @@ export default function AccountPage() {
                     handleNotificationsChange()
                   }}
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                    notifications.push ? 'bg-blue-600' : 'bg-gray-300'
+                    notifications.push ? 'bg-slate-900' : 'bg-gray-300'
                   }`}
                 >
                   <span

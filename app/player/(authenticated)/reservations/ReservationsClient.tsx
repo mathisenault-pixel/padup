@@ -87,7 +87,7 @@ export default function ReservationsClient({ reservations }: Props) {
         {/* Header Premium */}
         <div className="mb-12">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl">
+            <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center shadow-xl">
               <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -105,7 +105,7 @@ export default function ReservationsClient({ reservations }: Props) {
             {
               label: 'À venir',
               value: upcomingCount,
-              gradient: 'from-blue-500 to-blue-600',
+              gradient: 'bg-slate-800',
               icon: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -135,7 +135,7 @@ export default function ReservationsClient({ reservations }: Props) {
             {
               label: 'Total',
               value: reservations.length,
-              gradient: 'from-blue-500 to-blue-600',
+              gradient: 'bg-slate-800',
               icon: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -143,7 +143,7 @@ export default function ReservationsClient({ reservations }: Props) {
               )
             },
           ].map((stat, index) => (
-            <div key={index} className="group bg-white rounded-3xl p-6 border-2 border-gray-200 hover:border-blue-400 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+            <div key={index} className="group bg-white rounded-3xl p-6 border-2 border-gray-200 hover:border-slate-300 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform`}>
                   {stat.icon}
@@ -161,7 +161,7 @@ export default function ReservationsClient({ reservations }: Props) {
             onClick={() => setFilter('upcoming')}
             className={`px-8 py-4 font-bold text-base rounded-2xl transition-all duration-300 ${
               filter === 'upcoming'
-                ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
+                ? 'text-slate-900 bg-slate-200 border border-slate-300'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white'
             }`}
           >
@@ -171,7 +171,7 @@ export default function ReservationsClient({ reservations }: Props) {
             onClick={() => setFilter('past')}
             className={`px-8 py-4 font-bold text-base rounded-2xl transition-all duration-300 ${
               filter === 'past'
-                ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
+                ? 'text-slate-900 bg-slate-200 border border-slate-300'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white'
             }`}
           >
@@ -181,7 +181,7 @@ export default function ReservationsClient({ reservations }: Props) {
             onClick={() => setFilter('cancelled')}
             className={`px-8 py-4 font-bold text-base rounded-2xl transition-all duration-300 ${
               filter === 'cancelled'
-                ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
+                ? 'text-slate-900 bg-slate-200 border border-slate-300'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white'
             }`}
           >
@@ -191,7 +191,7 @@ export default function ReservationsClient({ reservations }: Props) {
             onClick={() => setFilter('all')}
             className={`px-8 py-4 font-bold text-base rounded-2xl transition-all duration-300 ${
               filter === 'all'
-                ? 'text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg'
+                ? 'text-slate-900 bg-slate-200 border border-slate-300'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-white'
             }`}
           >
@@ -216,7 +216,7 @@ export default function ReservationsClient({ reservations }: Props) {
                       ? 'border-red-200 bg-red-50/30'
                       : isPast
                       ? 'border-gray-200'
-                      : 'border-gray-200 hover:border-blue-400'
+                      : 'border-gray-200 hover:border-slate-300'
                   }`}
                   style={{animationDelay: `${index * 50}ms`}}
                 >
@@ -227,7 +227,7 @@ export default function ReservationsClient({ reservations }: Props) {
                         ? 'bg-gradient-to-br from-red-600 to-red-700' 
                         : isPast
                         ? 'bg-gradient-to-br from-gray-600 to-gray-700'
-                        : 'bg-gradient-to-br from-blue-600 to-blue-700'
+                        : 'bg-slate-800'
                     }`}>
                       <div className="text-center">
                         <p className="text-6xl font-bold mb-2 drop-shadow-lg">
@@ -269,7 +269,7 @@ export default function ReservationsClient({ reservations }: Props) {
                                 Terminée
                               </span>
                             ) : (
-                              <span className="px-4 py-1.5 bg-blue-100 text-blue-700 text-sm rounded-full font-bold">
+                              <span className="px-4 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full font-bold">
                                 Confirmée
                               </span>
                             )}
@@ -308,7 +308,7 @@ export default function ReservationsClient({ reservations }: Props) {
                           <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Paiement</p>
                           {reservation.payment_status === 'paid_on_site' ? (
                             <>
-                              <p className="font-bold text-blue-700 text-lg flex items-center gap-2">
+                              <p className="font-bold text-slate-700 text-lg flex items-center gap-2">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -318,7 +318,7 @@ export default function ReservationsClient({ reservations }: Props) {
                             </>
                           ) : (
                             <>
-                              <p className="font-bold text-blue-700 text-lg">Sur place</p>
+                              <p className="font-bold text-slate-700 text-lg">Sur place</p>
                               <p className="text-sm text-gray-600 mt-1">
                                 {reservation.courts?.price_per_hour ? `≈ ${reservation.courts.price_per_hour}€/h` : 'Prix à confirmer'}
                               </p>
@@ -363,7 +363,7 @@ export default function ReservationsClient({ reservations }: Props) {
             <button
               type="button"
               onClick={() => router.push('/player/clubs')}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

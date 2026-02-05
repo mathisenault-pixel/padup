@@ -30,7 +30,7 @@ export default function ClubSettingsPage() {
   if (!clubData || !session) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
       </div>
     )
   }
@@ -53,7 +53,7 @@ export default function ClubSettingsPage() {
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-100">
             <span className="text-sm font-semibold text-gray-500">Rôle</span>
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+            <span className="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
               Administrateur
             </span>
           </div>
@@ -161,7 +161,7 @@ export default function ClubSettingsPage() {
           {clubData.equipements.map((eq, index) => (
             <span
               key={index}
-              className="px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-lg"
+              className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg"
             >
               {eq}
             </span>
@@ -193,7 +193,7 @@ export default function ClubSettingsPage() {
 
       {/* Back to player */}
       <div className="text-center py-4">
-        <a href="/player/clubs" className="text-sm text-blue-600 hover:underline">
+        <a href="/player/clubs" className="text-sm text-slate-700 hover:underline">
           ← Retour à l'espace joueur
         </a>
       </div>
