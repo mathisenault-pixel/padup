@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import { getClubImage } from '@/lib/clubImages'
-import FiltersBar from '../components/FiltersBar'
 
 // ✅ Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -331,39 +330,91 @@ export default function ReservationsPage() {
         <p className="text-gray-600">Vos parties et tournois à venir</p>
       </div>
 
-      {/* Filtres - Nouveau design compact */}
-      <div className="mb-6">
-        <FiltersBar
-          filterButtons={[
-            { id: 'tous-type', label: 'Tout', count: validBookings.length + tournaments.length, icon: '🎾' },
-            { id: 'parties', label: 'Parties', count: validBookings.length },
-            { id: 'tournois', label: 'Tournois', count: tournaments.length },
-          ]}
-          activeFilter={selectedType === 'tous' ? 'tous-type' : selectedType}
-          onFilterChange={(id) => {
-            if (id === 'tous-type') setSelectedType('tous')
-            else setSelectedType(id as 'parties' | 'tournois')
-          }}
-          dropdowns={[
-            {
-              id: 'statut',
-              label: 'Statut',
-              value: selectedFilter,
-              onChange: (value) => setSelectedFilter(value as typeof selectedFilter),
-              options: [
-                { value: 'tous', label: 'Toutes' },
-                { value: 'a-venir', label: 'À venir' },
-                { value: 'passees', label: 'Passées' },
-                { value: 'annulees', label: 'Annulées' },
-              ],
-            },
-          ]}
-          showReset={selectedFilter !== 'tous' || selectedType !== 'tous'}
-          onReset={() => {
-            setSelectedFilter('tous')
-            setSelectedType('tous')
-          }}
-        />
+      {/* Filtres - Style compact (comme Clubs/Tournois), tous filtres restaurés */}
+      <div className="mb-6 bg-white border border-slate-200 rounded-lg p-4">
+        {/* Filtre par type */}
+        <div className="mb-3">
+          <h3 className="text-sm font-bold text-gray-900 mb-3">Type d'événement</h3>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <button
+              onClick={() => setSelectedType('tous')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedType === 'tous'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              Tout ({validBookings.length + tournaments.length})
+            </button>
+            <button
+              onClick={() => setSelectedType('parties')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedType === 'parties'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              Parties ({validBookings.length})
+            </button>
+            <button
+              onClick={() => setSelectedType('tournois')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedType === 'tournois'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              Tournois ({tournaments.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Filtre par statut */}
+        <div className="mb-0">
+          <h3 className="text-sm font-bold text-gray-900 mb-3">Filtrer par statut</h3>
+          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <button
+              onClick={() => setSelectedFilter('tous')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedFilter === 'tous'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              Toutes ({validBookings.length})
+            </button>
+            <button
+              onClick={() => setSelectedFilter('a-venir')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedFilter === 'a-venir'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              À venir ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})
+            </button>
+            <button
+              onClick={() => setSelectedFilter('passees')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedFilter === 'passees'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              Passées ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})
+            </button>
+            <button
+              onClick={() => setSelectedFilter('annulees')}
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all ${
+                selectedFilter === 'annulees'
+                  ? 'bg-slate-900 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              Annulées ({validBookings.filter(b => b.status === 'cancelled').length})
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Liste des événements */}
