@@ -362,8 +362,8 @@ export default function TournoisPage() {
           {/* Filtre Autour de (Ville ou Club) avec Rayon */}
           <div className="mb-3 md:mb-4">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="w-full sm:flex-1 min-w-0">
                 <SmartSearchBar
                   placeholder="Sélectionner une ville..."
                   onSearch={(query) => setCityClubFilter(query)}
@@ -381,7 +381,7 @@ export default function TournoisPage() {
               <select
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white whitespace-nowrap"
+                className="w-full sm:w-auto px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white whitespace-nowrap"
               >
                 <option value={10}>10 km</option>
                 <option value={20}>20 km</option>
