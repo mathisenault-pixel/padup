@@ -170,7 +170,7 @@ export default function MessagesPage() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ height: 'calc(100vh - 220px)', minHeight: '500px' }}>
           <div className="flex h-full">
             {/* Liste des conversations - Gauche */}
-            <div className="w-full md:w-80 lg:w-96 border-r border-gray-200 flex flex-col">
+            <div className={`w-full md:w-80 lg:w-96 border-r border-gray-200 flex flex-col ${selectedConversation ? 'hidden md:flex' : 'flex'}`}>
               {/* Recherche */}
               <div className="p-3 border-b border-gray-200">
                 <div className="relative">
@@ -191,7 +191,7 @@ export default function MessagesPage() {
                   <button
                     key={conv.id}
                     onClick={() => handleSelectConversation(conv)}
-                    className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors ${
+                    className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer touch-manipulation ${
                       selectedConversation?.id === conv.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''
                     }`}
                   >
@@ -226,15 +226,25 @@ export default function MessagesPage() {
 
             {/* Zone de conversation - Droite */}
             {selectedConversation ? (
-              <div className="hidden md:flex flex-1 flex-col">
+              <div className="flex flex-1 flex-col w-full">
                 {/* En-tête de la conversation */}
                 <div className="p-4 border-b border-gray-200 flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedConversation.type)} flex items-center justify-center text-white font-bold text-sm`}>
+                  {/* Bouton retour (mobile uniquement) */}
+                  <button
+                    onClick={() => setSelectedConversation(null)}
+                    className="md:hidden flex-shrink-0 w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedConversation.type)} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                     {getAvatarInitials(selectedConversation.contact)}
                   </div>
-                  <div className="flex-1">
-                    <h2 className="font-bold text-gray-900">{selectedConversation.contact}</h2>
-                    <p className="text-xs text-gray-500">
+                  <div className="flex-1 min-w-0">
+                    <h2 className="font-bold text-gray-900 truncate">{selectedConversation.contact}</h2>
+                    <p className="text-xs text-gray-500 truncate">
                       {selectedConversation.type === 'club' ? 'Club de padel' : 
                        selectedConversation.type === 'system' ? 'Notifications Pad\'Up' : 'Joueur'}
                     </p>
