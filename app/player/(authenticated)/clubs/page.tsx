@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import SmartSearchBar from '../components/SmartSearchBar'
+import FiltersDrawer from '../components/FiltersDrawer'
+import ActiveFiltersChips from '../components/ActiveFiltersChips'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
@@ -51,6 +53,7 @@ export default function ClubsPage() {
   const [selectedEquipements, setSelectedEquipements] = useState<string[]>([])
   const [selectedPrixRanges, setSelectedPrixRanges] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isFiltersDrawerOpen, setIsFiltersDrawerOpen] = useState(false)
 
   const [clubs, setClubs] = useState<Club[]>([])
   
@@ -253,116 +256,157 @@ export default function ClubsPage() {
           <p className="text-gray-600">Trouvez et réservez les meilleurs clubs de padel</p>
         </div>
 
-        {/* Barre de recherche + Filtres - Style compact (comme Mes réservations) */}
-        <div className="mb-6 bg-white border border-slate-200 rounded-lg p-4">
-          {/* Recherche */}
-          <div className="mb-3">
-            <SmartSearchBar
-              placeholder="Rechercher un club ou une ville..."
-              onSearch={(query) => setSearchTerm(query)}
-              suggestions={[
-                'Le Hangar Sport & Co',
-                'Paul & Louis Sport',
-                'ZE Padel',
-                'QG Padel Club',
-                ...getCitySuggestions()
-              ]}
-              storageKey="search-history-clubs"
-              compact={false}
-            />
+        {/* Barre de filtres compacte (nouvelle organisation) */}
+        <div className="mb-4">
+          <div className="flex items-center gap-3 py-3 border-b border-slate-200 flex-wrap">
+            {/* Recherche */}
+            <div className="flex-1 min-w-[200px]">
+              <SmartSearchBar
+                placeholder="Rechercher un club..."
+                onSearch={(query) => setSearchTerm(query)}
+                suggestions={[
+                  'Le Hangar Sport & Co',
+                  'Paul & Louis Sport',
+                  'ZE Padel',
+                  'QG Padel Club',
+                  ...getCitySuggestions()
+                ]}
+                storageKey="search-history-clubs"
+                compact={true}
+              />
+            </div>
+
+            {/* Filtre principal : Tri */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-slate-700 whitespace-nowrap">Trier:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="h-10 px-3 pr-8 text-sm font-medium border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white text-slate-700 cursor-pointer"
+              >
+                <option value="note">Mieux notés</option>
+                <option value="prix-asc">Prix croissant</option>
+                <option value="prix-desc">Prix décroissant</option>
+              </select>
+            </div>
+
+            {/* Bouton "Filtres" */}
+            <button
+              onClick={() => setIsFiltersDrawerOpen(true)}
+              className="inline-flex items-center gap-2 h-10 px-4 text-sm font-medium bg-white text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              Filtres
+            </button>
           </div>
 
-          {/* Filtre Autour de (Ville ou Club) avec Rayon */}
-          <div className="mb-3">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <SmartSearchBar
-                  placeholder="Sélectionner une ville..."
-                  onSearch={(query) => setCityClubFilter(query)}
-                  suggestions={[
-                    ...getCitySuggestions(),
-                    'Le Hangar Sport & Co',
-                    'Paul & Louis Sport',
-                    'ZE Padel',
-                    'QG Padel Club'
-                  ]}
-                  storageKey="search-history-city"
-                  compact={true}
-                />
-              </div>
+          {/* Chips de filtres actifs */}
+          <ActiveFiltersChips
+            chips={[
+              ...(searchTerm ? [{
+                id: 'search',
+                label: 'Recherche',
+                value: searchTerm,
+                onRemove: () => setSearchTerm('')
+              }] : []),
+              ...(sortBy !== 'note' ? [{
+                id: 'tri',
+                label: 'Tri',
+                value: sortBy === 'prix-asc' ? 'Prix croissant' : 'Prix décroissant',
+                onRemove: () => setSortBy('note')
+              }] : []),
+              ...selectedEquipements.map(eq => ({
+                id: `eq-${eq}`,
+                label: 'Équipement',
+                value: eq,
+                onRemove: () => toggleEquipement(eq)
+              })),
+              ...selectedPrixRanges.map(range => {
+                const labels: Record<string, string> = { '0-8': '≤ 8€', '9-10': '9-10€', '11+': '≥ 11€' }
+                return {
+                  id: `prix-${range}`,
+                  label: 'Prix',
+                  value: labels[range] || range,
+                  onRemove: () => togglePrixRange(range)
+                }
+              }),
+              ...(cityClubFilter ? [{
+                id: 'location',
+                label: 'Ville',
+                value: `${cityClubFilter} (${radiusKm}km)`,
+                onRemove: () => setCityClubFilter('')
+              }] : []),
+            ]}
+            onClearAll={() => {
+              setSearchTerm('')
+              setSortBy('note')
+              setSelectedEquipements([])
+              setSelectedPrixRanges([])
+              setCityClubFilter('')
+              setRadiusKm(50)
+            }}
+          />
+        </div>
+
+        {/* Drawer avec tous les filtres */}
+        <FiltersDrawer
+          isOpen={isFiltersDrawerOpen}
+          onClose={() => setIsFiltersDrawerOpen(false)}
+          title="Filtrer les clubs"
+          onReset={() => {
+            setSearchTerm('')
+            setSortBy('note')
+            setSelectedEquipements([])
+            setSelectedPrixRanges([])
+            setCityClubFilter('')
+            setRadiusKm(50)
+          }}
+        >
+          {/* Filtre Autour de */}
+          <div className="mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Autour de</h3>
+            <div className="space-y-2">
+              <SmartSearchBar
+                placeholder="Sélectionner une ville..."
+                onSearch={(query) => setCityClubFilter(query)}
+                suggestions={[
+                  ...getCitySuggestions(),
+                  'Le Hangar Sport & Co',
+                  'Paul & Louis Sport',
+                  'ZE Padel',
+                  'QG Padel Club'
+                ]}
+                storageKey="search-history-city"
+                compact={true}
+              />
               <select
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent bg-white whitespace-nowrap"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
               >
-                <option value={10}>10 km</option>
-                <option value={20}>20 km</option>
-                <option value={30}>30 km</option>
-                <option value={50}>50 km</option>
-                <option value={100}>100 km</option>
+                <option value={10}>Rayon : 10 km</option>
+                <option value={20}>Rayon : 20 km</option>
+                <option value={30}>Rayon : 30 km</option>
+                <option value={50}>Rayon : 50 km</option>
+                <option value={100}>Rayon : 100 km</option>
               </select>
             </div>
           </div>
 
-          {/* Filtres Tri */}
-          <div className="mb-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
-              <button
-                onClick={() => setSortBy('prix-asc')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  sortBy === 'prix-asc'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                </svg>
-                Prix croissant
-              </button>
-              <button
-                onClick={() => setSortBy('prix-desc')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  sortBy === 'prix-desc'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-                </svg>
-                Prix décroissant
-              </button>
-              <button
-                onClick={() => setSortBy('note')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  sortBy === 'note'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                Mieux notés
-              </button>
-            </div>
-          </div>
-
-          {/* Filtres Équipements (multi-sélection) */}
-          <div className="mb-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Équipements :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+          {/* Filtres Équipements */}
+          <div className="mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Équipements</h3>
+            <div className="flex flex-col gap-2">
               {['Restaurant', 'Parking', 'Bar', 'Fitness', 'Coaching'].map((equipement) => (
                 <button
                   key={equipement}
                   onClick={() => toggleEquipement(equipement)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
                     selectedEquipements.includes(equipement)
-                      ? 'bg-slate-900 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {equipement}
@@ -371,10 +415,10 @@ export default function ClubsPage() {
             </div>
           </div>
 
-          {/* Filtres Gamme de prix (multi-sélection) */}
+          {/* Filtres Gamme de prix */}
           <div className="mb-0">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Gamme de prix :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Gamme de prix</h3>
+            <div className="flex flex-col gap-2">
               {[
                 { label: '≤ 8€', value: '0-8' },
                 { label: '9-10€', value: '9-10' },
@@ -383,10 +427,10 @@ export default function ClubsPage() {
                 <button
                   key={range.value}
                   onClick={() => togglePrixRange(range.value)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
                     selectedPrixRanges.includes(range.value)
-                      ? 'bg-slate-900 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {range.label}
@@ -394,7 +438,7 @@ export default function ClubsPage() {
               ))}
             </div>
           </div>
-        </div>
+        </FiltersDrawer>
 
         {/* Loading state */}
         {isLoading && (

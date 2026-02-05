@@ -3,6 +3,8 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
+import FiltersDrawer from '../components/FiltersDrawer'
+import ActiveFiltersChips from '../components/ActiveFiltersChips'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
@@ -53,6 +55,7 @@ export default function TournoisPage() {
   const [cityClubFilter, setCityClubFilter] = useState<string>('')
   const [radiusKm, setRadiusKm] = useState<number>(50)
   const [sortBy, setSortBy] = useState<'date'>('date')
+  const [isFiltersDrawerOpen, setIsFiltersDrawerOpen] = useState(false)
 
   // Géolocalisation
   const { coords: userCoords, status: locationStatus, error: locationError, requestLocation } = useUserLocation()
@@ -320,146 +323,200 @@ export default function TournoisPage() {
           <p className="text-gray-600">Découvrez et participez aux tournois de padel</p>
         </div>
 
-        {/* Barre de recherche + Filtres - Style compact (comme Mes réservations) */}
-        <div className="mb-6 bg-white border border-slate-200 rounded-lg p-4">
-          {/* Recherche */}
-          <div className="mb-3">
-            <SmartSearchBar
-              placeholder="Rechercher un tournoi ou un club..."
-              onSearch={(query) => setSearchTerm(query)}
-              suggestions={[
-                'Le Hangar Sport & Co',
-                'Paul & Louis Sport',
-                'ZE Padel',
-                'QG Padel Club',
-                ...getCitySuggestions()
-              ]}
-              storageKey="search-history-tournois"
-              compact={false}
-            />
-          </div>
+        {/* Barre de filtres compacte (nouvelle organisation) */}
+        <div className="mb-4">
+          <div className="flex items-center gap-3 py-3 border-b border-slate-200 flex-wrap">
+            {/* Recherche */}
+            <div className="flex-1 min-w-[200px]">
+              <SmartSearchBar
+                placeholder="Rechercher un tournoi..."
+                onSearch={(query) => setSearchTerm(query)}
+                suggestions={[
+                  'Le Hangar Sport & Co',
+                  'Paul & Louis Sport',
+                  'ZE Padel',
+                  'QG Padel Club',
+                  ...getCitySuggestions()
+                ]}
+                storageKey="search-history-tournois"
+                compact={true}
+              />
+            </div>
 
-          {/* Filtres Tri */}
-          <div className="mb-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+            {/* Filtre principal : Statut */}
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setSortBy('date')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  sortBy === 'date'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                onClick={() => setSelectedFilter('ouverts')}
+                className={`px-3 py-2 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                  selectedFilter === 'ouverts'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Date
+                Ouverts
+              </button>
+              <button
+                onClick={() => setSelectedFilter('inscrits')}
+                className={`px-3 py-2 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                  selectedFilter === 'inscrits'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Mes inscriptions
+              </button>
+              <button
+                onClick={() => setSelectedFilter('tous')}
+                className={`px-3 py-2 text-xs font-medium rounded-md transition-all whitespace-nowrap ${
+                  selectedFilter === 'tous'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Tous
               </button>
             </div>
+
+            {/* Bouton "Filtres" */}
+            <button
+              onClick={() => setIsFiltersDrawerOpen(true)}
+              className="inline-flex items-center gap-2 h-10 px-4 text-sm font-medium bg-white text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-all"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              Filtres
+            </button>
           </div>
 
-          {/* Filtre Autour de (Ville ou Club) avec Rayon */}
-          <div className="mb-3">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <div className="w-full sm:flex-1 min-w-0">
-                <SmartSearchBar
-                  placeholder="Sélectionner une ville..."
-                  onSearch={(query) => setCityClubFilter(query)}
-                  suggestions={[
-                    ...getCitySuggestions(),
-                    'Le Hangar Sport & Co',
-                    'Paul & Louis Sport',
-                    'ZE Padel',
-                    'QG Padel Club'
-                  ]}
-                  storageKey="search-history-city-tournois"
-                  compact={true}
-                />
-              </div>
+          {/* Chips de filtres actifs */}
+          <ActiveFiltersChips
+            chips={[
+              ...(searchTerm ? [{
+                id: 'search',
+                label: 'Recherche',
+                value: searchTerm,
+                onRemove: () => setSearchTerm('')
+              }] : []),
+              ...(selectedFilter !== 'ouverts' ? [{
+                id: 'statut',
+                label: 'Statut',
+                value: selectedFilter === 'inscrits' ? 'Mes inscriptions' : 'Tous',
+                onRemove: () => setSelectedFilter('ouverts')
+              }] : []),
+              ...selectedCategories.map(cat => ({
+                id: `cat-${cat}`,
+                label: 'Niveau',
+                value: cat,
+                onRemove: () => toggleCategorie(cat)
+              })),
+              ...selectedGenres.map(genre => ({
+                id: `genre-${genre}`,
+                label: 'Genre',
+                value: genre,
+                onRemove: () => toggleGenre(genre)
+              })),
+              ...(cityClubFilter ? [{
+                id: 'location',
+                label: 'Ville',
+                value: `${cityClubFilter} (${radiusKm}km)`,
+                onRemove: () => setCityClubFilter('')
+              }] : []),
+            ]}
+            onClearAll={() => {
+              setSearchTerm('')
+              setSelectedFilter('ouverts')
+              setSelectedCategories([])
+              setSelectedGenres([])
+              setCityClubFilter('')
+              setRadiusKm(50)
+            }}
+          />
+        </div>
+
+        {/* Drawer avec tous les filtres */}
+        <FiltersDrawer
+          isOpen={isFiltersDrawerOpen}
+          onClose={() => setIsFiltersDrawerOpen(false)}
+          title="Filtrer les tournois"
+          onReset={() => {
+            setSearchTerm('')
+            setSelectedFilter('ouverts')
+            setSelectedCategories([])
+            setSelectedGenres([])
+            setCityClubFilter('')
+            setRadiusKm(50)
+            setSortBy('date')
+          }}
+        >
+          {/* Filtre Tri */}
+          <div className="mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Trier par</h3>
+            <button
+              onClick={() => setSortBy('date')}
+              className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
+                sortBy === 'date'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              📅 Date
+            </button>
+          </div>
+
+          {/* Filtre Autour de */}
+          <div className="mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Autour de</h3>
+            <div className="space-y-2">
+              <SmartSearchBar
+                placeholder="Sélectionner une ville..."
+                onSearch={(query) => setCityClubFilter(query)}
+                suggestions={[
+                  ...getCitySuggestions(),
+                  'Le Hangar Sport & Co',
+                  'Paul & Louis Sport',
+                  'ZE Padel',
+                  'QG Padel Club'
+                ]}
+                storageKey="search-history-city-tournois"
+                compact={true}
+              />
               <select
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="w-full sm:w-auto px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent bg-white whitespace-nowrap"
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
               >
-                <option value={10}>10 km</option>
-                <option value={20}>20 km</option>
-                <option value={30}>30 km</option>
-                <option value={50}>50 km</option>
-                <option value={100}>100 km</option>
+                <option value={10}>Rayon : 10 km</option>
+                <option value={20}>Rayon : 20 km</option>
+                <option value={30}>Rayon : 30 km</option>
+                <option value={50}>Rayon : 50 km</option>
+                <option value={100}>Rayon : 100 km</option>
               </select>
             </div>
           </div>
 
-          {/* Filtres Statut */}
-          <div className="mb-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Statut :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
-              <button
-                onClick={() => setSelectedFilter('ouverts')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  selectedFilter === 'ouverts'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Ouverts ({ouvertsCount})
-              </button>
-              <button
-                onClick={() => setSelectedFilter('inscrits')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  selectedFilter === 'inscrits'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Mes inscriptions ({inscritsCount})
-              </button>
-              <button
-                onClick={() => setSelectedFilter('tous')}
-                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
-                  selectedFilter === 'tous'
-                    ? 'bg-slate-900 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Tous ({tournois.length})
-              </button>
-            </div>
-          </div>
-
-          {/* Filtres Niveau */}
-          <div className="mb-3">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Niveau :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+          {/* Filtre Niveau */}
+          <div className="mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Niveau</h3>
+            <div className="flex flex-col gap-2">
               <button
                 onClick={() => setSelectedCategories([])}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
                   selectedCategories.length === 0
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Tous
+                Tous les niveaux
               </button>
               {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => toggleCategorie(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
                     selectedCategories.includes(cat)
-                      ? 'bg-slate-900 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {cat}
@@ -468,28 +525,28 @@ export default function TournoisPage() {
             </div>
           </div>
 
-          {/* Filtres Genre */}
+          {/* Filtre Genre */}
           <div className="mb-0">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Genre :</span>
-            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Genre</h3>
+            <div className="flex flex-col gap-2">
               <button
                 onClick={() => setSelectedGenres([])}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
                   selectedGenres.length === 0
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                    ? 'bg-slate-900 text-white'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Tous
+                Tous les genres
               </button>
               {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
                 <button
                   key={genre}
                   onClick={() => toggleGenre(genre)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  className={`px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
                     selectedGenres.includes(genre)
-                      ? 'bg-slate-900 text-white shadow-lg'
-                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {genre}
@@ -497,7 +554,7 @@ export default function TournoisPage() {
               ))}
             </div>
           </div>
-        </div>
+        </FiltersDrawer>
 
         {/* Liste des tournois */}
         {filteredTournois.length > 0 ? (
