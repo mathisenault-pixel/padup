@@ -454,15 +454,21 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-20 px-6 bg-gray-50">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-black text-gray-900 mb-3">Questions fréquentes</h2>
-            <p className="text-lg text-gray-600">Tout ce que vous devez savoir</p>
+      {/* FAQ - STYLE PRO */}
+      <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
+          {/* Header */}
+          <div className="text-center mb-12 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
+              Questions fréquentes
+            </h2>
+            <p className="text-base md:text-lg text-slate-600 leading-relaxed">
+              Tout ce que vous devez savoir sur Pad'Up et nos services de réservation
+            </p>
           </div>
 
-          <div className="space-y-4">
+          {/* Accordéon FAQ */}
+          <div className="space-y-3 max-w-4xl mx-auto">
             {[
               {
                 question: "Comment réserver un terrain ?",
@@ -485,18 +491,34 @@ export default function AccueilPage() {
                 answer: "Vous recevez automatiquement des notifications par email avant vos réservations. Vous pouvez gérer vos préférences de notification dans votre profil."
               }
             ].map((faq, i) => (
-              <details key={i} className="group bg-white rounded-xl overflow-hidden shadow-sm">
-                <summary className="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-gray-50 transition-all">
-                  <span className="text-lg font-semibold text-gray-900">{faq.question}</span>
-                  <svg className="w-5 h-5 text-gray-600 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              <details key={i} className="group border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-all">
+                <summary className="flex items-center justify-between px-6 md:px-8 py-5 cursor-pointer hover:bg-slate-50 transition-all">
+                  <span className="text-base md:text-lg font-semibold text-slate-900 pr-4">{faq.question}</span>
+                  <svg className="w-5 h-5 text-slate-600 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="px-6 pb-5 text-gray-600 leading-relaxed">
-                  {faq.answer}
+                <div className="px-6 md:px-8 pb-5 text-sm md:text-base text-slate-600 leading-relaxed border-t border-slate-100">
+                  <p className="pt-4">{faq.answer}</p>
                 </div>
               </details>
             ))}
+          </div>
+
+          {/* CTA Footer */}
+          <div className="mt-14 pt-12 border-t border-slate-200 text-center">
+            <p className="text-sm font-semibold text-slate-900 mb-3">
+              Vous avez d'autres questions ?
+            </p>
+            <Link
+              href="/faq"
+              className="text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium inline-flex items-center gap-2 group"
+            >
+              Consulter la FAQ complète
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
