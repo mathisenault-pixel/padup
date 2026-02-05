@@ -304,7 +304,7 @@ export default function AccueilPage() {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-100">
+                  <div className="pt-4">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black text-gray-900">{club.prixMin}€</span>
                       <span className="text-sm text-gray-600">par personne</span>
@@ -377,7 +377,7 @@ export default function AccueilPage() {
           </div>
 
           {/* CTA Footer */}
-          <div className="mt-14 pt-12 border-t border-slate-200">
+          <div className="mt-16">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="max-w-md">
                 <p className="text-sm font-semibold text-slate-900">
@@ -440,7 +440,7 @@ export default function AccueilPage() {
           </div>
 
           {/* Statistiques / Social proof */}
-          <div className="mt-14 pt-12 border-t border-slate-200">
+          <div className="mt-16">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
               <div>
                 <p className="text-3xl font-bold text-slate-900 mb-2">10 000+</p>
@@ -505,15 +505,15 @@ export default function AccueilPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="px-6 md:px-8 pb-5 text-sm md:text-base text-slate-600 leading-relaxed border-t border-slate-100">
-                  <p className="pt-4">{faq.answer}</p>
+                <div className="px-6 md:px-8 pb-5 pt-3 text-sm md:text-base text-slate-600 leading-relaxed">
+                  <p>{faq.answer}</p>
                 </div>
               </details>
             ))}
           </div>
 
           {/* CTA Footer */}
-          <div className="mt-14 pt-12 border-t border-slate-200 text-center">
+          <div className="mt-16 text-center">
             <p className="text-sm font-semibold text-slate-900 mb-3">
               Vous avez d'autres questions ?
             </p>
