@@ -150,7 +150,7 @@ export default function MessagesPage() {
 
   const getAvatarColor = (type: string) => {
     switch (type) {
-      case 'club': return 'from-blue-500 to-blue-600'
+      case 'club': return 'from-slate-700 to-slate-800'
       case 'system': return 'from-purple-500 to-purple-600'
       case 'player': return 'from-green-500 to-green-600'
       default: return 'from-gray-500 to-gray-600'
@@ -177,7 +177,7 @@ export default function MessagesPage() {
                   <input
                     type="text"
                     placeholder="Rechercher..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400"
                   />
                   <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -192,7 +192,7 @@ export default function MessagesPage() {
                     key={conv.id}
                     onClick={() => handleSelectConversation(conv)}
                     className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 active:bg-gray-100 transition-colors cursor-pointer touch-manipulation ${
-                      selectedConversation?.id === conv.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''
+                      selectedConversation?.id === conv.id ? 'bg-slate-50 border-l-4 border-slate-900' : ''
                     }`}
                   >
                     {/* Avatar */}
@@ -213,7 +213,7 @@ export default function MessagesPage() {
                           {conv.lastMessage}
                         </p>
                         {conv.unreadCount > 0 && (
-                          <span className="ml-2 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                          <span className="ml-2 bg-slate-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                             {conv.unreadCount}
                           </span>
                         )}
@@ -262,7 +262,7 @@ export default function MessagesPage() {
                         <div
                           className={`rounded-2xl px-4 py-2 ${
                             msg.isFromMe
-                              ? 'bg-blue-600 text-white rounded-br-md'
+                              ? 'bg-slate-900 text-white rounded-br-md'
                               : 'bg-white text-gray-900 shadow-sm rounded-bl-md'
                           }`}
                         >
@@ -286,12 +286,12 @@ export default function MessagesPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Écrivez votre message..."
-                      className="flex-1 px-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
-                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all"
+                      className="px-6 py-3 bg-slate-900 hover:bg-slate-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

@@ -347,7 +347,7 @@ export default function TournoisPage() {
                 onClick={() => setSortBy('date')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   sortBy === 'date'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -381,7 +381,7 @@ export default function TournoisPage() {
               <select
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="w-full sm:w-auto px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white whitespace-nowrap"
+                className="w-full sm:w-auto px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent bg-white whitespace-nowrap"
               >
                 <option value={10}>10 km</option>
                 <option value={20}>20 km</option>
@@ -400,7 +400,7 @@ export default function TournoisPage() {
                 onClick={() => setSelectedFilter('ouverts')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   selectedFilter === 'ouverts'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -413,7 +413,7 @@ export default function TournoisPage() {
                 onClick={() => setSelectedFilter('inscrits')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   selectedFilter === 'inscrits'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -426,7 +426,7 @@ export default function TournoisPage() {
                 onClick={() => setSelectedFilter('tous')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   selectedFilter === 'tous'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -458,7 +458,7 @@ export default function TournoisPage() {
                   onClick={() => toggleCategorie(cat)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     selectedCategories.includes(cat)
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      ? 'bg-slate-900 text-white shadow-lg'
                       : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
@@ -488,7 +488,7 @@ export default function TournoisPage() {
                   onClick={() => toggleGenre(genre)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     selectedGenres.includes(genre)
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      ? 'bg-slate-900 text-white shadow-lg'
                       : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
@@ -514,10 +514,10 @@ export default function TournoisPage() {
                   href={`/player/tournois/${tournoi.id}`}
                   className={`group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border-2 rounded-xl p-3 md:p-5 transition-all ${
                     tournoi.inscrit
-                      ? 'border-blue-200 bg-blue-50'
+                      ? 'border-slate-200 bg-slate-50'
                       : isComplet
                       ? 'border-gray-200 opacity-60'
-                      : 'border-gray-200 hover:border-blue-500 hover:shadow-lg'
+                      : 'border-gray-200 hover:border-slate-300 hover:shadow-lg'
                   }`}
                 >
                   {/* Image - Full width mobile, fixed width desktop */}
@@ -528,7 +528,7 @@ export default function TournoisPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {tournoi.inscrit && (
-                      <div className="absolute top-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded">
+                      <div className="absolute top-2 left-2 px-2 py-1 bg-slate-900 text-white text-xs font-bold rounded">
                         Inscrit
                       </div>
                     )}
@@ -568,7 +568,7 @@ export default function TournoisPage() {
                     {/* Distance (si géolocalisation active) */}
                     {tournoi.distanceKm !== undefined && (
                       <div className="flex items-center gap-2 -mt-1">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-semibold">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-800 rounded-lg text-sm font-semibold">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           </svg>
@@ -616,7 +616,7 @@ export default function TournoisPage() {
                         </div>
                         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-blue-600 rounded-full transition-all"
+                            className="h-full bg-slate-900 rounded-full transition-all"
                             style={{ width: `${pourcentageRempli}%` }}
                           ></div>
                         </div>
@@ -626,7 +626,7 @@ export default function TournoisPage() {
                     {/* Badge Inscrit */}
                     {tournoi.inscrit && (
                       <div className="mt-auto pt-3 md:pt-4 border-t border-gray-100">
-                        <div className="w-full md:w-auto px-5 py-3 md:py-2 bg-blue-600 text-white text-base md:text-sm font-semibold rounded-lg text-center">
+                        <div className="w-full md:w-auto px-5 py-3 md:py-2 bg-slate-900 text-white text-base md:text-sm font-semibold rounded-lg text-center">
                           ✓ Inscrit
                         </div>
                       </div>
