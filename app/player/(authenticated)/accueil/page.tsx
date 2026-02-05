@@ -210,16 +210,15 @@ export default function AccueilPage() {
               <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs autour de chez moi</h2>
               <p className="text-xl text-gray-600">Découvrez nos meilleures adresses</p>
             </div>
-            <button
-              type="button"
-              onClick={() => router.push('/player/clubs')}
-              className="hidden md:flex items-center gap-2 text-gray-900 font-bold hover:text-slate-700 transition-colors"
+            <Link
+              href="/player/clubs"
+              className="hidden md:inline-flex text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium items-center gap-2 group"
             >
               Voir tout
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
-            </button>
+            </Link>
           </div>
 
           {/* Bouton de géolocalisation */}
