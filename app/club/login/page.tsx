@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { loginClub } from '@/lib/clubAuth'
+import { loginClubWithCode } from '@/lib/clubAuth'
 
 export default function ClubLoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -17,7 +17,7 @@ export default function ClubLoginPage() {
     setIsLoading(true)
 
     try {
-      const result = loginClub(email, password)
+      const result = loginClubWithCode(code, password)
 
       if (result.success) {
         console.log('[Club Login] ✅ Success:', result.session)
@@ -49,27 +49,37 @@ export default function ClubLoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
+          {/* Code club */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              Email
+            <label htmlFor="code" className="block text-sm font-semibold text-gray-700 mb-2">
+              Identifiant club
             </label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@club.fr"
+              id="code"
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="Ex: PADUP-1234"
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all font-mono uppercase"
             />
+            <p className="text-xs text-gray-500 mt-1">Le code unique fourni par Pad&apos;Up lors de votre inscription</p>
           </div>
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-              Mot de passe
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                Mot de passe
+              </label>
+              <button
+                type="button"
+                onClick={() => alert('Pour réinitialiser votre mot de passe, contactez-nous à contact@padup.one')}
+                className="text-xs text-slate-700 hover:text-slate-900 underline"
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
             <input
               id="password"
               type="password"
@@ -113,15 +123,15 @@ export default function ClubLoginPage() {
           </button>
         </form>
 
-        {/* Demo credentials */}
-        <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <p className="text-xs font-semibold text-gray-700 mb-2">📌 Identifiants démo (MVP):</p>
-          <ul className="text-xs text-gray-600 space-y-1">
-            <li>• Email: <code className="bg-white px-2 py-0.5 rounded">admin@lehangar.fr</code></li>
-            <li>• Email: <code className="bg-white px-2 py-0.5 rounded">admin@pauletlouis.fr</code></li>
-            <li>• Email: <code className="bg-white px-2 py-0.5 rounded">admin@zepadel.fr</code></li>
-            <li>• Mot de passe: <code className="bg-white px-2 py-0.5 rounded">club2026</code></li>
-          </ul>
+        {/* Access request link */}
+        <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg text-center">
+          <p className="text-sm text-gray-600 mb-2">Vous n&apos;avez pas encore de code ?</p>
+          <a 
+            href="/club/signup" 
+            className="text-sm font-semibold text-slate-700 hover:text-slate-900 underline"
+          >
+            Demander un accès club →
+          </a>
         </div>
 
         {/* Back to player */}

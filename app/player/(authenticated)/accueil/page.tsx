@@ -202,8 +202,6 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      <SectionDivider />
-
       {/* Clubs - CAROUSEL CARDS STYLE */}
       <section className="pt-12 md:pt-16 pb-8 md:pb-12 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">

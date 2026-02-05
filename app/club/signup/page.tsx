@@ -1,25 +1,33 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClubRequest, type ClubRequestData } from '@/app/actions/clubRequests'
 
-export default function ClubSignupPage() {
-  const router = useRouter()
-  const [formData, setFormData] = useState({
+export default function ClubRequestPage() {
+  const [formData, setFormData] = useState<ClubRequestData>({
     clubName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    city: '',
+    contactName: '',
+    contactPhone: '',
+    contactEmail: '',
+    numCourts: undefined,
+    message: '',
+    acceptContact: false,
+    website: '',
   })
+  const [honeypot, setHoneypot] = useState('') // Anti-spam
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined
+    
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === 'checkbox' ? checked : value,
     }))
     setError('')
   }
@@ -28,45 +36,36 @@ export default function ClubSignupPage() {
     e.preventDefault()
     setError('')
 
-    // Validation
-    if (!formData.clubName || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('Tous les champs sont obligatoires')
+    // Anti-spam: honeypot
+    if (honeypot) {
+      console.log('[Club Request] Honeypot triggered')
+      setError('Erreur de validation')
       return
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas')
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères')
-      return
-    }
-
-    // Validation email simple
-    if (!formData.email.includes('@')) {
-      setError('Email invalide')
+    // Validation checkbox obligatoire
+    if (!formData.acceptContact) {
+      setError('Vous devez accepter d\'être recontacté pour envoyer votre demande')
       return
     }
 
     setIsLoading(true)
 
-    // Simuler création de compte (MVP front-only)
-    setTimeout(() => {
-      console.log('[Club Signup] MVP - Account created:', {
-        clubName: formData.clubName,
-        email: formData.email,
-      })
-      
-      setIsLoading(false)
-      setShowSuccess(true)
+    try {
+      const result = await createClubRequest(formData)
 
-      // Redirect vers login après 2 secondes
-      setTimeout(() => {
-        router.push('/club/login')
-      }, 2000)
-    }, 1000)
+      if (result.success) {
+        console.log('[Club Request] ✅ Success:', result.requestId)
+        setShowSuccess(true)
+      } else {
+        setError(result.error || 'Erreur lors de l\'envoi de votre demande')
+      }
+    } catch (err) {
+      console.error('[Club Request] Error:', err)
+      setError('Une erreur inattendue s\'est produite')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (showSuccess) {
@@ -78,9 +77,24 @@ export default function ClubSignupPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Compte créé !</h2>
-          <p className="text-gray-600 mb-4">Mode démo - Redirection vers la connexion...</p>
-          <div className="animate-spin rounded-full h-8 w-8 border-4 border-slate-900 border-t-transparent mx-auto"></div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">Demande envoyée !</h2>
+          <p className="text-gray-600 mb-2">Nous avons bien reçu votre demande d&apos;accès.</p>
+          <p className="text-gray-600 mb-6">Notre équipe vous recontactera sous <strong>24 à 48h</strong>.</p>
+          
+          <div className="space-y-3">
+            <Link 
+              href="/club/login"
+              className="block w-full px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg transition-all"
+            >
+              Retour à la connexion
+            </Link>
+            <Link 
+              href="/"
+              className="block w-full px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 transition-all"
+            >
+              Retour à l&apos;accueil
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -93,11 +107,11 @@ export default function ClubSignupPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-900 rounded-full mb-4">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Créer un compte club</h1>
-          <p className="text-gray-600">Rejoignez Pad&apos;up et gérez votre club</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Demander un accès club</h1>
+          <p className="text-gray-600">Remplissez ce formulaire, nous vous recontactons sous 24-48h</p>
         </div>
 
         {/* Form */}
@@ -105,7 +119,7 @@ export default function ClubSignupPage() {
           {/* Nom du club */}
           <div>
             <label htmlFor="clubName" className="block text-sm font-semibold text-gray-700 mb-2">
-              Nom du club
+              Nom du club <span className="text-red-500">*</span>
             </label>
             <input
               id="clubName"
@@ -114,57 +128,161 @@ export default function ClubSignupPage() {
               value={formData.clubName}
               onChange={handleChange}
               placeholder="Ex: Le Hangar Padel Club"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Ville */}
+          <div>
+            <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-2">
+              Ville <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              value={formData.city}
+              onChange={handleChange}
+              placeholder="Ex: Avignon"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Nom / Prénom contact */}
+          <div>
+            <label htmlFor="contactName" className="block text-sm font-semibold text-gray-700 mb-2">
+              Nom / Prénom du contact <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="contactName"
+              name="contactName"
+              type="text"
+              value={formData.contactName}
+              onChange={handleChange}
+              placeholder="Ex: Jean Dupont"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Téléphone */}
+          <div>
+            <label htmlFor="contactPhone" className="block text-sm font-semibold text-gray-700 mb-2">
+              Téléphone <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="contactPhone"
+              name="contactPhone"
+              type="tel"
+              value={formData.contactPhone}
+              onChange={handleChange}
+              placeholder="Ex: 06 12 34 56 78"
+              required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              Email
+            <label htmlFor="contactEmail" className="block text-sm font-semibold text-gray-700 mb-2">
+              Email <span className="text-red-500">*</span>
             </label>
             <input
-              id="email"
-              name="email"
+              id="contactEmail"
+              name="contactEmail"
               type="email"
-              value={formData.email}
+              value={formData.contactEmail}
               onChange={handleChange}
               placeholder="contact@monclub.fr"
+              required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
             />
           </div>
 
-          {/* Mot de passe */}
+          {/* Nombre de terrains (optionnel) */}
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-              Mot de passe
+            <label htmlFor="numCourts" className="block text-sm font-semibold text-gray-700 mb-2">
+              Nombre de terrains <span className="text-gray-400 font-normal">(optionnel)</span>
             </label>
             <input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
+              id="numCourts"
+              name="numCourts"
+              type="number"
+              min="1"
+              max="50"
+              value={formData.numCourts || ''}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder="Ex: 4"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
             />
-            <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
           </div>
 
-          {/* Confirmer mot de passe */}
+          {/* Site web / Instagram (optionnel) */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
-              Confirmer le mot de passe
+            <label htmlFor="website" className="block text-sm font-semibold text-gray-700 mb-2">
+              Site web ou Instagram <span className="text-gray-400 font-normal">(optionnel)</span>
             </label>
             <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
+              id="website"
+              name="website"
+              type="text"
+              value={formData.website}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder="Ex: www.monclub.fr ou @monclub_padel"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all"
             />
+          </div>
+
+          {/* Message (optionnel) */}
+          <div>
+            <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+              Message <span className="text-gray-400 font-normal">(optionnel)</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              placeholder="Parlez-nous de votre club, vos besoins..."
+              rows={3}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all resize-none"
+            />
+          </div>
+
+          {/* Honeypot (anti-spam) - Hidden */}
+          <div className="hidden">
+            <label htmlFor="company">Company</label>
+            <input
+              id="company"
+              name="company"
+              type="text"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
+          {/* Checkbox accepter contact - OBLIGATOIRE */}
+          <div className="flex items-start gap-3 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+            <input
+              id="acceptContact"
+              name="acceptContact"
+              type="checkbox"
+              checked={formData.acceptContact}
+              onChange={handleChange}
+              required
+              className="mt-1 w-4 h-4 text-slate-900 border-gray-300 rounded focus:ring-slate-400"
+            />
+            <label htmlFor="acceptContact" className="text-sm text-gray-700">
+              <span className="font-semibold">J&apos;accepte d&apos;être recontacté par l&apos;équipe Pad&apos;Up</span>
+              <span className="text-red-500"> *</span>
+              <span className="block text-xs text-gray-500 mt-1">
+                Cette autorisation est nécessaire pour traiter votre demande d&apos;accès.
+              </span>
+            </label>
           </div>
 
           {/* Error */}
@@ -186,39 +304,39 @@ export default function ClubSignupPage() {
             {isLoading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                Création...
+                Envoi en cours...
               </>
             ) : (
               <>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
-                Créer mon compte
+                Envoyer ma demande
               </>
             )}
           </button>
         </form>
 
-        {/* Mode démo notice */}
-        <div className="mt-6 p-4 bg-slate-100 border border-slate-300 rounded-lg">
+        {/* Info notice */}
+        <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
           <div className="flex gap-3">
             <svg className="w-5 h-5 text-slate-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="text-sm font-semibold text-slate-900 mb-1">Mode démo (MVP)</p>
+              <p className="text-sm font-semibold text-slate-900 mb-1">Comment ça marche ?</p>
               <p className="text-sm text-slate-700">
-                En production, votre compte sera créé dans la base de données. Pour tester, utilisez n&apos;importe quel email.
+                Après réception de votre demande, notre équipe vous recontactera sous 24-48h pour valider votre inscription et vous fournir vos identifiants d&apos;accès.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Already have account */}
+        {/* Already have code */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Vous avez déjà un compte ?{' '}
-            <Link href="/club/login" className="text-slate-700 hover:text-slate-700 font-semibold">
+            Vous avez déjà un code d&apos;accès ?{' '}
+            <Link href="/club/login" className="text-slate-700 hover:text-slate-900 font-semibold">
               Se connecter
             </Link>
           </p>
