@@ -1,6 +1,6 @@
 'use server'
 
-import { supabaseBrowser } from '@/lib/supabaseBrowser'
+import { supabase } from '@/lib/supabaseClient'
 
 export type ClubRequestData = {
   clubName: string
@@ -63,7 +63,6 @@ export async function createClubRequest(data: ClubRequestData): Promise<ClubRequ
     }
 
     // Insérer dans Supabase
-    const supabase = supabaseBrowser()
     const { data: insertData, error: insertError } = await supabase
       .from('club_requests')
       .insert([
