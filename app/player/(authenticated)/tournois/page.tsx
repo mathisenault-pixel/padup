@@ -3,7 +3,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
-import FiltersBar from '../components/FiltersBar'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
@@ -321,46 +320,183 @@ export default function TournoisPage() {
           <p className="text-gray-600">Découvrez et participez aux tournois de padel</p>
         </div>
 
-        {/* Filtres - Aligned with Mes reservations FiltersBar */}
-        <div className="mb-6">
-          <FiltersBar
-            searchPlaceholder="Rechercher un tournoi ou un club..."
-            onSearch={(query) => setSearchTerm(query)}
-            searchValue={searchTerm}
-            filterButtons={[
-              { id: 'ouverts', label: 'Ouverts', count: ouvertsCount, icon: '✅' },
-              { id: 'inscrits', label: 'Mes inscriptions', count: inscritsCount, icon: '🎾' },
-              { id: 'tous', label: 'Tous', count: tournois.length },
-            ]}
-            activeFilter={selectedFilter}
-            onFilterChange={(id) => setSelectedFilter(id as typeof selectedFilter)}
-            activeChips={[
-              ...selectedCategories.map(cat => ({
-                id: `cat-${cat}`,
-                label: cat,
-                onRemove: () => toggleCategorie(cat),
-              })),
-              ...selectedGenres.map(genre => ({
-                id: `genre-${genre}`,
-                label: genre,
-                onRemove: () => toggleGenre(genre),
-              })),
-              ...(cityClubFilter ? [{
-                id: 'location',
-                label: `${cityClubFilter} (${radiusKm}km)`,
-                onRemove: () => setCityClubFilter(''),
-              }] : []),
-            ]}
-            showReset={selectedFilter !== 'ouverts' || selectedCategories.length > 0 || selectedGenres.length > 0 || cityClubFilter !== '' || searchTerm !== ''}
-            onReset={() => {
-              setSearchTerm('')
-              setSelectedFilter('ouverts')
-              setSelectedCategories([])
-              setSelectedGenres([])
-              setCityClubFilter('')
-              setRadiusKm(50)
-            }}
-          />
+        {/* Barre de recherche + Filtres */}
+        <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200">
+          {/* Recherche */}
+          <div className="mb-3 md:mb-4">
+            <SmartSearchBar
+              placeholder="Rechercher un tournoi ou un club..."
+              onSearch={(query) => setSearchTerm(query)}
+              suggestions={[
+                'Le Hangar Sport & Co',
+                'Paul & Louis Sport',
+                'ZE Padel',
+                'QG Padel Club',
+                ...getCitySuggestions()
+              ]}
+              storageKey="search-history-tournois"
+              compact={false}
+            />
+          </div>
+
+          {/* Filtres Tri */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSortBy('date')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  sortBy === 'date'
+                    ? 'bg-slate-900 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Date
+              </button>
+            </div>
+          </div>
+
+          {/* Filtre Autour de (Ville ou Club) avec Rayon */}
+          <div className="mb-3 md:mb-4">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="w-full sm:flex-1 min-w-0">
+                <SmartSearchBar
+                  placeholder="Sélectionner une ville..."
+                  onSearch={(query) => setCityClubFilter(query)}
+                  suggestions={[
+                    ...getCitySuggestions(),
+                    'Le Hangar Sport & Co',
+                    'Paul & Louis Sport',
+                    'ZE Padel',
+                    'QG Padel Club'
+                  ]}
+                  storageKey="search-history-city-tournois"
+                  compact={true}
+                />
+              </div>
+              <select
+                value={radiusKm}
+                onChange={(e) => setRadiusKm(Number(e.target.value))}
+                className="w-full sm:w-auto px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent bg-white whitespace-nowrap"
+              >
+                <option value={10}>10 km</option>
+                <option value={20}>20 km</option>
+                <option value={30}>30 km</option>
+                <option value={50}>50 km</option>
+                <option value={100}>100 km</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Filtres Statut */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Statut :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedFilter('ouverts')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  selectedFilter === 'ouverts'
+                    ? 'bg-slate-900 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Ouverts ({ouvertsCount})
+              </button>
+              <button
+                onClick={() => setSelectedFilter('inscrits')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  selectedFilter === 'inscrits'
+                    ? 'bg-slate-900 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Mes inscriptions ({inscritsCount})
+              </button>
+              <button
+                onClick={() => setSelectedFilter('tous')}
+                className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
+                  selectedFilter === 'tous'
+                    ? 'bg-slate-900 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Tous ({tournois.length})
+              </button>
+            </div>
+          </div>
+
+          {/* Filtres Niveau */}
+          <div className="mb-3 md:mb-4">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Niveau :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedCategories([])}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  selectedCategories.length === 0
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                Tous
+              </button>
+              {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => toggleCategorie(cat)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                    selectedCategories.includes(cat)
+                      ? 'bg-slate-900 text-white shadow-lg'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filtres Genre */}
+          <div className="mb-0">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Genre :</span>
+            <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+              <button
+                onClick={() => setSelectedGenres([])}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  selectedGenres.length === 0
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                Tous
+              </button>
+              {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
+                <button
+                  key={genre}
+                  onClick={() => toggleGenre(genre)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                    selectedGenres.includes(genre)
+                      ? 'bg-slate-900 text-white shadow-lg'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Liste des tournois */}
