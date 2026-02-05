@@ -330,15 +330,21 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* POURQUOI PAD'UP - CARDS ÉLÉGANTES */}
-      <section className="py-20 px-6 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-12">
-            <h2 className="text-5xl font-black text-gray-900 mb-4">Rappels automatiques par e-mail</h2>
-            <p className="text-xl text-gray-600">Ne manquez plus jamais vos réservations</p>
+      {/* RAPPELS AUTOMATIQUES - STYLE PRO */}
+      <section className="bg-slate-950 text-slate-300">
+        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+          {/* Header */}
+          <div className="mb-12 max-w-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight">
+              Rappels automatiques par e-mail
+            </h2>
+            <p className="text-base text-slate-400 leading-relaxed">
+              Ne manquez plus jamais vos réservations. Recevez des notifications automatiques à chaque étape.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 icon: '📧',
@@ -356,15 +362,38 @@ export default function AccueilPage() {
                 description: 'Recevez un dernier rappel 2h avant votre match pour être prêt à temps',
               },
             ].map((feature, i) => (
-              <div key={i} className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-500 rounded-3xl transform group-hover:scale-105 transition-transform opacity-0 group-hover:opacity-100"></div>
-                <div className="relative bg-white rounded-3xl p-8 shadow-xl group-hover:shadow-2xl transition-all">
-                  <div className="text-6xl mb-6">{feature.icon}</div>
-                  <h3 className="text-2xl font-black text-gray-900 mb-4 group-hover:text-gray-900">{feature.title}</h3>
-                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700">{feature.description}</p>
-                </div>
+              <div 
+                key={i} 
+                className="group border border-white/10 rounded-xl p-6 hover:border-white/20 hover:bg-white/5 transition-all"
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">{feature.description}</p>
               </div>
             ))}
+          </div>
+
+          {/* CTA Footer */}
+          <div className="mt-10 pt-10 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-white">
+                  Gérez vos préférences de notification
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Activez ou désactivez les rappels depuis votre profil
+                </p>
+              </div>
+              <Link
+                href="/player/profil"
+                className="text-sm text-slate-400 hover:text-white transition-colors font-medium inline-flex items-center gap-2 group"
+              >
+                Accéder aux paramètres
+                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
