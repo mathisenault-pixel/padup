@@ -294,7 +294,7 @@ export default function ClubsPage() {
               <select
                 value={radiusKm}
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white whitespace-nowrap"
+                className="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent bg-white whitespace-nowrap"
               >
                 <option value={10}>10 km</option>
                 <option value={20}>20 km</option>
@@ -313,7 +313,7 @@ export default function ClubsPage() {
                 onClick={() => setSortBy('prix-asc')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   sortBy === 'prix-asc'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -326,7 +326,7 @@ export default function ClubsPage() {
                 onClick={() => setSortBy('prix-desc')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   sortBy === 'prix-desc'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -339,7 +339,7 @@ export default function ClubsPage() {
                 onClick={() => setSortBy('note')}
                 className={`group flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all whitespace-nowrap ${
                   sortBy === 'note'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                    ? 'bg-slate-900 text-white shadow-lg'
                     : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
@@ -361,7 +361,7 @@ export default function ClubsPage() {
                   onClick={() => toggleEquipement(equipement)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     selectedEquipements.includes(equipement)
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      ? 'bg-slate-900 text-white shadow-lg'
                       : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
@@ -385,7 +385,7 @@ export default function ClubsPage() {
                   onClick={() => togglePrixRange(range.value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                     selectedPrixRanges.includes(range.value)
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                      ? 'bg-slate-900 text-white shadow-lg'
                       : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
@@ -399,7 +399,7 @@ export default function ClubsPage() {
         {/* Loading state */}
         {isLoading && (
           <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent mb-4"></div>
             <p className="text-gray-600 font-semibold">Chargement des clubs...</p>
           </div>
         )}
@@ -419,7 +419,7 @@ export default function ClubsPage() {
                   console.error('[CLUB LIST CLICK] ❌ WARNING: club.id is undefined/null!')
                 }
               }}
-              className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-xl p-3 md:p-5 hover:border-blue-500 hover:shadow-lg transition-all"
+              className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-xl p-3 md:p-5 hover:border-slate-300 hover:shadow-lg transition-all"
             >
               {/* Image - Full width mobile, fixed width desktop */}
               <div className="relative w-full md:w-64 h-48 md:h-44 flex-shrink-0 rounded-lg overflow-hidden">
@@ -430,7 +430,7 @@ export default function ClubsPage() {
                 />
                 {/* Distance badge - Uniquement si géoloc active */}
                 {locationStatus === 'ready' && club.distanceKm !== undefined && club.distanceMinutes !== undefined && (
-                  <div className="absolute top-2 md:top-3 left-2 md:left-3 bg-blue-600 text-white px-2 md:px-3 py-1 md:py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
+                  <div className="absolute top-2 md:top-3 left-2 md:left-3 bg-slate-900/90 text-white px-2 md:px-3 py-1 md:py-1.5 rounded-lg shadow-lg flex items-center gap-1.5">
                     <svg className="w-3 md:w-4 h-3 md:h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
@@ -473,7 +473,7 @@ export default function ClubsPage() {
                 {/* Nom + Badge Disponible */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-slate-900 transition-colors line-clamp-2 leading-tight">
                       {club.name}
                     </h3>
                     <p className="text-sm md:text-base text-gray-600 flex items-center gap-1.5 mt-1">
@@ -526,7 +526,7 @@ export default function ClubsPage() {
                       {club.prixMin}€ <span className="text-sm md:text-base text-gray-500 font-normal">/ pers · 1h30</span>
                     </p>
                   </div>
-                  <div className="w-full md:w-auto px-5 py-3 md:px-6 md:py-2.5 bg-blue-600 text-white font-semibold rounded-lg group-hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                  <div className="w-full md:w-auto px-5 py-3 md:px-6 md:py-2.5 bg-slate-900 text-white font-semibold rounded-lg group-hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>

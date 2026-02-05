@@ -202,6 +202,11 @@ export default function AccueilPage() {
         </div>
       </section>
 
+      {/* Séparation Hero → Clubs */}
+      <div className="mt-10 mb-10 w-full flex justify-center px-6">
+        <div className="h-px w-full max-w-5xl bg-slate-200" />
+      </div>
+
       {/* Clubs - CAROUSEL CARDS STYLE */}
       <section className="pt-[3px] pb-8 md:pb-12 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">

@@ -59,7 +59,7 @@ export default function UseMyLocationButton({
         className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
           loading
             ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25'
+            : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg'
         }`}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
