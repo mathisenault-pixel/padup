@@ -320,10 +320,10 @@ export default function TournoisPage() {
           <p className="text-gray-600">Découvrez et participez aux tournois de padel</p>
         </div>
 
-        {/* Barre de recherche + Filtres */}
-        <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200">
+        {/* Barre de recherche + Filtres - Style compact (comme Mes réservations) */}
+        <div className="mb-6 bg-white border border-slate-200 rounded-lg p-4">
           {/* Recherche */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <SmartSearchBar
               placeholder="Rechercher un tournoi ou un club..."
               onSearch={(query) => setSearchTerm(query)}
@@ -340,7 +340,7 @@ export default function TournoisPage() {
           </div>
 
           {/* Filtres Tri */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
             <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
               <button
@@ -360,7 +360,7 @@ export default function TournoisPage() {
           </div>
 
           {/* Filtre Autour de (Ville ou Club) avec Rayon */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <div className="w-full sm:flex-1 min-w-0">
@@ -393,7 +393,7 @@ export default function TournoisPage() {
           </div>
 
           {/* Filtres Statut */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Statut :</span>
             <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
               <button
@@ -439,7 +439,7 @@ export default function TournoisPage() {
           </div>
 
           {/* Filtres Niveau */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Niveau :</span>
             <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
               <button

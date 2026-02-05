@@ -253,10 +253,10 @@ export default function ClubsPage() {
           <p className="text-gray-600">Trouvez et réservez les meilleurs clubs de padel</p>
         </div>
 
-        {/* Barre de recherche + Filtres */}
-        <div className="mb-6 md:mb-8 bg-gray-50 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200">
+        {/* Barre de recherche + Filtres - Style compact (comme Mes réservations) */}
+        <div className="mb-6 bg-white border border-slate-200 rounded-lg p-4">
           {/* Recherche */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <SmartSearchBar
               placeholder="Rechercher un club ou une ville..."
               onSearch={(query) => setSearchTerm(query)}
@@ -273,7 +273,7 @@ export default function ClubsPage() {
           </div>
 
           {/* Filtre Autour de (Ville ou Club) avec Rayon */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Autour de :</label>
             <div className="flex items-center gap-2">
               <div className="flex-1">
@@ -306,7 +306,7 @@ export default function ClubsPage() {
           </div>
 
           {/* Filtres Tri */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Trier par :</span>
             <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
               <button
@@ -352,7 +352,7 @@ export default function ClubsPage() {
           </div>
 
           {/* Filtres Équipements (multi-sélection) */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-3">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-2">Équipements :</span>
             <div className="flex items-center gap-2 flex-wrap mt-2 overflow-x-auto pb-1 -mx-1 px-1">
               {['Restaurant', 'Parking', 'Bar', 'Fitness', 'Coaching'].map((equipement) => (
