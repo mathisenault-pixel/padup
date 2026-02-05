@@ -143,7 +143,7 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       {/* Hero - PREMIUM */}
-      <section className="px-6 pt-[30px] md:pt-32 pb-10">
+      <section className="px-6 pt-[30px] md:pt-32 pb-16 md:pb-24">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <div className="inline-block mb-6">
@@ -160,8 +160,8 @@ export default function AccueilPage() {
               Accédez aux meilleurs clubs de France et réservez votre terrain en quelques clics.
             </p>
 
-            {/* BARRE DE RECHERCHE DISCRÈTE */}
-            <div className="max-w-2xl mx-auto">
+            {/* BARRE DE RECHERCHE */}
+            <div className="max-w-4xl mx-auto">
               <SmartSearchBar
                 placeholder="Rechercher un club ou une ville"
                 onSearch={(query) => {
@@ -176,7 +176,7 @@ export default function AccueilPage() {
                   ...getCitySuggestions()
                 ]}
                 storageKey="search-history-accueil"
-                compact={true}
+                compact={false}
               />
             </div>
 

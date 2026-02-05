@@ -166,8 +166,8 @@ export default function SmartSearchBar({
       <div className={`relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 ${
         isFocused ? 'ring-2 ring-blue-500 shadow-lg' : ''
       }`}>
-        <div className="flex items-center gap-3 px-4">
-          <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`flex items-center gap-3 ${compact ? 'px-4' : 'px-6'}`}>
+          <svg className={`${compact ? 'w-5 h-5' : 'w-6 h-6'} text-gray-400 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -187,7 +187,7 @@ export default function SmartSearchBar({
               }
             }}
             onKeyDown={handleKeyDown}
-            className="flex-1 py-3 text-base focus:outline-none bg-transparent placeholder:text-gray-400"
+            className={`flex-1 ${compact ? 'py-3 text-base' : 'py-4 text-lg'} focus:outline-none bg-transparent placeholder:text-gray-400`}
           />
           {query && (
             <button
@@ -196,9 +196,9 @@ export default function SmartSearchBar({
                 setSelectedIndex(-1)
                 inputRef.current?.focus()
               }}
-              className="flex-shrink-0 w-7 h-7 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all"
+              className={`flex-shrink-0 ${compact ? 'w-7 h-7' : 'w-8 h-8'} bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all`}
             >
-              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-gray-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
