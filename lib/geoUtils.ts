@@ -107,3 +107,99 @@ export function formatTravelTime(minutes: number): string {
   
   return `🚗 ~${minutes} min`
 }
+
+// ============================================
+// API OSRM pour temps de trajet réel en voiture
+// ============================================
+
+// Cache en mémoire pour éviter de spammer l'API
+const osrmCache = new Map<string, { km: number; min: number }>()
+
+/**
+ * Obtient le temps de trajet réel en voiture via l'API OSRM
+ * Avec fallback sur estimation Haversine si l'API échoue
+ * 
+ * @param userLat Latitude utilisateur
+ * @param userLon Longitude utilisateur
+ * @param placeLat Latitude destination
+ * @param placeLon Longitude destination
+ * @returns Promise<{ km: number; min: number }> Distance en km et temps en minutes
+ */
+export async function getDrivingMetrics(
+  userLat: number,
+  userLon: number,
+  placeLat: number,
+  placeLon: number
+): Promise<{ km: number; min: number }> {
+  // Créer une clé de cache basée sur les coordonnées arrondies (3 décimales = ~100m précision)
+  const cacheKey = `${userLat.toFixed(3)},${userLon.toFixed(3)}->${placeLat.toFixed(3)},${placeLon.toFixed(3)}`
+  
+  // Vérifier le cache
+  const cached = osrmCache.get(cacheKey)
+  if (cached) {
+    return cached
+  }
+  
+  try {
+    // Appel OSRM avec timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
+    
+    const url = `https://router.project-osrm.org/route/v1/driving/${userLon},${userLat};${placeLon},${placeLat}?overview=false`
+    
+    const response = await fetch(url, {
+      signal: controller.signal,
+    })
+    
+    clearTimeout(timeoutId)
+    
+    if (!response.ok) {
+      throw new Error(`OSRM API error: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    
+    if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+      throw new Error('OSRM: No route found')
+    }
+    
+    const route = data.routes[0]
+    const distanceMeters = route.distance // en mètres
+    const durationSeconds = route.duration // en secondes
+    
+    const km = Math.round((distanceMeters / 1000) * 10) / 10 // Arrondi à 1 décimale
+    const min = Math.round(durationSeconds / 60)
+    
+    const result = { km, min }
+    
+    // Mettre en cache
+    osrmCache.set(cacheKey, result)
+    
+    return result
+  } catch (error) {
+    // Fallback : calcul Haversine + estimation temps
+    console.warn('[OSRM] Fallback to Haversine:', error)
+    
+    const km = Math.round(haversineKm(userLat, userLon, placeLat, placeLon) * 10) / 10
+    const min = estimateMinutes(km)
+    
+    const result = { km, min }
+    
+    // Mettre en cache le fallback aussi
+    osrmCache.set(cacheKey, result)
+    
+    return result
+  }
+}
+
+/**
+ * Formate l'affichage de la distance et du temps de trajet
+ * 
+ * @param km Distance en kilomètres
+ * @param min Temps en minutes
+ * @returns Chaîne formatée (ex: "4,8 km • 12 min en voiture")
+ */
+export function formatDrivingInfo(km: number, min: number): string {
+  const kmStr = km < 10 ? km.toFixed(1).replace('.', ',') : Math.round(km).toString()
+  return `${kmStr} km • ${min} min en voiture`
+}

@@ -10,7 +10,7 @@ import ClubCard from '../components/ClubCard'
 import PageHeader from '../components/PageHeader'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { useUserLocation } from '@/hooks/useUserLocation'
-import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
+import { haversineKm, formatDistance, estimateMinutes, formatTravelTime, getDrivingMetrics } from '@/lib/geoUtils'
 import { getCitySuggestions, getCityCoordinates } from '@/lib/cities'
 import { CLUBS_DATA, getClubById } from '@/lib/data/clubs'
 
@@ -62,6 +62,9 @@ export default function ClubsPage() {
   // États pour le header de recherche
   const [headerSearchTerm, setHeaderSearchTerm] = useState('')
   const [headerCitySearch, setHeaderCitySearch] = useState('')
+  
+  // État pour les métriques de conduite (OSRM)
+  const [drivingMetrics, setDrivingMetrics] = useState<Map<string, { km: number; min: number }>>(new Map())
   
   // ✅ Géolocalisation avec hook custom (cache + gestion erreurs)
   const { status: locationStatus, coords: userCoords, error: locationError, requestLocation } = useUserLocation()
@@ -167,6 +170,51 @@ export default function ClubsPage() {
       }
     })
   }, [clubs, userCoords, locationStatus])
+
+  // ============================================
+  // CALCUL MÉTRIQUES DE CONDUITE (OSRM API)
+  // ============================================
+  // Calculer les métriques de conduite réelles pour les premiers clubs visibles
+  useEffect(() => {
+    if (locationStatus !== 'ready' || !userCoords || clubsWithDistance.length === 0) {
+      return
+    }
+
+    const calculateDrivingMetrics = async () => {
+      // Prendre les 20 premiers clubs (visibles) pour limiter les appels API
+      const topClubs = clubsWithDistance.slice(0, 20)
+      
+      // Calculer en parallèle avec Promise.allSettled (ne bloque pas si une échoue)
+      const results = await Promise.allSettled(
+        topClubs.map(async (club) => {
+          if (!club.lat || !club.lng) {
+            return null
+          }
+          
+          const metrics = await getDrivingMetrics(
+            userCoords.lat,
+            userCoords.lng,
+            club.lat,
+            club.lng
+          )
+          
+          return { clubId: club.id, metrics }
+        })
+      )
+      
+      // Mettre à jour le state avec les résultats
+      const newMetrics = new Map<string, { km: number; min: number }>()
+      results.forEach((result) => {
+        if (result.status === 'fulfilled' && result.value) {
+          newMetrics.set(result.value.clubId, result.value.metrics)
+        }
+      })
+      
+      setDrivingMetrics(newMetrics)
+    }
+
+    calculateDrivingMetrics()
+  }, [clubsWithDistance, userCoords, locationStatus])
 
   // Trouver les coordonnées de référence pour le filtre "Autour de"
   const referenceCoords = useMemo(() => {
@@ -427,6 +475,7 @@ export default function ClubsPage() {
                   city={club.city}
                   imageUrl={club.imageUrl}
                   href={`/player/clubs/${club.id}/reserver`}
+                  drivingInfo={drivingMetrics.get(club.id) || null}
                 />
               ))}
             </div>

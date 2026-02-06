@@ -9,7 +9,7 @@ import PageHeader from '../components/PageHeader'
 import TournoiCard from '../components/TournoiCard'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
-import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
+import { haversineKm, formatDistance, estimateMinutes, formatTravelTime, getDrivingMetrics } from '@/lib/geoUtils'
 import { getCitySuggestions, getCityCoordinates } from '@/lib/cities'
 
 type Tournoi = {
@@ -62,6 +62,9 @@ export default function TournoisPage() {
   // États pour le header de recherche
   const [headerSearchTerm, setHeaderSearchTerm] = useState('')
   const [headerCitySearch, setHeaderCitySearch] = useState('')
+
+  // État pour les métriques de conduite (OSRM)
+  const [drivingMetrics, setDrivingMetrics] = useState<Map<number, { km: number; min: number }>>(new Map())
 
   // Géolocalisation
   const { coords: userCoords, status: locationStatus, error: locationError, requestLocation } = useUserLocation()
@@ -227,6 +230,46 @@ export default function TournoisPage() {
     })
   }, [tournois, userCoords])
 
+  // ============================================
+  // CALCUL MÉTRIQUES DE CONDUITE (OSRM API)
+  // ============================================
+  // Calculer les métriques de conduite réelles pour les premiers tournois visibles
+  useEffect(() => {
+    if (locationStatus !== 'ready' || !userCoords || tournoisWithDistance.length === 0) {
+      return
+    }
+
+    const calculateDrivingMetrics = async () => {
+      // Prendre les 20 premiers tournois (visibles) pour limiter les appels API
+      const topTournois = tournoisWithDistance.slice(0, 20)
+      
+      // Calculer en parallèle avec Promise.allSettled (ne bloque pas si une échoue)
+      const results = await Promise.allSettled(
+        topTournois.map(async (tournoi) => {
+          const metrics = await getDrivingMetrics(
+            userCoords.lat,
+            userCoords.lng,
+            tournoi.lat,
+            tournoi.lng
+          )
+          
+          return { tournoiId: tournoi.id, metrics }
+        })
+      )
+      
+      // Mettre à jour le state avec les résultats
+      const newMetrics = new Map<number, { km: number; min: number }>()
+      results.forEach((result) => {
+        if (result.status === 'fulfilled' && result.value) {
+          newMetrics.set(result.value.tournoiId, result.value.metrics)
+        }
+      })
+      
+      setDrivingMetrics(newMetrics)
+    }
+
+    calculateDrivingMetrics()
+  }, [tournoisWithDistance, userCoords, locationStatus])
 
   const toggleCategorie = (cat: string) => {
     setSelectedCategories(prev => 
@@ -555,6 +598,7 @@ export default function TournoisPage() {
                     categorie={tournoi.categorie}
                     imageUrl={tournoi.image}
                     href={`/player/tournois/${tournoi.id}`}
+                    drivingInfo={drivingMetrics.get(tournoi.id) || null}
                   />
                 )
               })}
