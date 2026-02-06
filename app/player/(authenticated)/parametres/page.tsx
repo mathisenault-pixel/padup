@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
 export default function ParametresPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('demo@padup.com')
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -46,6 +49,21 @@ export default function ParametresPage() {
     setShowSuccessMessage(true)
     setTimeout(() => setShowSuccessMessage(false), 3000)
     console.log('Notifications mises à jour:', notifications)
+  }
+
+  const handleSignOut = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+      return
+    }
+    
+    const { error } = await supabase.auth.signOut()
+    
+    if (error) {
+      console.error('Erreur lors de la déconnexion:', error)
+      alert('Erreur lors de la déconnexion')
+    } else {
+      router.push('/login')
+    }
   }
 
   return (
@@ -279,8 +297,11 @@ export default function ParametresPage() {
                 Historique de connexion
               </button>
               
-              <button className="w-full text-left px-4 py-3 bg-red-50 hover:bg-red-100 rounded-xl font-semibold text-red-600 transition-all">
-                Supprimer mon compte
+              <button 
+                onClick={handleSignOut}
+                className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl font-semibold text-slate-700 transition-all"
+              >
+                Me déconnecter de ce compte
               </button>
             </div>
           </div>
