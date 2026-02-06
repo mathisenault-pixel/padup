@@ -225,7 +225,7 @@ export const CLUBS_DATA: ClubData[] = [
     equipements: ['WiFi', 'TV', 'Casiers', 'Douches', 'Parking gratuit', 'Vestiaires'],
     note: 4.4,
     avis: 35,
-    prixMin: 6,
+    prixMin: 12,
     isActive: true,
     courts: [
       {
@@ -234,7 +234,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain Couvert 1',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 24,
+        pricePerHour: 32,
       },
       {
         id: 'court-ze-2',
@@ -242,7 +242,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain Couvert 2',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 24,
+        pricePerHour: 32,
       },
       {
         id: 'court-ze-3',
@@ -250,7 +250,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain Couvert 3',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 24,
+        pricePerHour: 32,
       },
       {
         id: 'court-ze-4',
@@ -258,7 +258,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain Couvert 4',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 24,
+        pricePerHour: 32,
       },
       {
         id: 'court-ze-5',
@@ -266,7 +266,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain Extérieur 1',
         type: 'outdoor',
         isActive: true,
-        pricePerHour: 24,
+        pricePerHour: 32,
       },
       {
         id: 'court-ze-6',
@@ -274,7 +274,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain Extérieur 2',
         type: 'outdoor',
         isActive: true,
-        pricePerHour: 24,
+        pricePerHour: 32,
       },
     ],
   },
@@ -292,7 +292,7 @@ export const CLUBS_DATA: ClubData[] = [
     equipements: ['Bar', 'Restaurant', 'Club house', 'Vestiaires', 'Douches', 'Terrasse', 'Pétanque gratuite', 'Parking', 'Location raquettes'],
     note: 4.9,
     avis: 203,
-    prixMin: 3,
+    prixMin: 12,
     isActive: true,
     courts: [
       {
@@ -301,7 +301,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain 1',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 8,
+        pricePerHour: 32,
       },
       {
         id: 'court-qg-2',
@@ -309,7 +309,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain 2',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 8,
+        pricePerHour: 32,
       },
       {
         id: 'court-qg-3',
@@ -317,7 +317,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain 3',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 8,
+        pricePerHour: 32,
       },
       {
         id: 'court-qg-4',
@@ -325,7 +325,7 @@ export const CLUBS_DATA: ClubData[] = [
         name: 'Terrain 4',
         type: 'indoor',
         isActive: true,
-        pricePerHour: 9,
+        pricePerHour: 32,
       },
     ],
   },

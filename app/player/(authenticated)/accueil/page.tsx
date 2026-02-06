@@ -14,6 +14,7 @@ import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { getCitySuggestions } from '@/lib/cities'
 import { haversineKm, formatTravelTime, estimateMinutes, formatDistance } from '@/lib/geoUtils'
 import { SectionDivider } from '@/components/ui/SectionDivider'
+import { getClubById } from '@/lib/data/clubs'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
@@ -79,6 +80,7 @@ export default function AccueilPage() {
       // Transformer les données Supabase en format UI
       const clubsWithUI = (data || []).map((club, index) => {
         const coords = CLUB_COORDINATES[club.id] || { lat: 43.9, lng: 4.8 } // Fallback Avignon
+        const clubData = getClubById(club.id) // Récupérer les vraies données
         return {
           id: club.id,
           name: club.name || 'Club sans nom',
@@ -91,7 +93,7 @@ export default function AccueilPage() {
           avis: 100 + index * 50,
           photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
           imageUrl: getClubImage(club.id), // ✅ Image par clubId
-          prixMin: 11 + index,
+          prixMin: clubData?.prixMin || 11 + index, // Utiliser le vrai prix depuis CLUBS_DATA
         }
       })
       
