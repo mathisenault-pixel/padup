@@ -163,8 +163,8 @@ export default function SmartSearchBar({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <div className={`relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 ${
-        isFocused ? 'ring-2 ring-slate-400 shadow-lg' : ''
+      <div className={`relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border ${
+        isFocused ? 'border-slate-300' : 'border-slate-200'
       }`}>
         <div className={`flex items-center gap-3 ${compact ? 'px-4' : 'px-6'}`}>
           <svg className={`${compact ? 'w-5 h-5' : 'w-6 h-6'} text-gray-400 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@ export default function SmartSearchBar({
               }
             }}
             onKeyDown={handleKeyDown}
-            className={`flex-1 ${compact ? 'py-3 text-base' : 'py-4 text-lg'} focus:outline-none bg-transparent placeholder:text-gray-400`}
+            className={`flex-1 ${compact ? 'py-3 text-base' : 'py-4 text-lg'} focus:outline-none focus:ring-0 focus:ring-offset-0 bg-transparent placeholder:text-gray-400`}
           />
           {query && (
             <button

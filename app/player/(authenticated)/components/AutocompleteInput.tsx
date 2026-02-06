@@ -101,7 +101,7 @@ export default function AutocompleteInput({
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
+        className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0 focus:ring-offset-0 bg-transparent"
       />
 
       {/* Dropdown suggestions */}
