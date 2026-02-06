@@ -201,6 +201,16 @@ export default function ClubsPage() {
     return [...getCitySuggestions(), ...cities].sort()
   }, [clubs])
 
+  // Calculer le nombre de filtres actifs
+  const activeFiltersCount = useMemo(() => {
+    let count = 0
+    if (sortBy !== 'note') count++
+    count += selectedEquipements.length
+    count += selectedPrixRanges.length
+    if (cityClubFilter) count++
+    return count
+  }, [sortBy, selectedEquipements, selectedPrixRanges, cityClubFilter])
+
   // Filtrer et trier avec useMemo (évite recalcul inutile)
   const filteredAndSortedClubs = useMemo(() => {
     const result = clubsWithDistance
@@ -289,84 +299,9 @@ export default function ClubsPage() {
             setSearchTerm(headerSearchTerm)
             setCityClubFilter(headerCitySearch)
           }}
+          onFiltersClick={() => setIsFiltersDrawerOpen(true)}
+          activeFiltersCount={activeFiltersCount}
         />
-
-        {/* Barre de filtres compacte (nouvelle organisation) */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 py-3 border-b border-slate-200 flex-wrap">
-            {/* Filtre principal : Tri */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-slate-700 whitespace-nowrap">Trier:</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="h-10 px-3 pr-8 text-sm font-medium border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white text-slate-700 cursor-pointer"
-              >
-                <option value="note">Mieux notés</option>
-                <option value="prix-asc">Prix croissant</option>
-                <option value="prix-desc">Prix décroissant</option>
-              </select>
-            </div>
-
-            {/* Bouton "Filtres" */}
-            <button
-              onClick={() => setIsFiltersDrawerOpen(true)}
-              className="inline-flex items-center gap-2 h-10 px-4 text-sm font-medium bg-white text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-all"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-              Filtres
-            </button>
-          </div>
-
-          {/* Chips de filtres actifs */}
-          <ActiveFiltersChips
-            chips={[
-              ...(searchTerm ? [{
-                id: 'search',
-                label: 'Recherche',
-                value: searchTerm,
-                onRemove: () => setSearchTerm('')
-              }] : []),
-              ...(sortBy !== 'note' ? [{
-                id: 'tri',
-                label: 'Tri',
-                value: sortBy === 'prix-asc' ? 'Prix croissant' : 'Prix décroissant',
-                onRemove: () => setSortBy('note')
-              }] : []),
-              ...selectedEquipements.map(eq => ({
-                id: `eq-${eq}`,
-                label: 'Équipement',
-                value: eq,
-                onRemove: () => toggleEquipement(eq)
-              })),
-              ...selectedPrixRanges.map(range => {
-                const labels: Record<string, string> = { '0-8': '≤ 8€', '9-10': '9-10€', '11+': '≥ 11€' }
-                return {
-                  id: `prix-${range}`,
-                  label: 'Prix',
-                  value: labels[range] || range,
-                  onRemove: () => togglePrixRange(range)
-                }
-              }),
-              ...(cityClubFilter ? [{
-                id: 'location',
-                label: 'Ville',
-                value: `${cityClubFilter} (${radiusKm}km)`,
-                onRemove: () => setCityClubFilter('')
-              }] : []),
-            ]}
-            onClearAll={() => {
-              setSearchTerm('')
-              setSortBy('note')
-              setSelectedEquipements([])
-              setSelectedPrixRanges([])
-              setCityClubFilter('')
-              setRadiusKm(50)
-            }}
-          />
-        </div>
 
         {/* Drawer avec tous les filtres */}
         <FiltersDrawer
@@ -382,6 +317,20 @@ export default function ClubsPage() {
             setRadiusKm(50)
           }}
         >
+          {/* Filtre Tri */}
+          <div className="mb-6">
+            <h3 className="text-sm font-bold text-slate-900 mb-3">Trier par</h3>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
+            >
+              <option value="note">Mieux notés</option>
+              <option value="prix-asc">Prix croissant</option>
+              <option value="prix-desc">Prix décroissant</option>
+            </select>
+          </div>
+
           {/* Filtre Autour de */}
           <div className="mb-6">
             <h3 className="text-sm font-bold text-slate-900 mb-3">Autour de</h3>

@@ -292,6 +292,14 @@ export default function ReservationsPage() {
     // Note: headerSearchTerm pourrait être utilisé pour filtrer par nom de club si besoin
   }
 
+  // Calculer le nombre de filtres actifs
+  const activeFiltersCount = useMemo(() => {
+    let count = 0
+    if (selectedType !== 'tous') count++
+    if (selectedFilter !== 'tous') count++
+    return count
+  }, [selectedType, selectedFilter])
+
   if (loading) {
     return (
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
@@ -407,60 +415,9 @@ export default function ReservationsPage() {
         }}
         buttonLabel="Appliquer"
         onSearch={handleHeaderSearch}
+        onFiltersClick={() => setIsFiltersDrawerOpen(true)}
+        activeFiltersCount={activeFiltersCount}
       />
-
-      {/* Barre de filtres compacte (nouvelle organisation) */}
-      <div className="mb-4">
-        <div className="flex items-center gap-3 py-3 border-b border-slate-200">
-          {/* Filtre principal : Statut */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-slate-700 whitespace-nowrap">Statut:</label>
-            <select
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value as typeof selectedFilter)}
-              className="h-10 px-3 pr-8 text-sm font-medium border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent bg-white text-slate-700 cursor-pointer appearance-none transition-all"
-            >
-              <option value="tous">Toutes ({validBookings.length})</option>
-              <option value="a-venir">À venir ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})</option>
-              <option value="passees">Passées ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})</option>
-              <option value="annulees">Annulées ({validBookings.filter(b => b.status === 'cancelled').length})</option>
-            </select>
-          </div>
-
-          {/* Bouton "Filtres" */}
-          <button
-            onClick={() => setIsFiltersDrawerOpen(true)}
-            className="inline-flex items-center gap-2 h-10 px-4 text-sm font-medium bg-white text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-all ml-auto"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-            Filtres
-          </button>
-        </div>
-
-        {/* Chips de filtres actifs */}
-        <ActiveFiltersChips
-          chips={[
-            ...(selectedType !== 'tous' ? [{
-              id: 'type',
-              label: 'Type',
-              value: selectedType === 'parties' ? 'Parties' : 'Tournois',
-              onRemove: () => setSelectedType('tous')
-            }] : []),
-            ...(selectedFilter !== 'tous' ? [{
-              id: 'statut',
-              label: 'Statut',
-              value: selectedFilter === 'a-venir' ? 'À venir' : selectedFilter === 'passees' ? 'Passées' : 'Annulées',
-              onRemove: () => setSelectedFilter('tous')
-            }] : []),
-          ]}
-          onClearAll={() => {
-            setSelectedType('tous')
-            setSelectedFilter('tous')
-          }}
-        />
-      </div>
 
       {/* Drawer avec tous les filtres */}
       <FiltersDrawer
