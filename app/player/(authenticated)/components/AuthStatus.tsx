@@ -50,24 +50,6 @@ export default function AuthStatus() {
     }
   }, [])
 
-  // ============================================
-  // Handler de déconnexion
-  // ============================================
-  const handleSignOut = async () => {
-    console.log('[AUTH STATUS] Signing out...')
-    
-    const { error } = await supabase.auth.signOut()
-    
-    if (error) {
-      console.error('[AUTH STATUS] Error signing out:', error)
-      alert('Erreur lors de la déconnexion')
-    } else {
-      console.log('[AUTH STATUS] ✅ Signed out successfully')
-      setUser(null)
-      router.push('/player/accueil')
-    }
-  }
-
   // Loading state
   if (isLoading) {
     return (
@@ -88,15 +70,6 @@ export default function AuthStatus() {
           className="px-4 py-2 text-[14px] font-medium bg-slate-900 hover:bg-slate-800 text-white rounded-md transition-colors"
         >
           Mon compte
-        </button>
-
-        {/* Déconnexion - Lien texte simple rouge (discret) */}
-        <button
-          type="button"
-          onClick={handleSignOut}
-          className="hidden md:inline-flex px-2 py-2 text-[14px] font-medium text-red-600 hover:text-red-700 transition-colors"
-        >
-          Déconnexion
         </button>
       </div>
     )
