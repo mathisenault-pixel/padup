@@ -47,84 +47,93 @@ export default function PageHeader({
       </div>
 
       {/* Barre de recherche unifiée */}
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 px-6 py-3 flex items-center gap-4">
-          {/* Champ gauche - avec autocomplete si suggestions fournies */}
-          {leftField.suggestions && leftField.suggestions.length > 0 ? (
-            <div className="flex-[1.2]">
-              <AutocompleteInput
-                label={leftField.label}
-                placeholder={leftField.placeholder}
-                value={leftField.value}
-                onChange={leftField.onChange}
-                suggestions={leftField.suggestions}
-              />
-            </div>
-          ) : (
-            <div className="flex-[1.2] px-4 py-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                {leftField.label}
-              </label>
-              <input
-                type="text"
-                value={leftField.value}
-                onChange={(e) => leftField.onChange(e.target.value)}
-                placeholder={leftField.placeholder}
-                className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
-              />
-            </div>
-          )}
+      <div className="w-full max-w-6xl mx-auto px-4 min-w-0">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 px-4 md:px-6 py-3 flex flex-col md:flex-row md:items-center gap-3 w-full min-w-0">
+          
+          {/* Zone inputs - ligne 1 sur mobile, partie gauche sur desktop */}
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            {/* Champ gauche - avec autocomplete si suggestions fournies */}
+            {leftField.suggestions && leftField.suggestions.length > 0 ? (
+              <div className="flex-[1.2] min-w-0">
+                <AutocompleteInput
+                  label={leftField.label}
+                  placeholder={leftField.placeholder}
+                  value={leftField.value}
+                  onChange={leftField.onChange}
+                  suggestions={leftField.suggestions}
+                />
+              </div>
+            ) : (
+              <div className="flex-[1.2] px-4 py-2 min-w-0">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {leftField.label}
+                </label>
+                <input
+                  type="text"
+                  value={leftField.value}
+                  onChange={(e) => leftField.onChange(e.target.value)}
+                  placeholder={leftField.placeholder}
+                  className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
+                />
+              </div>
+            )}
 
-          {/* Séparateur vertical */}
-          <div className="w-px bg-slate-200 self-stretch"></div>
+            {/* Séparateur vertical - masqué sur mobile */}
+            <div className="hidden md:block w-px bg-slate-200 self-stretch"></div>
 
-          {/* Champ droit */}
-          {rightField.type === 'select' && rightField.options ? (
-            <div className="flex-1 px-4 py-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                {rightField.label}
-              </label>
-              <select
-                value={rightField.value}
-                onChange={(e) => rightField.onChange(e.target.value)}
-                className="w-full text-sm text-slate-900 focus:outline-none bg-transparent cursor-pointer"
-              >
-                {rightField.options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : rightField.suggestions && rightField.suggestions.length > 0 ? (
-            <div className="flex-1">
-              <AutocompleteInput
-                label={rightField.label}
-                placeholder={rightField.placeholder}
-                value={rightField.value}
-                onChange={rightField.onChange}
-                suggestions={rightField.suggestions}
-              />
-            </div>
-          ) : (
-            <div className="flex-1 px-4 py-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                {rightField.label}
-              </label>
-              <input
-                type="text"
-                value={rightField.value}
-                onChange={(e) => rightField.onChange(e.target.value)}
-                placeholder={rightField.placeholder}
-                className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
-              />
-            </div>
-          )}
+            {/* Champ droit */}
+            {rightField.type === 'select' && rightField.options ? (
+              <div className="flex-1 px-4 py-2 min-w-0">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {rightField.label}
+                </label>
+                <select
+                  value={rightField.value}
+                  onChange={(e) => rightField.onChange(e.target.value)}
+                  className="w-full text-sm text-slate-900 focus:outline-none bg-transparent cursor-pointer"
+                >
+                  {rightField.options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : rightField.suggestions && rightField.suggestions.length > 0 ? (
+              <div className="flex-1 min-w-0">
+                <AutocompleteInput
+                  label={rightField.label}
+                  placeholder={rightField.placeholder}
+                  value={rightField.value}
+                  onChange={rightField.onChange}
+                  suggestions={rightField.suggestions}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 px-4 py-2 min-w-0">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {rightField.label}
+                </label>
+                <input
+                  type="text"
+                  value={rightField.value}
+                  onChange={(e) => rightField.onChange(e.target.value)}
+                  placeholder={rightField.placeholder}
+                  className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
+                />
+              </div>
+            )}
+          </div>
 
-          {/* Bouton Filtres (optionnel) */}
-          {onFiltersClick && (
-            <>
-              <div className="w-px bg-slate-200 self-stretch"></div>
+          {/* Zone boutons - ligne 2 sur mobile, partie droite sur desktop */}
+          <div className="flex items-center justify-end md:justify-start gap-2 w-full md:w-auto">
+            {/* Séparateur avant boutons - desktop uniquement */}
+            {onFiltersClick && (
+              <div className="hidden md:block w-px bg-slate-200 h-10"></div>
+            )}
+
+            {/* Bouton Filtres (optionnel) */}
+            {onFiltersClick && (
               <button
                 onClick={onFiltersClick}
                 className="relative h-10 px-3 bg-slate-50 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-100 transition-colors flex-shrink-0 flex items-center gap-2 border border-slate-200"
@@ -139,16 +148,16 @@ export default function PageHeader({
                   </span>
                 )}
               </button>
-            </>
-          )}
+            )}
 
-          {/* Bouton Rechercher */}
-          <button
-            onClick={onSearch}
-            className="h-10 px-4 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0"
-          >
-            {buttonLabel}
-          </button>
+            {/* Bouton Rechercher - full width sur mobile */}
+            <button
+              onClick={onSearch}
+              className="h-10 px-4 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0 w-full sm:w-auto"
+            >
+              {buttonLabel}
+            </button>
+          </div>
         </div>
       </div>
     </div>
