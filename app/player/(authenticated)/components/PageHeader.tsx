@@ -125,18 +125,26 @@ export default function PageHeader({
             )}
           </div>
 
-          {/* Zone boutons - ligne 2 sur mobile, partie droite sur desktop */}
-          <div className="flex items-center justify-end md:justify-start gap-2 w-full md:w-auto">
+          {/* Zone boutons - ligne 2 sur mobile (full width, empilés), partie droite sur desktop */}
+          <div className="w-full flex flex-col gap-2 md:flex-row md:w-auto md:items-center">
             {/* Séparateur avant boutons - desktop uniquement */}
             {onFiltersClick && (
               <div className="hidden md:block w-px bg-slate-200 h-10"></div>
             )}
 
-            {/* Bouton Filtres (optionnel) */}
+            {/* Bouton Rechercher - full width sur mobile, ordre 1 */}
+            <button
+              onClick={onSearch}
+              className="h-10 px-4 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors w-full md:w-auto flex-shrink-0"
+            >
+              {buttonLabel}
+            </button>
+
+            {/* Bouton Filtres (optionnel) - full width sur mobile, ordre 2 */}
             {onFiltersClick && (
               <button
                 onClick={onFiltersClick}
-                className="relative h-10 px-3 bg-slate-50 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-100 transition-colors flex-shrink-0 flex items-center gap-2 border border-slate-200"
+                className="relative h-10 px-3 bg-slate-50 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-100 transition-colors w-full md:w-auto flex-shrink-0 flex items-center justify-center gap-2 border border-slate-200"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -149,14 +157,6 @@ export default function PageHeader({
                 )}
               </button>
             )}
-
-            {/* Bouton Rechercher - full width sur mobile */}
-            <button
-              onClick={onSearch}
-              className="h-10 px-4 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0 w-full sm:w-auto"
-            >
-              {buttonLabel}
-            </button>
           </div>
         </div>
       </div>
