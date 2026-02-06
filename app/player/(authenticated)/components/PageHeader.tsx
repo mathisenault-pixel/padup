@@ -127,14 +127,14 @@ export default function PageHeader({
               <div className="w-px bg-slate-200 self-stretch"></div>
               <button
                 onClick={onFiltersClick}
-                className="relative px-5 py-3 bg-slate-50 text-slate-700 font-medium rounded-xl hover:bg-slate-100 transition-colors flex-shrink-0 flex items-center gap-2 border border-slate-200"
+                className="relative px-3 py-2 bg-slate-50 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition-colors flex-shrink-0 flex items-center gap-1.5 border border-slate-200"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
-                <span className="text-sm">Filtres</span>
+                <span className="text-xs font-semibold">Filtres</span>
                 {activeFiltersCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-slate-900 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-slate-900 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -145,7 +145,7 @@ export default function PageHeader({
           {/* Bouton Rechercher */}
           <button
             onClick={onSearch}
-            className="px-8 py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors flex-shrink-0"
+            className="px-5 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors flex-shrink-0"
           >
             {buttonLabel}
           </button>
