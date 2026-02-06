@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Props = {
   onClose: () => void
@@ -47,6 +47,23 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
   const [selectedItems, setSelectedItems] = useState<{[key: string]: number}>({}) // itemId -> quantité
   const [selectedCategorie, setSelectedCategorie] = useState<string>('Toutes')
   const [isProcessing, setIsProcessing] = useState(false) // Guard anti double-clic
+  
+  // ✅ Bloquer le scroll du body quand le modal est ouvert
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    
+    const prevHtmlOverflow = html.style.overflow
+    const prevBodyOverflow = body.style.overflow
+    
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    
+    return () => {
+      html.style.overflow = prevHtmlOverflow
+      body.style.overflow = prevBodyOverflow
+    }
+  }, [])
   
   const categories = ['Toutes', 'Boissons', 'Snacks', 'Repas', 'Desserts']
   
@@ -114,7 +131,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
   }
   
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 h-[100dvh] overflow-y-auto overscroll-contain">
       <div className="min-h-full flex items-center justify-center p-4 py-8">
         <div className="bg-white rounded-2xl max-w-5xl w-full shadow-2xl">
           <div className="px-4 sm:px-6 py-8 sm:py-12">
