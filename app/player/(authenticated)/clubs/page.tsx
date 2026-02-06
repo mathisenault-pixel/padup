@@ -282,23 +282,6 @@ export default function ClubsPage() {
         {/* Barre de filtres compacte (nouvelle organisation) */}
         <div className="mb-4">
           <div className="flex items-center gap-3 py-3 border-b border-slate-200 flex-wrap">
-            {/* Recherche */}
-            <div className="flex-1 min-w-[200px]">
-              <SmartSearchBar
-                placeholder="Rechercher un club..."
-                onSearch={(query) => setSearchTerm(query)}
-                suggestions={[
-                  'Le Hangar Sport & Co',
-                  'Paul & Louis Sport',
-                  'ZE Padel',
-                  'QG Padel Club',
-                  ...getCitySuggestions()
-                ]}
-                storageKey="search-history-clubs"
-                compact={true}
-              />
-            </div>
-
             {/* Filtre principal : Tri */}
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-slate-700 whitespace-nowrap">Trier:</label>
