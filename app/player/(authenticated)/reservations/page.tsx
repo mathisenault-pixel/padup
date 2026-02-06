@@ -7,6 +7,8 @@ import { getClubImage } from '@/lib/clubImages'
 import FiltersDrawer from '../components/FiltersDrawer'
 import ActiveFiltersChips from '../components/ActiveFiltersChips'
 import PageHeader from '../components/PageHeader'
+import ReservationCard from '../components/ReservationCard'
+import TournoiCard from '../components/TournoiCard'
 
 // ✅ Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -514,7 +516,7 @@ export default function ReservationsPage() {
         </div>
       </FiltersDrawer>
 
-      {/* Liste des événements */}
+      {/* Grille des réservations - Catalogue premium */}
       {filteredEvents.length === 0 ? (
         <div className="text-center py-16 px-6">
           <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
@@ -537,170 +539,45 @@ export default function ReservationsPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-5 mb-16 md:mb-8">
-          {filteredEvents.map((event) => {
-            // Affichage pour les tournois
-            if (event.eventType === 'tournament') {
-              const tournament = event as TournamentRegistration & { eventType: 'tournament'; eventDate: Date }
-              const isPast = tournament.eventDate < new Date()
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 md:mb-8">
+            {filteredEvents.map((event) => {
+              // Affichage pour les tournois
+              if (event.eventType === 'tournament') {
+                const tournament = event as TournamentRegistration & { eventType: 'tournament'; eventDate: Date }
 
+                return (
+                  <TournoiCard
+                    key={`tournament-${tournament.id}`}
+                    id={tournament.id}
+                    nom={tournament.nom}
+                    club={tournament.club}
+                    date={formatDate(tournament.date)}
+                    categorie={tournament.categorie}
+                    imageUrl={tournament.image}
+                    onClick={() => handleTournamentClick(tournament)}
+                  />
+                )
+              }
+
+              // Affichage pour les parties (bookings)
+              const booking = event as EnrichedBooking & { eventType: 'booking'; eventDate: Date }
+              
               return (
-                <div
-                  key={`tournament-${tournament.id}`}
-                  onClick={() => handleTournamentClick(tournament)}
-                  className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border-2 border-slate-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all cursor-pointer"
-                >
-                  {/* Image tournoi */}
-                  <div className="w-full md:w-64 h-48 md:h-44 rounded-xl md:rounded-2xl overflow-hidden flex-shrink-0 relative">
-                    <img
-                      src={tournament.image}
-                      alt={tournament.nom}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute top-3 left-3 px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-lg">
-                      🏆 TOURNOI
-                    </div>
-                  </div>
-
-                  {/* Infos */}
-                  <div className="flex-1 flex flex-col gap-3">
-                    <div>
-                      <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-1 line-clamp-1">
-                        {tournament.nom}
-                      </h3>
-                      <p className="text-sm text-gray-600 line-clamp-1">{tournament.club} · {tournament.clubAdresse}</p>
-                    </div>
-
-                    {/* Date & heure */}
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="font-semibold text-sm md:text-base">
-                        {formatDate(tournament.date)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-gray-700">
-                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="font-semibold text-sm md:text-base">
-                        Début à {tournament.heureDebut}
-                      </span>
-                    </div>
-
-                    {/* Infos tournoi */}
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold">
-                        {tournament.categorie}
-                      </span>
-                      <span className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold">
-                        {tournament.genre}
-                      </span>
-                      <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-xs font-semibold">
-                        {tournament.prixInscription}€/pers
-                      </span>
-                    </div>
-
-                    {/* Badge statut */}
-                    <div>
-                      {isPast ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
-                          ⏱️ Passé
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-semibold">
-                          ✅ Inscrit
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Action */}
-                  <div className="flex md:justify-center md:items-center" onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      onClick={() => handleTournamentClick(tournament)}
-                      className="w-full md:w-auto px-5 py-3 md:px-6 md:py-2.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all text-sm md:text-base"
-                    >
-                      Voir tournoi
-                    </button>
-                  </div>
-                </div>
-              )
-            }
-
-            // Affichage pour les parties (bookings)
-            const booking = event as EnrichedBooking & { eventType: 'booking'; eventDate: Date }
-            return (
-            <div
-              key={booking.id}
-              onClick={() => handleBookingClick(booking)}
-              className="group flex flex-col md:flex-row gap-3 md:gap-6 bg-white border border-gray-200 rounded-2xl md:rounded-3xl p-3 md:p-5 hover:shadow-xl transition-all cursor-pointer"
-            >
-              {/* Image club */}
-              <div className="w-full md:w-64 h-48 md:h-44 rounded-xl md:rounded-2xl overflow-hidden flex-shrink-0">
-                <img
-                  src={booking.clubImage || '/images/clubs/default.jpg'}
-                  alt={booking.clubName}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-              </div>
-
-              {/* Infos */}
-              <div className="flex-1 flex flex-col gap-3">
-                <div>
-                  <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-1 line-clamp-1">
-                    {booking.clubName}
-                  </h3>
-                  <p className="text-sm text-gray-600 line-clamp-1">{booking.clubCity}</p>
-                </div>
-
-                {/* Date & heure */}
-                <div className="flex items-center gap-2 text-gray-700">
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="font-semibold text-sm md:text-base">
-                    {formatDate(booking.slot_start)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 text-gray-700">
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="font-semibold text-sm md:text-base">
-                    {formatTime(booking.slot_start)} - {formatTime(booking.slot_end)}
-                  </span>
-                </div>
-
-                {/* Terrain */}
-                <div className="flex items-center gap-2 text-gray-600 text-sm">
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  <span>{booking.courtName}</span>
-                </div>
-
-                {/* Badge statut */}
-                <div>
-                  <StatusBadge booking={booking} />
-                </div>
-              </div>
-
-              {/* Action */}
-              <div className="flex md:justify-center md:items-center" onClick={(e) => e.stopPropagation()}>
-                <button 
+                <ReservationCard
+                  key={booking.id}
+                  id={booking.id}
+                  clubName={booking.clubName || 'Club'}
+                  clubCity={booking.clubCity || ''}
+                  date={formatDate(booking.slot_start)}
+                  timeSlot={`${formatTime(booking.slot_start)} - ${formatTime(booking.slot_end)}`}
+                  imageUrl={booking.clubImage || '/images/clubs/default.jpg'}
+                  href="#"
                   onClick={() => handleBookingClick(booking)}
-                  className="w-full md:w-auto px-5 py-3 md:px-6 md:py-2.5 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all text-sm md:text-base"
-                >
-                  Voir partie
-                </button>
-              </div>
-            </div>
-            )
-          })}
+                />
+              )
+            })}
+          </div>
         </div>
       )}
 
