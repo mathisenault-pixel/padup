@@ -225,8 +225,8 @@ export default function AccountPage() {
           </div>
         )}
         
-        {/* Header avec bouton Modifier */}
-        <div className="flex items-center justify-end mb-8">
+        {/* Ancien header avec bouton Modifier - masqué car remplacé par boutons dans section Profil */}
+        {false && <div className="flex items-center justify-end mb-8">
           {isEditing ? (
             <div className="flex gap-3">
               <button
@@ -260,10 +260,10 @@ export default function AccountPage() {
               </span>
             </button>
           )}
-        </div>
+        </div>}
 
-        {/* Layout 2 colonnes - Profil à gauche, Stats à droite */}
-        {!isEditing ? (
+        {/* Ancienne section Profil/Stats - masquée car remplacée par nouvelle section Profil */}
+        {false && !isEditing ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Colonne gauche - Profil */}
             <div className="space-y-6">
@@ -285,7 +285,7 @@ export default function AccountPage() {
                     {photoUrl ? (
                       <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-xl relative">
                         <img
-                          src={photoUrl}
+                          src={photoUrl || ''}
                           alt="Photo de profil"
                           className="w-full h-full object-cover"
                         />
@@ -536,6 +536,275 @@ export default function AccountPage() {
             </div>
           </div>
         )}
+
+        {/* SECTION PROFIL */}
+        <div className="max-w-4xl mx-auto mt-12">
+          <div className="rounded-2xl bg-white border border-slate-200 shadow-sm p-6">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">Profil</h2>
+                <p className="text-sm text-slate-500 mt-1">Vos informations personnelles</p>
+              </div>
+              {!isEditing ? (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="h-10 px-4 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors flex-shrink-0"
+                >
+                  Modifier
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="h-10 px-4 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="h-10 px-4 text-sm font-semibold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-colors"
+                  >
+                    Enregistrer
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Contenu */}
+            <div className="grid grid-cols-1 md:grid-cols-[280px,1fr] gap-6">
+              {/* Colonne gauche : Avatar + Nom + Email */}
+              <div className="flex flex-col items-center md:items-start gap-4">
+                {/* Avatar */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="photo-upload-profile"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                    disabled={!isEditing}
+                  />
+                  <label
+                    htmlFor={isEditing ? "photo-upload-profile" : undefined}
+                    className={`block ${isEditing ? 'cursor-pointer' : 'cursor-default'}`}
+                  >
+                    {photoUrl ? (
+                      <div className="h-20 w-20 rounded-full overflow-hidden bg-slate-100 border border-slate-200">
+                        <img
+                          src={photoUrl || ''}
+                          alt="Photo de profil"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-20 w-20 bg-slate-900 rounded-full flex items-center justify-center text-white text-2xl font-bold border border-slate-200">
+                        {profil.prenom[0]}{profil.nom[0]}
+                      </div>
+                    )}
+                  </label>
+                </div>
+
+                {/* Nom et Email */}
+                <div className="min-w-0 text-center md:text-left">
+                  <p className="font-semibold text-slate-900 truncate">
+                    {profil.prenom} {profil.nom}
+                  </p>
+                  <p className="text-sm text-slate-500 truncate mt-0.5">
+                    {profil.email}
+                  </p>
+                  <span className="inline-block mt-2 px-3 py-1 bg-slate-900 text-white text-xs font-semibold rounded-lg">
+                    {profil.niveau}
+                  </span>
+                </div>
+              </div>
+
+              {/* Colonne droite : Champs en grille */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Prénom */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Prénom
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profil.prenom}
+                      onChange={(e) => setProfil({ ...profil, prenom: e.target.value })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    />
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.prenom}
+                    </p>
+                  )}
+                </div>
+
+                {/* Nom */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Nom
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profil.nom}
+                      onChange={(e) => setProfil({ ...profil, nom: e.target.value })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    />
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.nom}
+                    </p>
+                  )}
+                </div>
+
+                {/* Téléphone */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Téléphone
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      value={profil.telephone}
+                      onChange={(e) => setProfil({ ...profil, telephone: e.target.value })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    />
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.telephone}
+                    </p>
+                  )}
+                </div>
+
+                {/* Date de naissance */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Date de naissance
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      value={profil.dateNaissance}
+                      onChange={(e) => setProfil({ ...profil, dateNaissance: e.target.value })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    />
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {new Date(profil.dateNaissance).toLocaleDateString('fr-FR')}
+                    </p>
+                  )}
+                </div>
+
+                {/* Niveau */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Niveau
+                  </label>
+                  {isEditing ? (
+                    <select
+                      value={profil.niveau}
+                      onChange={(e) => setProfil({ ...profil, niveau: e.target.value as any })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    >
+                      <option value="Débutant">Débutant</option>
+                      <option value="Intermédiaire">Intermédiaire</option>
+                      <option value="Avancé">Avancé</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.niveau}
+                    </p>
+                  )}
+                </div>
+
+                {/* Main dominante */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Main dominante
+                  </label>
+                  {isEditing ? (
+                    <select
+                      value={profil.mainDominante}
+                      onChange={(e) => setProfil({ ...profil, mainDominante: e.target.value as any })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    >
+                      <option value="Droitier">Droitier</option>
+                      <option value="Gaucher">Gaucher</option>
+                      <option value="Ambidextre">Ambidextre</option>
+                    </select>
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.mainDominante}
+                    </p>
+                  )}
+                </div>
+
+                {/* Position préférée */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Position préférée
+                  </label>
+                  {isEditing ? (
+                    <select
+                      value={profil.positionPreferee}
+                      onChange={(e) => setProfil({ ...profil, positionPreferee: e.target.value as any })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    >
+                      <option value="Gauche">Gauche</option>
+                      <option value="Droite">Droite</option>
+                      <option value="Les deux">Les deux</option>
+                    </select>
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.positionPreferee}
+                    </p>
+                  )}
+                </div>
+
+                {/* Coup préféré */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Coup préféré
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={profil.coupPrefere}
+                      onChange={(e) => setProfil({ ...profil, coupPrefere: e.target.value })}
+                      className="w-full h-10 px-3 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                    />
+                  ) : (
+                    <p className="h-10 px-3 flex items-center text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl">
+                      {profil.coupPrefere}
+                    </p>
+                  )}
+                </div>
+
+                {/* Expérience - span 2 colonnes sur desktop */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Expérience
+                  </label>
+                  {isEditing ? (
+                    <textarea
+                      value={profil.experience}
+                      onChange={(e) => setProfil({ ...profil, experience: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 resize-none"
+                    />
+                  ) : (
+                    <p className="px-3 py-2 text-sm text-slate-900 bg-slate-50 border border-slate-200 rounded-xl min-h-[60px]">
+                      {profil.experience}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* SECTION PARAMÈTRES (anciennement dans parametres/page.tsx) */}
         <div className="space-y-6 max-w-4xl mx-auto mt-12">
