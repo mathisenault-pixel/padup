@@ -48,7 +48,7 @@ export default function PageHeader({
 
       {/* Barre de recherche unifiée */}
       <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-white rounded-2xl shadow-md border border-slate-200 px-6 py-3 flex items-stretch gap-4">
+        <div className="bg-white rounded-2xl shadow-md border border-slate-200 px-6 py-3 flex items-center gap-4">
           {/* Champ gauche - avec autocomplete si suggestions fournies */}
           {leftField.suggestions && leftField.suggestions.length > 0 ? (
             <div className="flex-[1.2]">
