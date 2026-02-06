@@ -14,10 +14,10 @@ export default function ClubCard({ id, name, city, imageUrl, href }: ClubCardPro
   return (
     <Link
       href={href}
-      className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+      className="group block rounded-md overflow-hidden hover:opacity-90 transition-opacity duration-200"
     >
       {/* Image */}
-      <div className="relative w-full aspect-[3/2] overflow-hidden bg-slate-100">
+      <div className="relative w-full h-32 overflow-hidden bg-slate-100">
         <img
           src={imageUrl}
           alt={name}
@@ -26,8 +26,11 @@ export default function ClubCard({ id, name, city, imageUrl, href }: ClubCardPro
       </div>
 
       {/* Texte */}
-      <div className="px-3 py-2.5">
-        <h3 className="text-sm font-medium text-slate-900 leading-snug">
+      <div className="pt-2 pb-1">
+        <p className="text-[11px] font-normal text-slate-500 mb-0.5">
+          Découvrez nos
+        </p>
+        <h3 className="text-xs font-medium text-slate-900 leading-tight">
           {name}
         </h3>
       </div>
