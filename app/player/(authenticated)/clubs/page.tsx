@@ -449,10 +449,10 @@ export default function ClubsPage() {
           </div>
         )}
 
-        {/* Grille des clubs - Style Planity */}
+        {/* Grille des clubs - Catalogue premium */}
         {!isLoading && filteredAndSortedClubs.length > 0 && (
-          <div className="mx-auto max-w-4xl px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16 md:mb-8">
+          <div className="max-w-7xl mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 md:mb-8">
               {filteredAndSortedClubs.map((club) => (
                 <ClubCard
                   key={club.id}
