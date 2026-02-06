@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import AutocompleteInput from './AutocompleteInput'
 
 type SearchBarField = {
   label: string
@@ -9,6 +10,7 @@ type SearchBarField = {
   onChange: (value: string) => void
   type?: 'text' | 'select'
   options?: { value: string; label: string }[]
+  suggestions?: string[]
 }
 
 type PageHeaderProps = {
@@ -43,29 +45,39 @@ export default function PageHeader({
       {/* Barre de recherche unifiée */}
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-3 flex items-stretch gap-0">
-          {/* Champ gauche */}
-          <div className="flex-1 px-4 py-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              {leftField.label}
-            </label>
-            <input
-              type="text"
-              value={leftField.value}
-              onChange={(e) => leftField.onChange(e.target.value)}
+          {/* Champ gauche - avec autocomplete si suggestions fournies */}
+          {leftField.suggestions && leftField.suggestions.length > 0 ? (
+            <AutocompleteInput
+              label={leftField.label}
               placeholder={leftField.placeholder}
-              className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
+              value={leftField.value}
+              onChange={leftField.onChange}
+              suggestions={leftField.suggestions}
             />
-          </div>
+          ) : (
+            <div className="flex-1 px-4 py-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {leftField.label}
+              </label>
+              <input
+                type="text"
+                value={leftField.value}
+                onChange={(e) => leftField.onChange(e.target.value)}
+                placeholder={leftField.placeholder}
+                className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
+              />
+            </div>
+          )}
 
           {/* Séparateur vertical */}
           <div className="w-px bg-slate-200 self-stretch my-2"></div>
 
           {/* Champ droit */}
-          <div className="flex-1 px-4 py-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-              {rightField.label}
-            </label>
-            {rightField.type === 'select' && rightField.options ? (
+          {rightField.type === 'select' && rightField.options ? (
+            <div className="flex-1 px-4 py-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {rightField.label}
+              </label>
               <select
                 value={rightField.value}
                 onChange={(e) => rightField.onChange(e.target.value)}
@@ -77,7 +89,20 @@ export default function PageHeader({
                   </option>
                 ))}
               </select>
-            ) : (
+            </div>
+          ) : rightField.suggestions && rightField.suggestions.length > 0 ? (
+            <AutocompleteInput
+              label={rightField.label}
+              placeholder={rightField.placeholder}
+              value={rightField.value}
+              onChange={rightField.onChange}
+              suggestions={rightField.suggestions}
+            />
+          ) : (
+            <div className="flex-1 px-4 py-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                {rightField.label}
+              </label>
               <input
                 type="text"
                 value={rightField.value}
@@ -85,8 +110,8 @@ export default function PageHeader({
                 placeholder={rightField.placeholder}
                 className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
               />
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Bouton */}
           <button

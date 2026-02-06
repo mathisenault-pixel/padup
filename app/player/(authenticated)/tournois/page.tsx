@@ -266,6 +266,20 @@ export default function TournoisPage() {
     return null
   }, [cityClubFilter, tournois])
 
+  // Suggestions pour l'autocomplete
+  const tournoiNameSuggestions = useMemo(() => {
+    return tournois.map(t => t.nom).sort()
+  }, [tournois])
+
+  const citySuggestions = useMemo(() => {
+    const cities = [...new Set(tournois.map(t => {
+      // Extraire la ville depuis clubAdresse
+      const parts = t.clubAdresse.split(',')
+      return parts[parts.length - 1]?.trim() || ''
+    }).filter(Boolean))]
+    return [...getCitySuggestions(), ...cities].sort()
+  }, [tournois])
+
   // Mémoïser le filtrage et le tri (évite recalcul inutile)
   const filteredTournois = useMemo(() => {
     let result = tournoisWithDistance.filter(t => {
@@ -330,13 +344,15 @@ export default function TournoisPage() {
             label: "Que cherchez-vous ?",
             placeholder: "Nom du tournoi",
             value: headerSearchTerm,
-            onChange: setHeaderSearchTerm
+            onChange: setHeaderSearchTerm,
+            suggestions: tournoiNameSuggestions
           }}
           rightField={{
             label: "Où",
             placeholder: "Ville",
             value: headerCitySearch,
-            onChange: setHeaderCitySearch
+            onChange: setHeaderCitySearch,
+            suggestions: citySuggestions
           }}
           buttonLabel="Rechercher"
           onSearch={() => {

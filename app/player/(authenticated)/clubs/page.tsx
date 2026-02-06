@@ -191,6 +191,16 @@ export default function ClubsPage() {
     return null
   }, [cityClubFilter, clubs])
 
+  // Suggestions pour l'autocomplete
+  const clubNameSuggestions = useMemo(() => {
+    return clubs.map(club => club.name).sort()
+  }, [clubs])
+
+  const citySuggestions = useMemo(() => {
+    const cities = [...new Set(clubs.map(club => club.city))]
+    return [...getCitySuggestions(), ...cities].sort()
+  }, [clubs])
+
   // Filtrer et trier avec useMemo (évite recalcul inutile)
   const filteredAndSortedClubs = useMemo(() => {
     const result = clubsWithDistance
@@ -264,13 +274,15 @@ export default function ClubsPage() {
             label: "Que cherchez-vous ?",
             placeholder: "Nom du club",
             value: headerSearchTerm,
-            onChange: setHeaderSearchTerm
+            onChange: setHeaderSearchTerm,
+            suggestions: clubNameSuggestions
           }}
           rightField={{
             label: "Où",
             placeholder: "Ville",
             value: headerCitySearch,
-            onChange: setHeaderCitySearch
+            onChange: setHeaderCitySearch,
+            suggestions: citySuggestions
           }}
           buttonLabel="Rechercher"
           onSearch={() => {
