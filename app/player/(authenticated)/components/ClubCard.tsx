@@ -28,7 +28,7 @@ export default function ClubCard({ id, name, city, imageUrl, href }: ClubCardPro
       {/* Texte */}
       <div className="p-4 min-h-[80px]">
         <p className="text-xs font-normal text-slate-500 mb-1">
-          Découvrez nos
+          Découvrez
         </p>
         <h3 className="text-base font-semibold text-slate-900 leading-tight mb-1">
           {name}
