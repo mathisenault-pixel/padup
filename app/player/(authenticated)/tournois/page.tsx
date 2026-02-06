@@ -5,6 +5,7 @@ import Link from 'next/link'
 import SmartSearchBar from '../components/SmartSearchBar'
 import FiltersDrawer from '../components/FiltersDrawer'
 import ActiveFiltersChips from '../components/ActiveFiltersChips'
+import PageHeader from '../components/PageHeader'
 import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime } from '@/lib/geoUtils'
@@ -56,6 +57,10 @@ export default function TournoisPage() {
   const [radiusKm, setRadiusKm] = useState<number>(50)
   const [sortBy, setSortBy] = useState<'date'>('date')
   const [isFiltersDrawerOpen, setIsFiltersDrawerOpen] = useState(false)
+  
+  // États pour le header de recherche
+  const [headerSearchTerm, setHeaderSearchTerm] = useState('')
+  const [headerCitySearch, setHeaderCitySearch] = useState('')
 
   // Géolocalisation
   const { coords: userCoords, status: locationStatus, error: locationError, requestLocation } = useUserLocation()
@@ -318,10 +323,27 @@ export default function TournoisPage() {
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         
         {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Tournois</h1>
-          <p className="text-gray-600">Découvrez et participez aux tournois de padel</p>
-        </div>
+        <PageHeader
+          title="Tournois"
+          subtitle="Découvrez et participez aux tournois de padel"
+          leftField={{
+            label: "Que cherchez-vous ?",
+            placeholder: "Nom du tournoi",
+            value: headerSearchTerm,
+            onChange: setHeaderSearchTerm
+          }}
+          rightField={{
+            label: "Où",
+            placeholder: "Ville",
+            value: headerCitySearch,
+            onChange: setHeaderCitySearch
+          }}
+          buttonLabel="Rechercher"
+          onSearch={() => {
+            setSearchTerm(headerSearchTerm)
+            setCityClubFilter(headerCitySearch)
+          }}
+        />
 
         {/* Barre de filtres compacte (nouvelle organisation) */}
         <div className="mb-4">

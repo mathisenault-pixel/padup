@@ -6,6 +6,7 @@ import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import { getClubImage } from '@/lib/clubImages'
 import FiltersDrawer from '../components/FiltersDrawer'
 import ActiveFiltersChips from '../components/ActiveFiltersChips'
+import PageHeader from '../components/PageHeader'
 
 // ✅ Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -66,6 +67,10 @@ export default function ReservationsPage() {
   const [clubDetails, setClubDetails] = useState<any>(null)
   const [showTournamentModal, setShowTournamentModal] = useState(false)
   const [selectedTournament, setSelectedTournament] = useState<TournamentRegistration | null>(null)
+  
+  // États pour le header de recherche
+  const [headerSearchTerm, setHeaderSearchTerm] = useState('')
+  const [headerStatusFilter, setHeaderStatusFilter] = useState('tous')
 
   useEffect(() => {
     async function loadBookingsAndTournaments() {
@@ -279,15 +284,44 @@ export default function ReservationsPage() {
     )
   }
 
+  const handleHeaderSearch = () => {
+    // Appliquer les filtres du header
+    if (headerStatusFilter !== 'tous') {
+      setSelectedFilter(headerStatusFilter as typeof selectedFilter)
+    }
+    // Note: headerSearchTerm pourrait être utilisé pour filtrer par nom de club si besoin
+  }
+
   if (loading) {
     return (
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         
         {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Mes réservations</h1>
-          <p className="text-gray-600">Vos parties et tournois à venir</p>
-        </div>
+        <PageHeader
+          title="Mes réservations"
+          subtitle="Retrouvez et gérez toutes vos réservations de padel"
+          leftField={{
+            label: "Rechercher",
+            placeholder: "Club, ville…",
+            value: headerSearchTerm,
+            onChange: setHeaderSearchTerm
+          }}
+          rightField={{
+            label: "Statut",
+            placeholder: "",
+            value: headerStatusFilter,
+            onChange: setHeaderStatusFilter,
+            type: "select",
+            options: [
+              { value: 'tous', label: 'Toutes' },
+              { value: 'a-venir', label: 'À venir' },
+              { value: 'passees', label: 'Passées' },
+              { value: 'annulees', label: 'Annulées' }
+            ]
+          }}
+          buttonLabel="Appliquer"
+          onSearch={handleHeaderSearch}
+        />
 
         <div className="grid gap-5">
           {[1, 2, 3].map(i => (
@@ -312,10 +346,31 @@ export default function ReservationsPage() {
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         
         {/* Header */}
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Mes réservations</h1>
-          <p className="text-gray-600">Vos parties et tournois à venir</p>
-        </div>
+        <PageHeader
+          title="Mes réservations"
+          subtitle="Retrouvez et gérez toutes vos réservations de padel"
+          leftField={{
+            label: "Rechercher",
+            placeholder: "Club, ville…",
+            value: headerSearchTerm,
+            onChange: setHeaderSearchTerm
+          }}
+          rightField={{
+            label: "Statut",
+            placeholder: "",
+            value: headerStatusFilter,
+            onChange: setHeaderStatusFilter,
+            type: "select",
+            options: [
+              { value: 'tous', label: 'Toutes' },
+              { value: 'a-venir', label: 'À venir' },
+              { value: 'passees', label: 'Passées' },
+              { value: 'annulees', label: 'Annulées' }
+            ]
+          }}
+          buttonLabel="Appliquer"
+          onSearch={handleHeaderSearch}
+        />
 
         <div className="p-6 bg-red-50 border border-red-200 rounded-2xl">
           <p className="text-red-700 font-semibold">Erreur : {error}</p>
@@ -328,10 +383,31 @@ export default function ReservationsPage() {
     <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
       
       {/* Header */}
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Mes réservations</h1>
-        <p className="text-gray-600">Vos parties et tournois à venir</p>
-      </div>
+      <PageHeader
+        title="Mes réservations"
+        subtitle="Retrouvez et gérez toutes vos réservations de padel"
+        leftField={{
+          label: "Rechercher",
+          placeholder: "Club, ville…",
+          value: headerSearchTerm,
+          onChange: setHeaderSearchTerm
+        }}
+        rightField={{
+          label: "Statut",
+          placeholder: "",
+          value: headerStatusFilter,
+          onChange: setHeaderStatusFilter,
+          type: "select",
+          options: [
+            { value: 'tous', label: 'Toutes' },
+            { value: 'a-venir', label: 'À venir' },
+            { value: 'passees', label: 'Passées' },
+            { value: 'annulees', label: 'Annulées' }
+          ]
+        }}
+        buttonLabel="Appliquer"
+        onSearch={handleHeaderSearch}
+      />
 
       {/* Barre de filtres compacte (nouvelle organisation) */}
       <div className="mb-4">
