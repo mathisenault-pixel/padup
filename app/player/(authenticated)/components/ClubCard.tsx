@@ -16,8 +16,8 @@ export default function ClubCard({ id, name, city, imageUrl, href }: ClubCardPro
       href={href}
       className="group block rounded-md overflow-hidden hover:opacity-90 transition-opacity duration-200"
     >
-      {/* Image */}
-      <div className="relative w-full h-32 overflow-hidden bg-slate-100">
+      {/* Image carrée */}
+      <div className="relative w-full aspect-square overflow-hidden bg-slate-100">
         <img
           src={imageUrl}
           alt={name}

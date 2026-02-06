@@ -451,17 +451,19 @@ export default function ClubsPage() {
 
         {/* Grille des clubs - Style Planity */}
         {!isLoading && filteredAndSortedClubs.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16 md:mb-8">
-            {filteredAndSortedClubs.map((club) => (
-              <ClubCard
-                key={club.id}
-                id={club.id}
-                name={club.name}
-                city={club.city}
-                imageUrl={club.imageUrl}
-                href={`/player/clubs/${club.id}/reserver`}
-              />
-            ))}
+          <div className="mx-auto max-w-4xl px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16 md:mb-8">
+              {filteredAndSortedClubs.map((club) => (
+                <ClubCard
+                  key={club.id}
+                  id={club.id}
+                  name={club.name}
+                  city={club.city}
+                  imageUrl={club.imageUrl}
+                  href={`/player/clubs/${club.id}/reserver`}
+                />
+              ))}
+            </div>
           </div>
         )}
 
