@@ -299,7 +299,7 @@ export default function ParametresPage() {
               
               <button 
                 onClick={handleSignOut}
-                className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-xl font-semibold text-slate-700 transition-all"
+                className="w-full text-left px-4 py-3 bg-red-50 hover:bg-red-100 rounded-xl font-semibold text-red-600 transition-all"
               >
                 Me déconnecter de ce compte
               </button>
