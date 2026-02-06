@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 
 type ClubCardProps = {
   id: string
@@ -15,28 +14,25 @@ export default function ClubCard({ id, name, city, imageUrl, href }: ClubCardPro
   return (
     <Link
       href={href}
-      className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+      className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
     >
       {/* Image */}
-      <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-100">
+      <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-100">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover"
         />
       </div>
 
       {/* Texte */}
-      <div className="p-4">
-        <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">
-          Découvrez
+      <div className="p-5">
+        <p className="text-xs font-normal text-slate-500 mb-1.5">
+          Découvrez nos
         </p>
-        <h3 className="text-base font-bold text-slate-900 group-hover:text-slate-700 transition-colors">
+        <h3 className="text-lg font-semibold text-slate-900 leading-snug">
           {name}
         </h3>
-        <p className="text-sm text-slate-600 mt-0.5">
-          {city}
-        </p>
       </div>
     </Link>
   )
