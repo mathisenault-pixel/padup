@@ -114,9 +114,10 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
   }
   
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl max-w-5xl w-full shadow-2xl my-8">
-        <div className="px-4 sm:px-6 py-8 sm:py-12 max-h-[85vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 overflow-y-auto">
+      <div className="min-h-full flex items-center justify-center p-4 py-8">
+        <div className="bg-white rounded-2xl max-w-5xl w-full shadow-2xl">
+          <div className="px-4 sm:px-6 py-8 sm:py-12">
           
           {/* Header */}
           <div className="text-center mb-8">
@@ -464,6 +465,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
