@@ -27,9 +27,10 @@ export default function PlayerNav() {
             href={item.href}
             className={`px-3 py-2 text-sm whitespace-nowrap transition-colors ${
               isActive(item.href)
-                ? 'text-white font-normal border-b border-white'
-                : 'text-white/50 font-light hover:text-white/80'
+                ? 'font-normal border-b border-white'
+                : 'text-white/50 font-light hover:text-white'
             }`}
+            style={isActive(item.href) ? { color: '#FFFFFF' } : undefined}
           >
             {item.label}
           </Link>
@@ -46,12 +47,13 @@ export default function PlayerNav() {
               href={item.href}
               className={`
                 relative px-4 py-2 text-[14px] whitespace-nowrap tracking-wide transition-colors
-                ${active ? 'text-white font-normal' : 'text-white/50 font-light hover:text-white/80'}
+                ${active ? 'font-normal' : 'text-white/50 font-light hover:text-white'}
                 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] 
                 after:bg-white after:transition-opacity
                 ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
                 hover:after:!opacity-100
               `}
+              style={active ? { color: '#FFFFFF' } : undefined}
             >
               {item.label}
             </Link>
