@@ -163,11 +163,11 @@ export default function SmartSearchBar({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <div className={`relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border ${
-        isFocused ? 'border-slate-300' : 'border-slate-200'
+      <div className={`relative bg-white rounded-2xl shadow-sm transition-all duration-200 border ${
+        isFocused ? 'border-black/20 shadow-lg' : 'border-black/10'
       }`}>
-        <div className={`flex items-center gap-3 ${compact ? 'px-4' : 'px-6'}`}>
-          <svg className={`${compact ? 'w-5 h-5' : 'w-6 h-6'} text-gray-400 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`flex items-center gap-4 ${compact ? 'px-5' : 'px-7'}`}>
+          <svg className={`${compact ? 'w-5 h-5' : 'w-5 h-5'} text-black/40 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -187,7 +187,7 @@ export default function SmartSearchBar({
               }
             }}
             onKeyDown={handleKeyDown}
-            className={`flex-1 ${compact ? 'py-3 text-base' : 'py-4 text-lg'} focus:outline-none focus:ring-0 focus:ring-offset-0 bg-transparent placeholder:text-gray-400`}
+            className={`flex-1 ${compact ? 'py-4 text-base' : 'py-5 text-base'} focus:outline-none focus:ring-0 focus:ring-offset-0 bg-transparent placeholder:text-black/40 text-black`}
           />
           {query && (
             <button

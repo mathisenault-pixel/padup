@@ -17,7 +17,7 @@ export default function PlayerAuthLayout({
       {/* Header style Planity (sobre, texte simple) */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/10 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 md:h-16">
+          <div className="flex items-center justify-between h-12 md:h-14">
             
             {/* Logo */}
             <Link

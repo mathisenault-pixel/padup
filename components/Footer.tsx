@@ -3,32 +3,29 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-slate-300">
-      {/* CTA band */}
+    <footer className="bg-black text-slate-400">
+      {/* CTA band - Réduit */}
       <div className="border-b border-white/10">
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto max-w-6xl px-6 py-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xl font-semibold text-white">
-                Réservez en 30 secondes.
-              </p>
-              <p className="mt-1 text-sm text-slate-400">
-                Disponibilités en temps réel • Réservations sans frais • Made in France
+              <p className="text-base font-medium text-white">
+                Prêt à réserver ?
               </p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/player/clubs"
-                className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-white/90"
+                className="inline-flex items-center justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-white/90 transition-all"
               >
                 Trouver un club
               </Link>
               <Link
-                href="/player/reservations"
-                className="inline-flex items-center justify-center rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-white hover:bg-white/5"
+                href="/club-access"
+                className="inline-flex items-center justify-center rounded-lg border border-white/20 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/5 transition-all"
               >
-                Mes réservations
+                Espace club
               </Link>
             </div>
           </div>
@@ -36,7 +33,7 @@ export default function Footer() {
       </div>
 
       {/* Main grid */}
-      <div className="mx-auto max-w-6xl px-6 py-12">
+      <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="grid gap-10 md:grid-cols-12">
           {/* Brand */}
           <div className="md:col-span-4">
@@ -44,26 +41,26 @@ export default function Footer() {
               <Image
                 src="/icon.png"
                 alt="Pad'Up logo"
-                width={36}
-                height={36}
+                width={32}
+                height={32}
                 className="rounded-full"
               />
               <span className="text-base font-semibold text-white">Pad&apos;Up</span>
             </div>
-            <p className="mt-3 text-sm text-slate-400">
-              Le leader français de la réservation de terrains de padel.
+            <p className="mt-3 text-sm text-slate-500">
+              Réservation de terrains de padel en France.
             </p>
 
-            <div className="mt-5 flex items-center gap-3">
-              {/* Social icons placeholders (remplace par tes icônes) */}
-              <a className="rounded-lg p-2 hover:bg-white/5" href="#" aria-label="Facebook">
-                <span className="text-slate-300">f</span>
+            <div className="mt-5 flex items-center gap-2">
+              {/* Social icons - Plus discrets */}
+              <a className="rounded-lg p-1.5 hover:bg-white/5 transition-all" href="#" aria-label="Facebook">
+                <span className="text-xs text-slate-500">f</span>
               </a>
-              <a className="rounded-lg p-2 hover:bg-white/5" href="#" aria-label="Instagram">
-                <span className="text-slate-300">ig</span>
+              <a className="rounded-lg p-1.5 hover:bg-white/5 transition-all" href="#" aria-label="Instagram">
+                <span className="text-xs text-slate-500">ig</span>
               </a>
-              <a className="rounded-lg p-2 hover:bg-white/5" href="#" aria-label="X">
-                <span className="text-slate-300">x</span>
+              <a className="rounded-lg p-1.5 hover:bg-white/5 transition-all" href="#" aria-label="X">
+                <span className="text-xs text-slate-500">x</span>
               </a>
             </div>
           </div>
@@ -131,11 +128,11 @@ function FooterCol({
 }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-white">{title}</p>
-      <ul className="mt-4 space-y-2">
+      <p className="text-xs font-semibold text-white uppercase tracking-wider mb-3">{title}</p>
+      <ul className="space-y-2">
         {links.map((l) => (
           <li key={l.href}>
-            <Link className="text-sm text-slate-400 hover:text-white" href={l.href}>
+            <Link className="text-sm text-slate-500 hover:text-white transition-colors" href={l.href}>
               {l.label}
             </Link>
           </li>
