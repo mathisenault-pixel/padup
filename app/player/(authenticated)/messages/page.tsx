@@ -378,8 +378,8 @@ export default function MessagesPage() {
         <div 
           className="md:hidden fixed inset-0 bg-white z-50 flex flex-col"
           style={{
-            height: '100vh',
-            height: '100dvh', // Dynamic viewport height
+            minHeight: '100vh',
+            height: '100dvh', // Dynamic viewport height avec fallback
           }}
         >
           {/* En-tête de la conversation */}
