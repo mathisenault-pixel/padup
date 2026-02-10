@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-300">
+    <footer className="bg-black text-slate-300">
       {/* CTA band */}
       <div className="border-b border-white/10">
         <div className="mx-auto max-w-6xl px-6 py-10">

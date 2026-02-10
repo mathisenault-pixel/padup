@@ -43,12 +43,32 @@ const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
   'd4e5f6a7-b8c9-4012-d345-6789abcdef01': { lat: 44.0528, lng: 4.6981 }, // QG Padel - Saint-Laurent-des-Arbres
 }
 
+/**
+ * Génère une prochaine disponibilité mock réaliste
+ * TODO: Remplacer par les vraies données depuis l'API
+ */
+function getNextAvailability(index: number): string {
+  const now = new Date()
+  const currentHour = now.getHours()
+  
+  // Si on est le matin (avant 14h), montrer une dispo ce jour
+  if (currentHour < 14) {
+    const hours = [18, 19, 20, 21][index % 4]
+    return `Dispo dès ${hours}:00`
+  }
+  
+  // Sinon, montrer demain
+  const hours = [9, 10, 14, 18][index % 4]
+  return `Demain ${hours}:00`
+}
+
 export default function AccueilPage() {
   const router = useRouter()
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
-  const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [locationError, setLocationError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showSearchError, setShowSearchError] = useState(false)
 
@@ -160,23 +180,32 @@ export default function AccueilPage() {
     router.push(`/player/clubs?q=${encodeURIComponent(currentQuery)}`)
   }
 
+  const handleEnterCity = () => {
+    // Scroll vers le hero et focus la search
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => {
+      const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement
+      searchInput?.focus()
+    }, 300)
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero - ULTRA PREMIUM - Full Screen */}
-      <section className="px-4 pt-20 sm:pt-24 pb-8 md:pb-12 min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)] flex items-center justify-center">
+      {/* Hero - ULTRA PREMIUM - Compact */}
+      <section className="px-4 pt-12 sm:pt-16 pb-6 md:pb-8">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <div className="inline-block mb-6 sm:mb-8">
+            <div className="inline-block mb-4 sm:mb-5">
               <span className="px-4 py-2.5 sm:px-8 sm:py-3 bg-black text-white text-xs sm:text-sm font-medium rounded-full tracking-wide whitespace-nowrap">
                 Réserver un terrain n'a jamais été aussi simple
               </span>
             </div>
             
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-black mb-4 sm:mb-6 leading-[0.95] tracking-tight px-2">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-black mb-3 sm:mb-4 leading-[0.95] tracking-tight px-2">
               Réservez un terrain de padel en 30 secondes
             </h1>
             
-            <p className="text-lg sm:text-xl md:text-2xl text-black/60 mb-8 sm:mb-10 max-w-3xl mx-auto font-light tracking-tight px-2">
+            <p className="text-lg sm:text-xl md:text-2xl text-black/60 mb-6 sm:mb-8 max-w-3xl mx-auto font-light tracking-tight px-2">
               Disponibilités en temps réel, réservation sans appel ni attente.
             </p>
 
@@ -231,12 +260,12 @@ export default function AccueilPage() {
       </section>
 
       {/* Clubs - MINIMAL STYLE */}
-      <section className="pt-24 md:pt-32 pb-16 md:pb-24 px-6 bg-white border-t border-black/5">
+      <section className="pt-12 md:pt-16 pb-16 md:pb-24 px-6 bg-white border-t border-black/5">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-5xl font-black text-black mb-4 tracking-tight">Clubs autour de chez moi</h2>
-              <p className="text-xl text-black/50 font-light">Découvrez nos meilleures adresses</p>
+              <h2 className="text-4xl md:text-5xl font-black text-black mb-3 tracking-tight">Clubs autour de chez moi</h2>
+              <p className="text-lg md:text-xl text-black/50 font-light">Découvrez nos meilleures adresses</p>
             </div>
             <Link
               href="/player/clubs"
@@ -250,23 +279,46 @@ export default function AccueilPage() {
             </Link>
           </div>
 
-          {/* Bouton de géolocalisation */}
+          {/* Bouton de géolocalisation + fallback */}
           <div className="mb-8">
-            <UseMyLocationButton
-              onCoords={(coords) => {
-                setUserCoords(coords);
-                setLocationStatus('success');
-                console.log('📍 Position détectée:', coords);
-                console.log('✅ Les clubs vont être triés par distance réelle');
-              }}
-            />
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+              <UseMyLocationButton
+                onCoords={(coords) => {
+                  setUserCoords(coords);
+                  setLocationStatus('success');
+                  setLocationError(null);
+                  console.log('📍 Position détectée:', coords);
+                  console.log('✅ Les clubs vont être triés par distance réelle');
+                }}
+                onError={(error) => {
+                  setLocationStatus('error');
+                  setLocationError(error);
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleEnterCity}
+                className="text-sm text-black/60 hover:text-black font-light underline underline-offset-4 transition-colors"
+              >
+                Entrer une ville
+              </button>
+            </div>
             
-            {/* ✅ Affichage propre sans popup */}
+            {/* Message de succès */}
             {locationStatus === 'success' && userCoords && (
               <div className="mt-6 p-5 bg-black text-white rounded-lg flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
                 <p className="text-sm font-light tracking-wide">
                   Position détectée. Clubs triés par distance.
+                </p>
+              </div>
+            )}
+            
+            {/* Message d'erreur */}
+            {locationStatus === 'error' && locationError && (
+              <div className="mt-4 p-4 bg-black/5 border border-black/10 rounded-lg flex items-start gap-3">
+                <p className="text-sm text-black/70 font-light">
+                  {locationError} — <button onClick={handleEnterCity} className="underline hover:text-black">entrez une ville</button>
                 </p>
               </div>
             )}
@@ -329,6 +381,13 @@ export default function AccueilPage() {
                     </div>
                   </div>
 
+                  {/* Prochaine disponibilité */}
+                  <div className="mb-4 py-2 px-3 bg-black/5 rounded-lg">
+                    <p className="text-xs text-black/60 font-medium tracking-wide">
+                      {getNextAvailability(index)}
+                    </p>
+                  </div>
+
                   <div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-black tracking-tight">{club.prixMin}€</span>
@@ -357,42 +416,48 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* RAPPELS AUTOMATIQUES - MINIMAL */}
-      <section className="bg-white mt-24 md:mt-32 mb-24 md:mb-32 border-t border-black/5">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-24">
+      {/* RAPPELS AUTOMATIQUES - COMPACT */}
+      <section className="bg-white mt-16 md:mt-20 mb-16 md:mb-20 border-t border-black/5">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
           {/* Header */}
-          <div className="mb-20 max-w-3xl">
-            <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 leading-tight tracking-tight">
+          <div className="mb-10 max-w-3xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4 leading-tight tracking-tight">
               Rappels automatiques
             </h2>
-            <p className="text-lg md:text-xl text-black/50 leading-relaxed font-light">
+            <p className="text-base md:text-lg text-black/50 leading-relaxed font-light">
               Ne manquez plus jamais vos réservations. Recevez des notifications automatiques à chaque étape.
             </p>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+          {/* Features Grid - Mini cards compactes */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               {
                 title: 'Confirmation instantanée',
-                description: 'Recevez immédiatement un e-mail de confirmation avec tous les détails de votre réservation',
+                description: 'Recevez immédiatement un e-mail de confirmation avec tous les détails',
               },
               {
                 title: 'Rappel 24h avant',
-                description: 'Un e-mail automatique vous rappelle votre session 24h avant pour ne rien oublier',
+                description: 'Un e-mail automatique vous rappelle votre session pour ne rien oublier',
               },
               {
                 title: 'Notification dernière minute',
-                description: 'Recevez un dernier rappel 2h avant votre match pour être prêt à temps',
+                description: 'Recevez un dernier rappel 2h avant votre match',
               },
             ].map((feature, i) => (
               <div 
                 key={i} 
-                className="group"
+                className="p-5 border border-black/10 rounded-xl bg-white hover:border-black/20 transition-all"
               >
-                <div className="w-2 h-2 rounded-full bg-black mb-6"></div>
-                <h3 className="text-xl font-semibold text-black mb-4 tracking-tight">{feature.title}</h3>
-                <p className="text-base text-black/50 leading-relaxed font-light">{feature.description}</p>
+                <div className="flex items-start gap-3 mb-3">
+                  <svg className="w-5 h-5 text-black flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <h3 className="text-base font-semibold text-black mb-2 tracking-tight">{feature.title}</h3>
+                    <p className="text-sm text-black/60 leading-relaxed font-light">{feature.description}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -402,7 +467,7 @@ export default function AccueilPage() {
       <SectionDivider />
 
       {/* CTA - MINIMAL */}
-      <section className="bg-black text-white mt-24 md:mt-32 mb-24 md:mb-32">
+      <section className="bg-black text-white mt-24 md:mt-32">
         <div className="mx-auto max-w-7xl px-6 md:px-8 py-20 md:py-32">
           {/* Contenu centré */}
           <div className="max-w-3xl mx-auto text-center">
@@ -410,7 +475,7 @@ export default function AccueilPage() {
               Prêt à jouer ?
             </h2>
             <p className="text-lg md:text-xl text-white/60 leading-relaxed mb-12 font-light">
-              Rejoignez plus de 10 000 joueurs qui font confiance à Pad'Up pour réserver leurs terrains de padel partout en France.
+              Trouvez votre terrain de padel et réservez en quelques clics. Simple, rapide et sans frais.
             </p>
             
             {/* CTA principal + lien secondaire */}
@@ -418,10 +483,10 @@ export default function AccueilPage() {
               <button
                 type="button"
                 onClick={() => router.push('/player/clubs')}
-                className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-light rounded-lg tracking-wide"
+                className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-light rounded-lg tracking-wide hover:bg-white/90"
                 style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
-                Commencer maintenant
+                Voir les terrains disponibles
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -439,20 +504,35 @@ export default function AccueilPage() {
             </div>
           </div>
 
-          {/* Statistiques / Social proof */}
-          <div className="mt-20">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto text-center">
-              <div>
-                <p className="text-4xl font-bold mb-3 tracking-tight">10 000+</p>
-                <p className="text-sm text-white/50 font-light tracking-wide">Joueurs actifs</p>
+          {/* Bénéfices crédibles */}
+          <div className="mt-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-semibold mb-2 tracking-tight">Réservation en 30 secondes</p>
+                <p className="text-sm text-white/50 font-light">Trouvez et réservez votre terrain en quelques clics</p>
               </div>
-              <div>
-                <p className="text-4xl font-bold mb-3 tracking-tight">50+</p>
-                <p className="text-sm text-white/50 font-light tracking-wide">Clubs partenaires</p>
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-semibold mb-2 tracking-tight">Paiement sécurisé</p>
+                <p className="text-sm text-white/50 font-light">Payez directement sur place, aucune CB requise en ligne</p>
               </div>
-              <div>
-                <p className="text-4xl font-bold mb-3 tracking-tight">4.8/5</p>
-                <p className="text-sm text-white/50 font-light tracking-wide">Note moyenne</p>
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-semibold mb-2 tracking-tight">Disponibilités en temps réel</p>
+                <p className="text-sm text-white/50 font-light">Voyez instantanément les créneaux libres sans appeler</p>
               </div>
             </div>
           </div>

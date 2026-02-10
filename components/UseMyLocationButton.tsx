@@ -6,8 +6,10 @@ type Coords = { lat: number; lng: number };
 
 export default function UseMyLocationButton({
   onCoords,
+  onError,
 }: {
   onCoords?: (coords: Coords) => void;
+  onError?: (error: string) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +38,13 @@ export default function UseMyLocationButton({
       },
       (err) => {
         // Codes classiques: 1=refus, 2=indispo, 3=timeout
-        if (err.code === 1) setError("Localisation refusée.");
-        else if (err.code === 2) setError("Position indisponible.");
-        else if (err.code === 3) setError("Délai dépassé.");
-        else setError("Erreur de localisation.");
+        let errorMsg = "Erreur de localisation.";
+        if (err.code === 1) errorMsg = "Localisation refusée.";
+        else if (err.code === 2) errorMsg = "Position indisponible.";
+        else if (err.code === 3) errorMsg = "Délai dépassé.";
+        
+        setError(errorMsg);
+        onError?.(errorMsg);
         setLoading(false);
       },
       {
