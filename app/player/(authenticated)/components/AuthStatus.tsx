@@ -54,7 +54,7 @@ export default function AuthStatus() {
   if (isLoading) {
     return (
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-6 h-6 border border-black border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -63,11 +63,12 @@ export default function AuthStatus() {
   if (user) {
     return (
       <div className="flex items-center gap-2 md:gap-3">
-        {/* Mon compte - Seul vrai bouton (style Planity) */}
+        {/* Mon compte - Seul vrai bouton */}
         <button
           type="button"
           onClick={() => router.push('/player/compte')}
-          className="px-4 py-2 text-[14px] font-medium bg-slate-900 hover:bg-slate-800 text-white rounded-md transition-colors"
+          className="px-4 py-2 text-[14px] font-light bg-black hover:bg-black/80 text-white rounded-md tracking-wide"
+          style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
           Mon compte
         </button>
@@ -81,14 +82,16 @@ export default function AuthStatus() {
       <button
         type="button"
         onClick={() => router.push('/login')}
-        className="px-2 py-2 text-[14px] font-medium text-slate-700 hover:text-slate-900 transition-colors"
+        className="px-2 py-2 text-[14px] font-light text-black/60 hover:text-black tracking-wide"
+        style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
         Se connecter
       </button>
       <button
         type="button"
         onClick={() => router.push('/login')}
-        className="hidden md:inline-flex px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-medium rounded-md transition-colors"
+        className="hidden md:inline-flex px-4 py-2 bg-black hover:bg-black/80 text-white text-[14px] font-light rounded-md tracking-wide"
+        style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
         S&apos;inscrire
       </button>
