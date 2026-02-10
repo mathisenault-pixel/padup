@@ -191,9 +191,10 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero - PREMIUM SIMPLIFIÉ */}
-      <section className="min-h-screen flex flex-col items-center justify-center px-4 pt-24">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center">
+      <section className="relative min-h-screen">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center">
             <div className="inline-block mb-3 sm:mb-4">
               <span className="px-4 py-2.5 sm:px-8 sm:py-3 bg-black text-white text-xs sm:text-sm font-medium rounded-full tracking-wide whitespace-nowrap">
                 Réserver un terrain n'a jamais été aussi simple
