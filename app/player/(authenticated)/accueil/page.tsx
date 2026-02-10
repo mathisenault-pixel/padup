@@ -144,29 +144,29 @@ export default function AccueilPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50/30">
-      {/* Hero - PREMIUM - Full Screen */}
+    <div className="min-h-screen bg-white">
+      {/* Hero - ULTRA PREMIUM - Full Screen */}
       <section className="px-6 py-8 md:py-12 min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)] flex items-center justify-center">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <div className="inline-block mb-6">
-              <span className="px-6 py-2 bg-slate-900 text-white text-sm font-bold rounded-full shadow-lg">
-                Jouez plus, cherchez moins
+            <div className="inline-block mb-8">
+              <span className="px-8 py-3 bg-black text-white text-sm font-medium rounded-full tracking-wide">
+                Réserver un terrain n'a jamais été aussi simple
               </span>
             </div>
             
-            <h1 className="text-7xl md:text-8xl font-black text-gray-900 mb-6 leading-none">
-              Réservez votre terrain de padel
+            <h1 className="text-7xl md:text-8xl font-black text-black mb-8 leading-[0.95] tracking-tight">
+              Votre terrain de padel. En quelques secondes
             </h1>
             
-            <p className="text-2xl text-gray-600 mb-10 max-w-3xl mx-auto">
-              Accédez aux meilleurs clubs de France et réservez votre terrain en quelques clics.
+            <p className="text-2xl text-black/60 mb-12 max-w-3xl mx-auto font-light tracking-tight">
+              Les meilleurs clubs. Des disponibilités en temps réel. Une réservation instantanée
             </p>
 
             {/* BARRE DE RECHERCHE */}
             <div className="max-w-4xl mx-auto">
               <SmartSearchBar
-                placeholder="Rechercher un club ou une ville"
+                placeholder="Où souhaitez-vous jouer ?"
                 onSearch={(query) => {
                   console.log('Recherche:', query)
                   // Logique de recherche ici
@@ -183,41 +183,38 @@ export default function AccueilPage() {
               />
             </div>
 
-            <div className="flex items-center justify-center gap-8 mt-8 text-sm text-gray-600">
+            <div className="flex items-center justify-center gap-12 mt-12 text-sm text-black/50">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 font-medium">🇫🇷 Made in France</span>
+                <span className="text-sm font-light tracking-wide">Made in France</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-slate-900" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">Disponibilités en temps réel</span>
+                <span className="w-1 h-1 rounded-full bg-black/30"></span>
+                <span className="font-light tracking-wide">Temps réel</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-slate-900" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">Réservations sans frais</span>
+                <span className="w-1 h-1 rounded-full bg-black/30"></span>
+                <span className="font-light tracking-wide">Sans frais</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Clubs - CAROUSEL CARDS STYLE */}
-      <section className="pt-12 md:pt-16 pb-8 md:pb-12 px-6 bg-white">
+      {/* Clubs - MINIMAL STYLE */}
+      <section className="pt-24 md:pt-32 pb-16 md:pb-24 px-6 bg-white border-t border-black/5">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex items-end justify-between mb-12">
             <div>
-              <h2 className="text-4xl font-black text-gray-900 mb-3">Clubs autour de chez moi</h2>
-              <p className="text-xl text-gray-600">Découvrez nos meilleures adresses</p>
+              <h2 className="text-5xl font-black text-black mb-4 tracking-tight">Clubs autour de chez moi</h2>
+              <p className="text-xl text-black/50 font-light">Découvrez nos meilleures adresses</p>
             </div>
             <Link
               href="/player/clubs"
-              className="hidden md:inline-flex text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium items-center gap-2 group"
+              className="hidden md:inline-flex text-sm text-black hover:text-black/60 font-light items-center gap-2 group tracking-wide"
+              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
             >
               Voir tout
-              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ transition: 'transform 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
@@ -236,18 +233,16 @@ export default function AccueilPage() {
             
             {/* ✅ Affichage propre sans popup */}
             {locationStatus === 'success' && userCoords && (
-              <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-3">
-                <svg className="w-5 h-5 text-slate-900 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-sm font-medium text-slate-900">
-                  📍 Position détectée ! Les clubs sont maintenant triés du plus proche au plus éloigné.
+              <div className="mt-6 p-5 bg-black text-white rounded-lg flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+                <p className="text-sm font-light tracking-wide">
+                  Position détectée. Clubs triés par distance.
                 </p>
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {clubsWithDistance.map((club, index) => (
               <Link
                 key={club.id}
@@ -260,119 +255,114 @@ export default function AccueilPage() {
                     console.error('[CLUB CARD CLICK] ❌ WARNING: club.id is undefined/null!')
                   }
                 }}
-                className="group bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all block"
+                className="group bg-white border border-black/10 rounded-xl overflow-hidden hover:border-black/30 block"
+                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative h-72 overflow-hidden">
                   <img
                     src={club.imageUrl}
                     alt={club.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover"
+                    style={{ transition: 'transform 1200ms cubic-bezier(0.16, 1, 0.3, 1)' }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                   
                   {index === 0 && (
-                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-lg">
-                      ⭐ Top choix
+                    <div className="absolute top-5 left-5 px-4 py-2 bg-black text-white text-xs font-light rounded-md tracking-widest">
+                      TOP
                     </div>
                   )}
 
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg shadow-lg">
-                    <svg className="w-4 h-4 text-slate-900 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="text-sm font-black text-gray-900">{club.note.toFixed(1)}</span>
+                  <div className="absolute top-5 right-5 flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-md">
+                    <span className="text-sm font-medium text-black">{club.note.toFixed(1)}</span>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="text-xl font-black mb-1">{club.name}</h3>
-                    <p className="text-sm text-white/90">{club.city}</p>
+                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                    <h3 className="text-2xl font-bold mb-1 tracking-tight">{club.name}</h3>
+                    <p className="text-sm text-white/80 font-light">{club.city}</p>
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-black/5">
+                    <div className="flex items-center gap-2 text-sm text-black/50">
                       {club.distanceKm !== undefined ? (
-                        <span className="font-medium">
-                          {club.distance} • {formatDistance(club.distanceKm)}
+                        <span className="font-light">
+                          {formatDistance(club.distanceKm)}
                         </span>
                       ) : (
-                        <span className="font-medium">{club.distance}</span>
+                        <span className="font-light">{club.distance}</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-black/50 font-light">
                       {club.nombreTerrains} terrains
                     </div>
                   </div>
 
-                  <div className="pt-4">
+                  <div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-gray-900">{club.prixMin}€</span>
-                      <span className="text-sm text-gray-600">par personne</span>
+                      <span className="text-3xl font-bold text-black tracking-tight">{club.prixMin}€</span>
+                      <span className="text-sm text-black/50 font-light">par personne</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">pour 1h30 de jeu</p>
+                    <p className="text-xs text-black/40 mt-1 font-light">1h30 de jeu</p>
                   </div>
                 </div>
               </Link>
             ))}
           </div>
 
-          <div className="text-center mt-8 md:hidden">
+          <div className="text-center mt-12 md:hidden">
             <button
               type="button"
               onClick={() => router.push('/player/clubs')}
-              className="inline-flex items-center gap-2 px-10 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl"
+              className="inline-flex items-center gap-3 px-12 py-4 bg-black text-white font-light rounded-lg tracking-wide"
+              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
             >
-              Découvrir tous les clubs
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              Tous les clubs
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </button>
           </div>
         </div>
       </section>
 
-      <SectionDivider />
-
-      {/* RAPPELS AUTOMATIQUES - STYLE PRO */}
-      <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
+      {/* RAPPELS AUTOMATIQUES - MINIMAL */}
+      <section className="bg-white mt-24 md:mt-32 mb-24 md:mb-32 border-t border-black/5">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-24">
           {/* Header */}
-          <div className="mb-16 max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
-              Rappels automatiques par e-mail
+          <div className="mb-20 max-w-3xl">
+            <h2 className="text-4xl md:text-5xl font-bold text-black mb-6 leading-tight tracking-tight">
+              Rappels automatiques
             </h2>
-            <p className="text-base md:text-lg text-slate-600 leading-relaxed">
+            <p className="text-lg md:text-xl text-black/50 leading-relaxed font-light">
               Ne manquez plus jamais vos réservations. Recevez des notifications automatiques à chaque étape.
             </p>
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
             {[
               {
-                icon: '📧',
                 title: 'Confirmation instantanée',
                 description: 'Recevez immédiatement un e-mail de confirmation avec tous les détails de votre réservation',
               },
               {
-                icon: '🔔',
                 title: 'Rappel 24h avant',
                 description: 'Un e-mail automatique vous rappelle votre session 24h avant pour ne rien oublier',
               },
               {
-                icon: '⏰',
                 title: 'Notification dernière minute',
                 description: 'Recevez un dernier rappel 2h avant votre match pour être prêt à temps',
               },
             ].map((feature, i) => (
               <div 
                 key={i} 
-                className="group border border-slate-200 rounded-xl p-8 hover:border-slate-300 hover:bg-slate-50 transition-all"
+                className="group"
               >
-                <div className="text-5xl mb-5">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">{feature.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+                <div className="w-2 h-2 rounded-full bg-black mb-6"></div>
+                <h3 className="text-xl font-semibold text-black mb-4 tracking-tight">{feature.title}</h3>
+                <p className="text-base text-black/50 leading-relaxed font-light">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -381,36 +371,38 @@ export default function AccueilPage() {
 
       <SectionDivider />
 
-      {/* CTA - STYLE PRO */}
-      <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
+      {/* CTA - MINIMAL */}
+      <section className="bg-black text-white mt-24 md:mt-32 mb-24 md:mb-32">
+        <div className="mx-auto max-w-7xl px-6 md:px-8 py-20 md:py-32">
           {/* Contenu centré */}
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
               Prêt à jouer ?
             </h2>
-            <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-10">
+            <p className="text-lg md:text-xl text-white/60 leading-relaxed mb-12 font-light">
               Rejoignez plus de 10 000 joueurs qui font confiance à Pad'Up pour réserver leurs terrains de padel partout en France.
             </p>
             
             {/* CTA principal + lien secondaire */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button
                 type="button"
                 onClick={() => router.push('/player/clubs')}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl"
+                className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-light rounded-lg tracking-wide"
+                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
                 Commencer maintenant
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </button>
               <Link
                 href="/a-propos"
-                className="text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium inline-flex items-center gap-2 group"
+                className="text-sm text-white/60 hover:text-white font-light inline-flex items-center gap-2 group tracking-wide"
+                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
-                En savoir plus sur Pad'Up
-                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                En savoir plus
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ transition: 'transform 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
@@ -418,19 +410,19 @@ export default function AccueilPage() {
           </div>
 
           {/* Statistiques / Social proof */}
-          <div className="mt-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
+          <div className="mt-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto text-center">
               <div>
-                <p className="text-3xl font-bold text-slate-900 mb-2">10 000+</p>
-                <p className="text-sm text-slate-600">Joueurs actifs</p>
+                <p className="text-4xl font-bold mb-3 tracking-tight">10 000+</p>
+                <p className="text-sm text-white/50 font-light tracking-wide">Joueurs actifs</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-slate-900 mb-2">50+</p>
-                <p className="text-sm text-slate-600">Clubs partenaires</p>
+                <p className="text-4xl font-bold mb-3 tracking-tight">50+</p>
+                <p className="text-sm text-white/50 font-light tracking-wide">Clubs partenaires</p>
               </div>
               <div>
-                <p className="text-3xl font-bold text-slate-900 mb-2">4.8/5</p>
-                <p className="text-sm text-slate-600">Note moyenne</p>
+                <p className="text-4xl font-bold mb-3 tracking-tight">4.8/5</p>
+                <p className="text-sm text-white/50 font-light tracking-wide">Note moyenne</p>
               </div>
             </div>
           </div>
