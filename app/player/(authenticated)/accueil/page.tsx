@@ -191,7 +191,7 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero - PREMIUM SIMPLIFIÉ */}
-      <section className="px-4 pt-10 sm:pt-14 pb-8 md:pb-10">
+      <section className="px-4 pt-10 sm:pt-14 pb-20 md:pb-32 min-h-[calc(100vh-56px)]">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
             <div className="inline-block mb-3 sm:mb-4">
