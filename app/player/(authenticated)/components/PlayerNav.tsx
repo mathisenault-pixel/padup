@@ -25,7 +25,7 @@ export default function PlayerNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`px-3 py-2 text-sm font-light whitespace-nowrap transition-opacity hover:opacity-70 ${
+            className={`px-3 py-2 text-sm font-bold whitespace-nowrap transition-opacity hover:opacity-70 ${
               isActive(item.href) ? 'border-b border-black' : ''
             }`}
             style={{ color: '#000000' }}
@@ -44,7 +44,7 @@ export default function PlayerNav() {
               key={item.href}
               href={item.href}
               className={`
-                relative px-4 py-2 text-[14px] font-light whitespace-nowrap tracking-wide transition-opacity hover:opacity-70
+                relative px-4 py-2 text-[14px] font-bold whitespace-nowrap tracking-wide transition-opacity hover:opacity-70
                 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] 
                 after:bg-black after:transition-opacity
                 ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
