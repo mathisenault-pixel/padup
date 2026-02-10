@@ -3,11 +3,18 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
+type NavItem = {
+  href: string
+  label: string
+  desktopOnly?: boolean
+  mobileOnly?: boolean
+}
+
 export default function PlayerNav() {
   const pathname = usePathname()
 
   // Navigation style Planity (texte simple, pas de boutons)
-  const navItems = [
+  const navItems: NavItem[] = [
     { href: '/player/accueil', label: 'Accueil' },
     { href: '/player/reservations', label: 'Mes réservations' },
     { href: '/player/clubs', label: 'Clubs' },
