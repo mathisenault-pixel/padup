@@ -47,10 +47,10 @@ export default function PlayerNav() {
               href={item.href}
               className={`
                 relative px-4 py-2 text-[14px] whitespace-nowrap tracking-wide
-                ${active ? 'text-black font-normal' : 'text-black/50 font-light hover:text-black/80'}
+                ${active ? 'text-black font-medium' : 'text-black/50 font-light hover:text-black'}
                 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] 
                 after:bg-black
-                ${active ? 'after:opacity-30 group-hover:after:opacity-0' : 'after:opacity-0'}
+                ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
                 hover:after:!opacity-100
               `}
               style={{ 
