@@ -134,10 +134,10 @@ export default function ClubLoginPage() {
           </a>
         </div>
 
-        {/* Back to player */}
+        {/* Back */}
         <div className="mt-6 text-center">
-          <a href="/player/clubs" className="text-sm text-slate-700 hover:underline">
-            ← Retour à l'espace joueur
+          <a href="/club-access" className="text-sm text-slate-700 hover:underline">
+            ← Retour
           </a>
         </div>
       </div>

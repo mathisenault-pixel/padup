@@ -111,6 +111,26 @@ export default function MessagesPage() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [newMessage, setNewMessage] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Bloquer le scroll du body quand une conversation est ouverte sur mobile
+  useEffect(() => {
+    if (selectedConversation && window.innerWidth < 768) {
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+    }
+  }, [selectedConversation])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -134,6 +154,9 @@ export default function MessagesPage() {
 
     setSelectedConversation(prev => prev ? { ...prev, messages: [...prev.messages, newMsg] } : null)
     setNewMessage('')
+    
+    // Scroll vers le bas après l'envoi
+    setTimeout(scrollToBottom, 100)
   }
 
   const handleSelectConversation = (conv: Conversation) => {
@@ -142,6 +165,8 @@ export default function MessagesPage() {
     setConversations(prev => prev.map(c => 
       c.id === conv.id ? { ...c, unreadCount: 0 } : c
     ))
+    // Scroll vers le bas après ouverture
+    setTimeout(scrollToBottom, 100)
   }
 
   const getAvatarInitials = (name: string) => {
@@ -158,17 +183,19 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-3 md:px-6 py-4 md:py-6 pb-1 md:pb-3 max-w-[1400px]">
-        {/* En-tête */}
-        <div className="mb-4 md:mb-5">
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Messages</h1>
-          <p className="text-sm md:text-base text-gray-600">Discutez avec les clubs et consultez vos notifications</p>
-        </div>
+    <>
+      {/* Vue normale (liste + desktop) */}
+      <div className={`min-h-screen bg-gray-50 ${selectedConversation ? 'hidden md:block' : 'block'}`}>
+        <div className="container mx-auto px-3 md:px-6 py-4 md:py-6 pb-1 md:pb-3 max-w-[1400px]">
+          {/* En-tête */}
+          <div className="mb-4 md:mb-5">
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Messages</h1>
+            <p className="text-sm md:text-base text-gray-600">Discutez avec les clubs et consultez vos notifications</p>
+          </div>
 
-        {/* Interface de messagerie */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ height: 'calc(100vh - 220px)', minHeight: '500px' }}>
-          <div className="flex h-full">
+          {/* Interface de messagerie */}
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ height: 'calc(100vh - 220px)', minHeight: '500px' }}>
+            <div className="flex h-full">
             {/* Liste des conversations - Gauche */}
             <div className={`w-full md:w-80 lg:w-96 border-r border-gray-200 flex flex-col ${selectedConversation ? 'hidden md:flex' : 'flex'}`}>
               {/* Recherche */}
@@ -224,21 +251,11 @@ export default function MessagesPage() {
               </div>
             </div>
 
-            {/* Zone de conversation - Droite */}
+            {/* Zone de conversation - Droite (Desktop) */}
             {selectedConversation ? (
-              <div className="flex flex-1 flex-col w-full">
+              <div className="hidden md:flex flex-1 flex-col w-full">
                 {/* En-tête de la conversation */}
                 <div className="p-4 border-b border-gray-200 flex items-center gap-3">
-                  {/* Bouton retour (mobile uniquement) */}
-                  <button
-                    onClick={() => setSelectedConversation(null)}
-                    className="md:hidden flex-shrink-0 w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  
                   <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedConversation.type)} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
                     {getAvatarInitials(selectedConversation.contact)}
                   </div>
@@ -313,6 +330,88 @@ export default function MessagesPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+
+      {/* Vue mobile plein écran pour la conversation */}
+      {selectedConversation && (
+        <div className="md:hidden fixed inset-0 bg-white z-50 flex flex-col">
+          {/* En-tête de la conversation */}
+          <div className="flex-shrink-0 p-4 border-b border-gray-200 flex items-center gap-3 bg-white">
+            {/* Bouton retour */}
+            <button
+              onClick={() => setSelectedConversation(null)}
+              className="flex-shrink-0 w-10 h-10 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
+            >
+              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(selectedConversation.type)} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+              {getAvatarInitials(selectedConversation.contact)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-bold text-gray-900 truncate">{selectedConversation.contact}</h2>
+              <p className="text-xs text-gray-500 truncate">
+                {selectedConversation.type === 'club' ? 'Club de padel' : 
+                 selectedConversation.type === 'system' ? 'Notifications Pad\'Up' : 'Joueur'}
+              </p>
+            </div>
+          </div>
+
+          {/* Messages - Zone scrollable */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 overscroll-contain">
+            {selectedConversation.messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`max-w-[75%] ${msg.isFromMe ? 'order-2' : 'order-1'}`}>
+                  <div
+                    className={`rounded-2xl px-4 py-3 ${
+                      msg.isFromMe
+                        ? 'bg-slate-900 text-white rounded-br-md'
+                        : 'bg-white text-gray-900 shadow-sm rounded-bl-md'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap break-words text-[15px]">{msg.text}</p>
+                  </div>
+                  <p className={`text-xs text-gray-500 mt-1 px-2 ${msg.isFromMe ? 'text-right' : 'text-left'}`}>
+                    {msg.timestamp}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Zone de saisie - Fixe en bas */}
+          <div className="flex-shrink-0 p-3 border-t border-gray-200 bg-white safe-area-bottom">
+            <div className="flex items-end gap-2">
+              <input
+                ref={inputRef}
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onFocus={scrollToBottom}
+                placeholder="Écrivez votre message..."
+                className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-400 text-[16px] resize-none"
+                style={{ fontSize: '16px' }} // Évite le zoom sur iOS
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim()}
+                className="flex-shrink-0 w-12 h-12 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all flex items-center justify-center touch-manipulation"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
