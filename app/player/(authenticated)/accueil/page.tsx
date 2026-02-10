@@ -357,8 +357,8 @@ export default function AccueilPage() {
             </p>
           </div>
 
-          {/* 3 étapes horizontales */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* 3 étapes verticales */}
+          <div className="flex flex-col gap-8 max-w-3xl mx-auto">
             {[
               {
                 number: '1',
@@ -393,17 +393,22 @@ export default function AccueilPage() {
             ].map((step, i) => (
               <div 
                 key={i} 
-                className="relative text-center"
+                className="flex items-start gap-6"
               >
-                <div className="flex flex-col items-center">
-                  <div className="mb-4 w-16 h-16 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg">
+                {/* Icône + Numéro à gauche */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg">
                     {step.icon}
                   </div>
                   <div className="absolute -top-2 -left-2 w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
                     <span className="text-lg font-bold text-black/30">{step.number}</span>
                   </div>
+                </div>
+                
+                {/* Titre + Description à droite */}
+                <div className="flex-1 pt-2">
                   <h3 className="text-xl font-semibold text-black mb-2 tracking-tight">{step.title}</h3>
-                  <p className="text-sm text-black/60 leading-relaxed font-light max-w-xs">{step.description}</p>
+                  <p className="text-sm text-black/60 leading-relaxed font-light">{step.description}</p>
                 </div>
               </div>
             ))}
