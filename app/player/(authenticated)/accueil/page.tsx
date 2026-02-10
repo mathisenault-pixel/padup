@@ -13,7 +13,6 @@ import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { getCitySuggestions } from '@/lib/cities'
 import { haversineKm, formatTravelTime, estimateMinutes, formatDistance } from '@/lib/geoUtils'
-import { SectionDivider } from '@/components/ui/SectionDivider'
 import { getClubById } from '@/lib/data/clubs'
 
 type Club = {
@@ -191,11 +190,11 @@ export default function AccueilPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero - ULTRA PREMIUM - Compact */}
-      <section className="px-4 pt-12 sm:pt-16 pb-6 md:pb-8">
+      {/* Hero - PREMIUM SIMPLIFIÉ */}
+      <section className="px-4 pt-10 sm:pt-14 pb-8 md:pb-10">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <div className="inline-block mb-4 sm:mb-5">
+            <div className="inline-block mb-3 sm:mb-4">
               <span className="px-4 py-2.5 sm:px-8 sm:py-3 bg-black text-white text-xs sm:text-sm font-medium rounded-full tracking-wide whitespace-nowrap">
                 Réserver un terrain n'a jamais été aussi simple
               </span>
@@ -205,12 +204,12 @@ export default function AccueilPage() {
               Réservez un terrain de padel en 30 secondes
             </h1>
             
-            <p className="text-lg sm:text-xl md:text-2xl text-black/60 mb-6 sm:mb-8 max-w-3xl mx-auto font-light tracking-tight px-2">
+            <p className="text-lg sm:text-xl md:text-2xl text-black/60 mb-5 sm:mb-6 max-w-3xl mx-auto font-light tracking-tight px-2">
               Disponibilités en temps réel, réservation sans appel ni attente.
             </p>
 
             {/* BARRE DE RECHERCHE */}
-            <div className="max-w-4xl mx-auto mb-4">
+            <div className="max-w-4xl mx-auto mb-5">
               <SmartSearchBar
                 placeholder="Ville ou club (ex : Paris, Lyon, Le Hangar…)"
                 onSearch={(query) => {
@@ -234,52 +233,41 @@ export default function AccueilPage() {
               )}
             </div>
 
-            {/* CTA PRINCIPAL */}
-            <div className="max-w-4xl mx-auto mb-4">
+            {/* CTA PRINCIPAL UNIQUE */}
+            <div className="max-w-4xl mx-auto">
               <button
                 type="button"
                 onClick={handleCTAClick}
-                className="w-full sm:w-auto px-8 py-4 bg-black text-white font-light rounded-lg tracking-wide text-base hover:bg-black/80"
-                style={{ 
-                  transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
-                  minHeight: '48px' // Hauteur tactile iOS
-                }}
+                className="w-full sm:w-auto px-10 py-4 bg-black text-white font-medium rounded-lg tracking-wide text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
               >
                 Voir les terrains disponibles
               </button>
-            </div>
-
-            {/* MICRO-PREUVE */}
-            <div className="text-center mb-8">
-              <p className="text-sm text-black/40 font-light tracking-wide">
-                Aucun frais pour les joueurs · Disponibilités en temps réel
-              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Clubs - MINIMAL STYLE */}
-      <section className="pt-12 md:pt-16 pb-16 md:pb-24 px-6 bg-white border-t border-black/5">
+      {/* Clubs - PREMIUM */}
+      <section className="pt-12 md:pt-16 pb-16 md:pb-24 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-end justify-between mb-8">
+          <div className="flex items-end justify-between mb-6">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black text-black mb-3 tracking-tight">Clubs autour de chez moi</h2>
-              <p className="text-lg md:text-xl text-black/50 font-light">Découvrez nos meilleures adresses</p>
+              <h2 className="text-4xl md:text-5xl font-black text-black mb-2 tracking-tight">Les meilleurs clubs près de chez vous</h2>
+              <p className="text-base md:text-lg text-black/60 font-light">Disponibilités réelles. Réservation immédiate.</p>
             </div>
             <Link
               href="/player/clubs"
-              className="hidden md:inline-flex text-sm text-black hover:text-black/60 font-light items-center gap-2 group tracking-wide"
-              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+              className="hidden md:inline-flex text-sm text-black/50 hover:text-black font-light items-center gap-2 group tracking-wide"
+              style={{ transition: 'all 300ms ease' }}
             >
               Voir tout
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ transition: 'transform 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ transition: 'transform 300ms ease' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
           </div>
 
-          {/* Bouton de géolocalisation + fallback */}
+          {/* Bouton de géolocalisation + fallback - Style discret */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
               <UseMyLocationButton
@@ -298,7 +286,7 @@ export default function AccueilPage() {
               <button
                 type="button"
                 onClick={handleEnterCity}
-                className="text-sm text-black/60 hover:text-black font-light underline underline-offset-4 transition-colors"
+                className="text-sm text-black/50 hover:text-black/80 font-light underline underline-offset-4 transition-colors"
               >
                 Entrer une ville
               </button>
@@ -324,7 +312,7 @@ export default function AccueilPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {clubsWithDistance.map((club, index) => (
               <Link
                 key={club.id}
@@ -337,63 +325,65 @@ export default function AccueilPage() {
                     console.error('[CLUB CARD CLICK] ❌ WARNING: club.id is undefined/null!')
                   }
                 }}
-                className="group bg-white border border-black/10 rounded-xl overflow-hidden hover:border-black/30 block"
-                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+                className="group bg-white rounded-2xl overflow-hidden hover:shadow-2xl block shadow-sm"
+                style={{ transition: 'all 400ms ease' }}
               >
-                <div className="relative h-72 overflow-hidden">
+                <div className="relative h-64 overflow-hidden">
                   <img
                     src={club.imageUrl}
                     alt={club.name}
-                    className="w-full h-full object-cover"
-                    style={{ transition: 'transform 1200ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+                    className="w-full h-full object-cover group-hover:scale-105"
+                    style={{ transition: 'transform 600ms ease' }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                   
                   {index === 0 && (
-                    <div className="absolute top-5 left-5 px-4 py-2 bg-black text-white text-xs font-light rounded-md tracking-widest">
+                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/90 backdrop-blur-sm text-white text-xs font-medium rounded-full tracking-wider">
                       TOP
                     </div>
                   )}
 
-                  <div className="absolute top-5 right-5 flex items-center gap-2 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-md">
-                    <span className="text-sm font-medium text-black">{club.note.toFixed(1)}</span>
+                  <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg">
+                    <svg className="w-3.5 h-3.5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="text-sm font-semibold text-black">{club.note.toFixed(1)}</span>
                   </div>
 
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <div className="absolute bottom-5 left-5 right-5 text-white">
                     <h3 className="text-2xl font-bold mb-1 tracking-tight">{club.name}</h3>
-                    <p className="text-sm text-white/80 font-light">{club.city}</p>
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4 pb-4 border-b border-black/5">
-                    <div className="flex items-center gap-2 text-sm text-black/50">
+                    <div className="flex items-center gap-2 text-sm">
+                      <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
                       {club.distanceKm !== undefined ? (
-                        <span className="font-light">
+                        <span className="font-light text-white/90">
                           {formatDistance(club.distanceKm)}
                         </span>
                       ) : (
-                        <span className="font-light">{club.distance}</span>
+                        <span className="font-light text-white/90">{club.distance}</span>
                       )}
                     </div>
-                    <div className="text-sm text-black/50 font-light">
-                      {club.nombreTerrains} terrains
-                    </div>
                   </div>
+                </div>
 
-                  {/* Prochaine disponibilité */}
-                  <div className="mb-4 py-2 px-3 bg-black/5 rounded-lg">
-                    <p className="text-xs text-black/60 font-medium tracking-wide">
+                <div className="p-5">
+                  {/* Prochaine disponibilité - Mise en avant */}
+                  <div className="mb-4 py-2.5 px-4 bg-black/5 rounded-xl border border-black/5">
+                    <p className="text-sm text-black font-medium tracking-wide">
                       {getNextAvailability(index)}
                     </p>
                   </div>
 
-                  <div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-black tracking-tight">{club.prixMin}€</span>
-                      <span className="text-sm text-black/50 font-light">par personne</span>
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-black tracking-tight">{club.prixMin}€</span>
+                        <span className="text-xs text-black/40 font-light">/ pers.</span>
+                      </div>
+                      <p className="text-xs text-black/30 mt-0.5 font-light">{club.nombreTerrains} terrains</p>
                     </div>
-                    <p className="text-xs text-black/40 mt-1 font-light">1h30 de jeu</p>
                   </div>
                 </div>
               </Link>
@@ -416,47 +406,66 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* RAPPELS AUTOMATIQUES - COMPACT */}
+      {/* 3 ÉTAPES - PREMIUM */}
       <section className="bg-white mt-16 md:mt-20 mb-16 md:mb-20 border-t border-black/5">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
+        <div className="mx-auto max-w-6xl px-6 md:px-8 py-12 md:py-16">
           {/* Header */}
-          <div className="mb-10 max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4 leading-tight tracking-tight">
-              Rappels automatiques
+          <div className="text-center mb-12 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-3 leading-tight tracking-tight">
+              Réserver n'a jamais été aussi simple
             </h2>
-            <p className="text-base md:text-lg text-black/50 leading-relaxed font-light">
-              Ne manquez plus jamais vos réservations. Recevez des notifications automatiques à chaque étape.
+            <p className="text-sm md:text-base text-black/50 leading-relaxed font-light">
+              Confirmation immédiate et rappels automatiques inclus
             </p>
           </div>
 
-          {/* Features Grid - Mini cards compactes */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* 3 étapes horizontales */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: 'Confirmation instantanée',
-                description: 'Recevez immédiatement un e-mail de confirmation avec tous les détails',
+                number: '1',
+                title: 'Trouvez un club',
+                description: 'Recherchez par ville ou utilisez votre localisation',
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                ),
               },
               {
-                title: 'Rappel 24h avant',
-                description: 'Un e-mail automatique vous rappelle votre session pour ne rien oublier',
+                number: '2',
+                title: 'Choisissez un créneau',
+                description: 'Disponibilités en temps réel, réservation instantanée',
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  </svg>
+                ),
               },
               {
-                title: 'Notification dernière minute',
-                description: 'Recevez un dernier rappel 2h avant votre match',
+                number: '3',
+                title: 'Jouez',
+                description: 'Présentez-vous au club, payez sur place et jouez',
+                icon: (
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ),
               },
-            ].map((feature, i) => (
+            ].map((step, i) => (
               <div 
                 key={i} 
-                className="p-5 border border-black/10 rounded-xl bg-white hover:border-black/20 transition-all"
+                className="relative text-center"
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <svg className="w-5 h-5 text-black flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <h3 className="text-base font-semibold text-black mb-2 tracking-tight">{feature.title}</h3>
-                    <p className="text-sm text-black/60 leading-relaxed font-light">{feature.description}</p>
+                <div className="flex flex-col items-center">
+                  <div className="mb-4 w-16 h-16 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg">
+                    {step.icon}
                   </div>
+                  <div className="absolute -top-2 -left-2 w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
+                    <span className="text-lg font-bold text-black/30">{step.number}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-black mb-2 tracking-tight">{step.title}</h3>
+                  <p className="text-sm text-black/60 leading-relaxed font-light max-w-xs">{step.description}</p>
                 </div>
               </div>
             ))}
@@ -464,98 +473,76 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      <SectionDivider />
-
-      {/* CTA - MINIMAL */}
-      <section className="bg-black text-white mt-24 md:mt-32">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-20 md:py-32">
+      {/* CTA - CONVERSION */}
+      <section className="bg-black text-white mt-20 md:mt-24">
+        <div className="mx-auto max-w-6xl px-6 md:px-8 py-16 md:py-20">
           {/* Contenu centré */}
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
-              Prêt à jouer ?
+          <div className="max-w-2xl mx-auto text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight tracking-tight">
+              Réservez votre terrain en quelques clics
             </h2>
-            <p className="text-lg md:text-xl text-white/60 leading-relaxed mb-12 font-light">
-              Trouvez votre terrain de padel et réservez en quelques clics. Simple, rapide et sans frais.
-            </p>
             
-            {/* CTA principal + lien secondaire */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button
-                type="button"
-                onClick={() => router.push('/player/clubs')}
-                className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-light rounded-lg tracking-wide hover:bg-white/90"
-                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-              >
-                Voir les terrains disponibles
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
-              <Link
-                href="/a-propos"
-                className="text-sm text-white/60 hover:text-white font-light inline-flex items-center gap-2 group tracking-wide"
-                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-              >
-                En savoir plus
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ transition: 'transform 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
+            {/* CTA principal unique */}
+            <button
+              type="button"
+              onClick={() => router.push('/player/clubs')}
+              className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-semibold rounded-xl tracking-wide hover:bg-white/90 shadow-xl transition-all mt-6"
+            >
+              Voir les terrains disponibles
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
           </div>
 
-          {/* Bénéfices crédibles */}
-          <div className="mt-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-4">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="text-lg font-semibold mb-2 tracking-tight">Réservation en 30 secondes</p>
-                <p className="text-sm text-white/50 font-light">Trouvez et réservez votre terrain en quelques clics</p>
+          {/* 3 bénéfices max - Compacts */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-8 border-t border-white/10">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-white/10 rounded-full mb-3">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-4">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <p className="text-lg font-semibold mb-2 tracking-tight">Paiement sécurisé</p>
-                <p className="text-sm text-white/50 font-light">Payez directement sur place, aucune CB requise en ligne</p>
+              <p className="text-sm font-semibold mb-1">Réservation en 30 secondes</p>
+              <p className="text-xs text-white/50 font-light">Simple et rapide</p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-white/10 rounded-full mb-3">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
               </div>
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 rounded-lg mb-4">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <p className="text-lg font-semibold mb-2 tracking-tight">Disponibilités en temps réel</p>
-                <p className="text-sm text-white/50 font-light">Voyez instantanément les créneaux libres sans appeler</p>
+              <p className="text-sm font-semibold mb-1">Paiement sécurisé</p>
+              <p className="text-xs text-white/50 font-light">Sur place au club</p>
+            </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-white/10 rounded-full mb-3">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
+              <p className="text-sm font-semibold mb-1">Disponibilités en temps réel</p>
+              <p className="text-xs text-white/50 font-light">Sans appeler le club</p>
             </div>
           </div>
         </div>
       </section>
 
-      <SectionDivider />
-
-      {/* FAQ - STYLE PRO */}
-      <section className="bg-white mt-8 md:mt-12 mb-16 md:mb-20">
-        <div className="mx-auto max-w-7xl px-6 md:px-8 py-12 md:py-16">
+      {/* FAQ - COMPACT */}
+      <section className="bg-white mt-12 md:mt-16 mb-12 md:mb-16 border-t border-black/5">
+        <div className="mx-auto max-w-5xl px-6 md:px-8 py-10 md:py-12">
           {/* Header */}
-          <div className="text-center mb-12 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-5 leading-tight">
+          <div className="text-center mb-8 max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 leading-tight">
               Questions fréquentes
             </h2>
-            <p className="text-base md:text-lg text-slate-600 leading-relaxed">
-              Tout ce que vous devez savoir sur Pad'Up et nos services de réservation
+            <p className="text-sm md:text-base text-slate-600 leading-relaxed">
+              Tout ce que vous devez savoir sur Pad'Up
             </p>
           </div>
 
           {/* Accordéon FAQ */}
-          <div className="space-y-3 max-w-4xl mx-auto">
+          <div className="space-y-2 max-w-3xl mx-auto">
             {[
               {
                 question: "Comment réserver un terrain ?",
@@ -578,32 +565,29 @@ export default function AccueilPage() {
                 answer: "Vous recevez automatiquement des notifications par email avant vos réservations. Vous pouvez gérer vos préférences de notification dans votre profil."
               }
             ].map((faq, i) => (
-              <details key={i} className="group border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-all">
-                <summary className="flex items-center justify-between px-6 md:px-8 py-5 cursor-pointer hover:bg-slate-50 transition-all">
-                  <span className="text-base md:text-lg font-semibold text-slate-900 pr-4">{faq.question}</span>
-                  <svg className="w-5 h-5 text-slate-600 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <details key={i} className="group border border-slate-200 rounded-lg overflow-hidden hover:border-slate-300 transition-all">
+                <summary className="flex items-center justify-between px-5 md:px-6 py-4 cursor-pointer hover:bg-slate-50 transition-all">
+                  <span className="text-sm md:text-base font-semibold text-slate-900 pr-4">{faq.question}</span>
+                  <svg className="w-4 h-4 text-slate-600 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="px-6 md:px-8 pb-5 pt-3 text-sm md:text-base text-slate-600 leading-relaxed">
+                <div className="px-5 md:px-6 pb-4 pt-2 text-xs md:text-sm text-slate-600 leading-relaxed">
                   <p>{faq.answer}</p>
                 </div>
               </details>
             ))}
           </div>
 
-          {/* CTA Footer */}
-          <div className="mt-16 text-center">
-            <p className="text-sm font-semibold text-slate-900 mb-3">
-              Vous avez d'autres questions ?
-            </p>
+          {/* CTA Footer discret */}
+          <div className="mt-10 text-center">
             <Link
-              href="/faq"
-              className="text-sm text-slate-700 hover:text-slate-900 transition-colors font-medium inline-flex items-center gap-2 group"
+              href="/player/clubs"
+              className="inline-flex items-center gap-2 px-8 py-3 text-sm text-slate-700 hover:text-white bg-slate-100 hover:bg-black rounded-lg font-medium transition-all shadow-sm"
             >
-              Consulter la FAQ complète
-              <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              Trouver un club
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
           </div>
