@@ -59,41 +59,18 @@ export default function AuthStatus() {
     )
   }
 
-  // Si connecté
-  if (user) {
-    return (
-      <div className="flex items-center gap-2 md:gap-3">
-        {/* Mon compte - Seul vrai bouton */}
-        <button
-          type="button"
-          onClick={() => router.push('/player/compte')}
-          className="px-4 py-2 text-[14px] font-light bg-black hover:bg-black/80 text-white rounded-md tracking-wide"
-          style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-        >
-          Mon compte
-        </button>
-      </div>
-    )
-  }
-
-  // Si non connecté
+  // Afficher "Mon compte" dans tous les cas
+  // Si connecté → aller vers /player/compte
+  // Si non connecté → aller vers /login
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 md:gap-3">
       <button
         type="button"
-        onClick={() => router.push('/login')}
-        className="px-2 py-2 text-[14px] font-light text-black/60 hover:text-black tracking-wide"
+        onClick={() => router.push(user ? '/player/compte' : '/login')}
+        className="px-4 py-2 text-[14px] font-light bg-black hover:bg-black/80 text-white rounded-md tracking-wide"
         style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
       >
-        Se connecter
-      </button>
-      <button
-        type="button"
-        onClick={() => router.push('/login')}
-        className="hidden md:inline-flex px-4 py-2 bg-black hover:bg-black/80 text-white text-[14px] font-light rounded-md tracking-wide"
-        style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-      >
-        S&apos;inscrire
+        Mon compte
       </button>
     </div>
   )

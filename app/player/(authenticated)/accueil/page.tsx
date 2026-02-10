@@ -50,6 +50,7 @@ export default function AccueilPage() {
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success'>('idle')
   const [isLoading, setIsLoading] = useState(true)
+  const [showSearchError, setShowSearchError] = useState(false)
 
   const [clubs, setClubs] = useState<Club[]>([])
 
@@ -143,33 +144,49 @@ export default function AccueilPage() {
     setShowReservationModal(true)
   }
 
+  const handleCTAClick = () => {
+    // Lire la valeur actuelle du champ de recherche
+    const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement
+    const currentQuery = searchInput?.value || ''
+    
+    if (!currentQuery.trim()) {
+      setShowSearchError(true)
+      searchInput?.focus()
+      // Masquer le message après 3 secondes
+      setTimeout(() => setShowSearchError(false), 3000)
+      return
+    }
+    // Naviguer vers la page clubs avec le filtre
+    router.push(`/player/clubs?q=${encodeURIComponent(currentQuery)}`)
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero - ULTRA PREMIUM - Full Screen */}
       <section className="px-4 pt-20 sm:pt-24 pb-8 md:pb-12 min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)] flex items-center justify-center">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <div className="inline-block mb-8">
+            <div className="inline-block mb-6 sm:mb-8">
               <span className="px-4 py-2.5 sm:px-8 sm:py-3 bg-black text-white text-xs sm:text-sm font-medium rounded-full tracking-wide whitespace-nowrap">
                 Réserver un terrain n'a jamais été aussi simple
               </span>
             </div>
             
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-black mb-6 sm:mb-8 leading-[0.95] tracking-tight px-2">
-              Votre terrain de padel. En quelques secondes
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-black mb-4 sm:mb-6 leading-[0.95] tracking-tight px-2">
+              Réservez un terrain de padel en 30 secondes
             </h1>
             
-            <p className="text-2xl text-black/60 mb-12 max-w-3xl mx-auto font-light tracking-tight">
-              Les meilleurs clubs. Des disponibilités en temps réel. Une réservation instantanée
+            <p className="text-lg sm:text-xl md:text-2xl text-black/60 mb-8 sm:mb-10 max-w-3xl mx-auto font-light tracking-tight px-2">
+              Disponibilités en temps réel, réservation sans appel ni attente.
             </p>
 
             {/* BARRE DE RECHERCHE */}
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto mb-4">
               <SmartSearchBar
-                placeholder="Où souhaitez-vous jouer ?"
+                placeholder="Ville ou club (ex : Paris, Lyon, Le Hangar…)"
                 onSearch={(query) => {
-                  console.log('Recherche:', query)
-                  // Logique de recherche ici
+                  // Naviguer directement vers les clubs avec le filtre
+                  router.push(`/player/clubs?q=${encodeURIComponent(query)}`)
                 }}
                 suggestions={[
                   'Le Hangar Sport & Co',
@@ -181,20 +198,33 @@ export default function AccueilPage() {
                 storageKey="search-history-accueil"
                 compact={false}
               />
+              {showSearchError && (
+                <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
+                  Entrez une ville ou un club
+                </p>
+              )}
             </div>
 
-            <div className="flex items-center justify-center gap-12 mt-12 text-sm text-black/50">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-light tracking-wide">Made in France</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-black/30"></span>
-                <span className="font-light tracking-wide">Temps réel</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-black/30"></span>
-                <span className="font-light tracking-wide">Sans frais</span>
-              </div>
+            {/* CTA PRINCIPAL */}
+            <div className="max-w-4xl mx-auto mb-4">
+              <button
+                type="button"
+                onClick={handleCTAClick}
+                className="w-full sm:w-auto px-8 py-4 bg-black text-white font-light rounded-lg tracking-wide text-base hover:bg-black/80"
+                style={{ 
+                  transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
+                  minHeight: '48px' // Hauteur tactile iOS
+                }}
+              >
+                Voir les terrains disponibles
+              </button>
+            </div>
+
+            {/* MICRO-PREUVE */}
+            <div className="text-center mb-8">
+              <p className="text-sm text-black/40 font-light tracking-wide">
+                Aucun frais pour les joueurs · Disponibilités en temps réel
+              </p>
             </div>
           </div>
         </div>
