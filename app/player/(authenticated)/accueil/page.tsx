@@ -190,61 +190,64 @@ export default function AccueilPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero - PREMIUM SIMPLIFIÉ */}
-      <section className="relative min-h-screen">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4">
+      {/* Hero - Version mobile simple */}
+      <section className="pt-10 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen">
+        <div className="md:absolute md:top-1/2 md:left-1/2 md:w-full md:px-4 md:-translate-x-1/2 md:-translate-y-1/2">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center">
-            <div className="inline-block mb-3 sm:mb-4">
-              <span className="px-4 py-2.5 sm:px-8 sm:py-3 bg-black text-white text-xs sm:text-sm font-medium rounded-full tracking-wide whitespace-nowrap">
-                Réserver un terrain n'a jamais été aussi simple
-              </span>
-            </div>
-            
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-black mb-3 sm:mb-4 leading-[0.95] tracking-tight px-2">
-              Réservez un terrain de padel en 30 secondes
-            </h1>
-            
-            <p className="text-lg sm:text-xl md:text-2xl text-black/60 mb-5 sm:mb-6 max-w-3xl mx-auto font-light tracking-tight px-2">
-              Disponibilités en temps réel, réservation sans appel ni attente.
-            </p>
+              {/* Badge */}
+              <div className="inline-block mb-6">
+                <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
+                  Réserver un terrain n'a jamais été aussi simple
+                </span>
+              </div>
+              
+              {/* Titre */}
+              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
+                Votre terrain de padel.<br />En quelques secondes
+              </h1>
+              
+              {/* Sous-texte */}
+              <p className="text-base sm:text-lg md:text-xl text-black/60 mb-8 max-w-2xl mx-auto font-light">
+                Disponibilités en temps réel, réservation sans appel ni attente.
+              </p>
 
-            {/* BARRE DE RECHERCHE */}
-            <div className="max-w-4xl mx-auto mb-5">
-              <SmartSearchBar
-                placeholder="Ville ou club (ex : Paris, Lyon, Le Hangar…)"
-                onSearch={(query) => {
-                  router.push(`/player/clubs?q=${encodeURIComponent(query)}`)
-                }}
-                suggestions={[
-                  'Le Hangar Sport & Co',
-                  'Paul & Louis Sport',
-                  'ZE Padel',
-                  'QG Padel Club',
-                  ...getCitySuggestions()
-                ]}
-                storageKey="search-history-accueil"
-                compact={false}
-              />
-              {showSearchError && (
-                <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
-                  Entrez une ville ou un club
-                </p>
-              )}
-            </div>
+              {/* BARRE DE RECHERCHE */}
+              <div className="max-w-2xl mx-auto mb-6">
+                <SmartSearchBar
+                  placeholder="Où souhaitez-vous jouer ?"
+                  onSearch={(query) => {
+                    router.push(`/player/clubs?q=${encodeURIComponent(query)}`)
+                  }}
+                  suggestions={[
+                    'Le Hangar Sport & Co',
+                    'Paul & Louis Sport',
+                    'ZE Padel',
+                    'QG Padel Club',
+                    ...getCitySuggestions()
+                  ]}
+                  storageKey="search-history-accueil"
+                  compact={false}
+                />
+                {showSearchError && (
+                  <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
+                    Entrez une ville ou un club
+                  </p>
+                )}
+              </div>
 
-            {/* CTA PRINCIPAL UNIQUE */}
-            <div className="max-w-4xl mx-auto">
-              <button
-                type="button"
-                onClick={handleCTAClick}
-                className="w-full sm:w-auto px-10 py-4 bg-black text-white font-medium rounded-lg tracking-wide text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
-              >
-                Voir les terrains disponibles
-              </button>
+              {/* CTA PRINCIPAL */}
+              <div className="max-w-2xl mx-auto">
+                <button
+                  type="button"
+                  onClick={handleCTAClick}
+                  className="w-full sm:w-auto px-10 py-4 bg-black text-white font-medium rounded-lg tracking-wide text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
+                >
+                  Voir les terrains disponibles
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </section>
 

@@ -19,7 +19,6 @@ export default function PlayerNav() {
     { href: '/player/reservations', label: 'Mes réservations' },
     { href: '/player/clubs', label: 'Clubs' },
     { href: '/player/tournois', label: 'Tournois' },
-    { href: '/club-access', label: 'Espace club' },
   ]
 
   const isActive = (href: string) => pathname === href
