@@ -246,36 +246,19 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* Clubs - PREMIUM */}
-      <section className="pt-12 md:pt-16 pb-16 md:pb-24 px-6 bg-white">
+      {/* Clubs */}
+      <section className="pt-12 md:pt-16 pb-16 md:pb-20 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black text-black mb-2 tracking-tight">Les meilleurs clubs près de chez vous</h2>
-              <p className="text-base md:text-lg text-black/60 font-light">Disponibilités réelles. Réservation immédiate.</p>
-            </div>
-            <Link
-              href="/player/clubs"
-              className="hidden md:inline-flex text-sm text-black/50 hover:text-black font-light items-center gap-2 group tracking-wide"
-              style={{ transition: 'all 300ms ease' }}
-            >
-              Voir tout
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ transition: 'transform 300ms ease' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-
-          {/* Bouton de géolocalisation + fallback - Style discret */}
+          {/* Header */}
           <div className="mb-8">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-black mb-6">Les meilleurs clubs près de chez vous</h2>
+            
+            <div className="flex items-center gap-3">
               <UseMyLocationButton
                 onCoords={(coords) => {
                   setUserCoords(coords);
                   setLocationStatus('success');
                   setLocationError(null);
-                  console.log('📍 Position détectée:', coords);
-                  console.log('✅ Les clubs vont être triés par distance réelle');
                 }}
                 onError={(error) => {
                   setLocationStatus('error');
@@ -285,33 +268,25 @@ export default function AccueilPage() {
               <button
                 type="button"
                 onClick={handleEnterCity}
-                className="text-sm text-black/50 hover:text-black/80 font-light underline underline-offset-4 transition-colors"
+                className="text-sm text-black/60 hover:text-black underline transition-colors"
               >
                 Entrer une ville
               </button>
             </div>
             
-            {/* Message de succès */}
+            {/* Messages status */}
             {locationStatus === 'success' && userCoords && (
-              <div className="mt-6 p-5 bg-black text-white rounded-lg flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
-                <p className="text-sm font-light tracking-wide">
-                  Position détectée. Clubs triés par distance.
-                </p>
-              </div>
+              <p className="mt-3 text-xs text-black/60">Clubs triés par distance</p>
             )}
-            
-            {/* Message d'erreur */}
             {locationStatus === 'error' && locationError && (
-              <div className="mt-4 p-4 bg-black/5 border border-black/10 rounded-lg flex items-start gap-3">
-                <p className="text-sm text-black/70 font-light">
-                  {locationError} — <button onClick={handleEnterCity} className="underline hover:text-black">entrez une ville</button>
-                </p>
-              </div>
+              <p className="mt-3 text-xs text-black/60">
+                {locationError} — <button onClick={handleEnterCity} className="underline">entrez une ville</button>
+              </p>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Grille */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {clubsWithDistance.map((club, index) => (
               <Link
                 key={club.id}
@@ -324,83 +299,45 @@ export default function AccueilPage() {
                     console.error('[CLUB CARD CLICK] ❌ WARNING: club.id is undefined/null!')
                   }
                 }}
-                className="group bg-white rounded-2xl overflow-hidden hover:shadow-2xl block shadow-sm"
-                style={{ transition: 'all 400ms ease' }}
+                className="group block border border-black/10 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div className="relative h-64 overflow-hidden">
+                {/* Image simple */}
+                <div className="relative h-48 overflow-hidden bg-gray-100">
                   <img
                     src={club.imageUrl}
                     alt={club.name}
-                    className="w-full h-full object-cover group-hover:scale-105"
-                    style={{ transition: 'transform 600ms ease' }}
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  
-                  {index === 0 && (
-                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/90 backdrop-blur-sm text-white text-xs font-medium rounded-full tracking-wider">
-                      TOP
-                    </div>
-                  )}
-
-                  <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg">
-                    <svg className="w-3.5 h-3.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="text-sm font-semibold text-black">{club.note.toFixed(1)}</span>
-                  </div>
-
-                  <div className="absolute bottom-5 left-5 right-5 text-white">
-                    <h3 className="text-2xl font-bold mb-1 tracking-tight">{club.name}</h3>
-                    <div className="flex items-center gap-2 text-sm">
-                      <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {club.distanceKm !== undefined ? (
-                        <span className="font-light text-white/90">
-                          {formatDistance(club.distanceKm)}
-                        </span>
-                      ) : (
-                        <span className="font-light text-white/90">{club.distance}</span>
-                      )}
-                    </div>
-                  </div>
                 </div>
 
-                <div className="p-5">
-                  {/* Prochaine disponibilité - Mise en avant */}
-                  <div className="mb-4 py-2.5 px-4 bg-black/5 rounded-xl border border-black/5">
-                    <p className="text-sm text-black font-medium tracking-wide">
-                      {getNextAvailability(index)}
-                    </p>
-                  </div>
-
-                  <div className="flex items-baseline justify-between">
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-black tracking-tight">{club.prixMin}€</span>
-                        <span className="text-xs text-black/40 font-light">/ pers.</span>
-                      </div>
-                      <p className="text-xs text-black/30 mt-0.5 font-light">{club.nombreTerrains} terrains</p>
-                    </div>
-                  </div>
+                {/* Bloc texte aligné à gauche */}
+                <div className="p-4">
+                  <h3 className="text-base font-semibold text-black mb-2">{club.name}</h3>
+                  
+                  <p className="text-sm text-black/60 mb-3">
+                    {club.city} • {club.distanceKm !== undefined ? formatDistance(club.distanceKm) : club.distance}
+                  </p>
+                  
+                  <p className="text-sm text-black mb-2">
+                    {getNextAvailability(index)}
+                  </p>
+                  
+                  <p className="text-sm text-black/80">
+                    À partir de <span className="font-semibold">{club.prixMin} €</span> / pers
+                  </p>
                 </div>
               </Link>
             ))}
           </div>
 
-          <div className="text-center mt-12 md:hidden">
-            <button
-              type="button"
-              onClick={() => router.push('/player/clubs')}
-              className="inline-flex items-center gap-3 px-12 py-4 bg-black text-white font-light rounded-lg tracking-wide"
-              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+          {/* Lien Voir tout */}
+          <div className="text-center mt-10">
+            <Link
+              href="/player/clubs"
+              className="text-sm text-black/60 hover:text-black underline transition-colors"
             >
-              Tous les clubs
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
+              Voir tous les clubs
+            </Link>
           </div>
         </div>
       </section>
