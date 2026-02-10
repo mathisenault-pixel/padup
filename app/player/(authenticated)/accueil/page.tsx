@@ -245,6 +245,7 @@ export default function AccueilPage() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Clubs */}
