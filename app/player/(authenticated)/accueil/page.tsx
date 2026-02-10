@@ -472,12 +472,12 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* CTA - CONVERSION */}
-      <section className="bg-black text-white mt-20 md:mt-24">
-        <div className="mx-auto max-w-6xl px-6 md:px-8 py-16 md:py-20">
+      {/* CTA */}
+      <section className="bg-white mt-16 md:mt-20 py-16 md:py-20 border-t border-black/5">
+        <div className="mx-auto max-w-6xl px-6 md:px-8">
           {/* Contenu centré */}
           <div className="max-w-2xl mx-auto text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 leading-tight tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4 leading-tight tracking-tight">
               Réservez votre terrain en quelques clics
             </h2>
             
@@ -485,7 +485,7 @@ export default function AccueilPage() {
             <button
               type="button"
               onClick={() => router.push('/player/clubs')}
-              className="inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-semibold rounded-xl tracking-wide hover:bg-white/90 shadow-xl transition-all mt-6"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-black text-white font-semibold rounded-xl tracking-wide hover:bg-black/90 shadow-lg transition-all mt-6"
             >
               Voir les terrains disponibles
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -494,34 +494,34 @@ export default function AccueilPage() {
             </button>
           </div>
 
-          {/* 3 bénéfices max - Compacts */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-8 border-t border-white/10">
+          {/* 3 bénéfices - Compacts */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-8 border-t border-black/5">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-white/10 rounded-full mb-3">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-black/5 rounded-full mb-3">
+                <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold mb-1">Réservation en 30 secondes</p>
-              <p className="text-xs text-white/50 font-light">Simple et rapide</p>
+              <p className="text-sm font-semibold text-black mb-1">Réservation en 30 secondes</p>
+              <p className="text-xs text-black/50 font-light">Simple et rapide</p>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-white/10 rounded-full mb-3">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-black/5 rounded-full mb-3">
+                <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold mb-1">Paiement sécurisé</p>
-              <p className="text-xs text-white/50 font-light">Sur place au club</p>
+              <p className="text-sm font-semibold text-black mb-1">Paiement sécurisé</p>
+              <p className="text-xs text-black/50 font-light">Sur place au club</p>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-10 h-10 bg-white/10 rounded-full mb-3">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-10 h-10 bg-black/5 rounded-full mb-3">
+                <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold mb-1">Disponibilités en temps réel</p>
-              <p className="text-xs text-white/50 font-light">Sans appeler le club</p>
+              <p className="text-sm font-semibold text-black mb-1">Disponibilités en temps réel</p>
+              <p className="text-xs text-black/50 font-light">Sans appeler le club</p>
             </div>
           </div>
         </div>
