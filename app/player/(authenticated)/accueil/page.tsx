@@ -190,25 +190,25 @@ export default function AccueilPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero - SEARCH FIRST */}
-      <section className="px-4 pt-16 sm:pt-20 pb-12 md:pb-16">
-        <div className="container mx-auto max-w-5xl">
+      {/* Hero - SIMPLIFIÉ */}
+      <section className="px-4 pt-16 pb-12">
+        <div className="container mx-auto max-w-4xl">
           <div className="text-center">
-            {/* H1 discret, secondaire */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-2 leading-tight tracking-tight">
-              Réservez un terrain de padel
+            {/* Titre */}
+            <h1 className="text-3xl sm:text-4xl font-bold text-black mb-3 leading-tight">
+              Réservez un terrain de padel en 30 secondes
             </h1>
             
-            <p className="text-sm sm:text-base text-black/50 mb-8 font-light">
-              Disponibilités en temps réel, partout en France
+            {/* Sous-texte */}
+            <p className="text-sm text-black/60 mb-8">
+              Disponibilités en temps réel. Réservation instantanée. Sans frais.
             </p>
 
-            {/* BARRE DE RECHERCHE - ÉLÉMENT CENTRAL */}
-            <div className="max-w-3xl mx-auto mb-6">
+            {/* BARRE DE RECHERCHE */}
+            <div className="max-w-2xl mx-auto mb-5">
               <SmartSearchBar
                 placeholder="Où voulez-vous jouer ? (ville ou club)"
                 onSearch={(query) => {
-                  // Naviguer directement vers les clubs avec le filtre
                   router.push(`/player/clubs?q=${encodeURIComponent(query)}`)
                 }}
                 suggestions={[
@@ -222,291 +222,125 @@ export default function AccueilPage() {
                 compact={false}
               />
               {showSearchError && (
-                <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
+                <p className="text-sm text-black/50 mt-2">
                   Entrez une ville ou un club
                 </p>
               )}
             </div>
 
-            {/* CTA PRINCIPAL UNIQUE */}
-            <div className="max-w-3xl mx-auto">
-              <button
-                type="button"
-                onClick={handleCTAClick}
-                className="w-full sm:w-auto px-12 py-4 bg-black text-white font-semibold rounded-xl text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
-              >
-                Voir les terrains disponibles
-              </button>
-            </div>
+            {/* CTA */}
+            <button
+              type="button"
+              onClick={handleCTAClick}
+              className="px-8 py-3 bg-black text-white font-medium rounded-lg text-sm hover:bg-black/90 transition-colors"
+            >
+              Voir les terrains disponibles
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Clubs - STYLE AIRBNB */}
-      <section className="pt-12 md:pt-16 pb-16 md:pb-24 px-6 bg-white">
-        <div className="container mx-auto max-w-7xl">
-          {/* Header minimaliste */}
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-black tracking-tight">Clubs près de chez vous</h2>
+      {/* Clubs */}
+      <section className="pt-8 pb-16 px-6 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-black">Clubs près de chez vous</h2>
             
-            <div className="flex items-center gap-3">
-              <UseMyLocationButton
-                onCoords={(coords) => {
-                  setUserCoords(coords);
-                  setLocationStatus('success');
-                  setLocationError(null);
-                  console.log('📍 Position détectée:', coords);
-                  console.log('✅ Les clubs vont être triés par distance réelle');
-                }}
-                onError={(error) => {
-                  setLocationStatus('error');
-                  setLocationError(error);
-                }}
-              />
-            </div>
+            <UseMyLocationButton
+              onCoords={(coords) => {
+                setUserCoords(coords);
+                setLocationStatus('success');
+                setLocationError(null);
+              }}
+              onError={(error) => {
+                setLocationStatus('error');
+                setLocationError(error);
+              }}
+            />
           </div>
 
-          {/* Message status - Discret */}
+          {/* Message status */}
           {locationStatus === 'success' && userCoords && (
-            <div className="mb-6 py-2 px-4 bg-black/5 rounded-lg inline-flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-black flex-shrink-0"></span>
-              <p className="text-xs font-medium text-black/70">
-                Clubs triés par distance
-              </p>
+            <div className="mb-4 text-xs text-black/60">
+              Clubs triés par distance
             </div>
           )}
           
           {locationStatus === 'error' && locationError && (
-            <div className="mb-6 py-2 px-4 bg-black/5 rounded-lg inline-flex items-start gap-2">
-              <p className="text-xs text-black/60">
-                {locationError} — <button onClick={handleEnterCity} className="underline hover:text-black font-medium">entrez une ville</button>
-              </p>
+            <div className="mb-4 text-xs text-black/60">
+              {locationError} — <button onClick={handleEnterCity} className="underline">entrez une ville</button>
             </div>
           )}
 
-          {/* Grille style Airbnb - 3 colonnes large */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {/* Grille */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {clubsWithDistance.map((club, index) => (
               <Link
                 key={club.id}
                 href={`/player/clubs/${club.id}/reserver`}
-                onClick={() => {
-                  console.log('[CLUB CARD CLICK] ✅ Navigation to:', club.name)
-                  console.log('[CLUB CARD CLICK] club.id:', club.id, 'type:', typeof club.id)
-                  console.log('[CLUB CARD CLICK] URL will be:', `/player/clubs/${club.id}/reserver`)
-                  if (!club.id) {
-                    console.error('[CLUB CARD CLICK] ❌ WARNING: club.id is undefined/null!')
-                  }
-                }}
                 className="group block"
-                style={{ transition: 'all 200ms ease' }}
               >
-                {/* Image dominante */}
-                <div className="relative h-80 md:h-[22rem] overflow-hidden rounded-2xl mb-3">
+                {/* Image */}
+                <div className="relative h-48 overflow-hidden rounded-lg mb-3">
                   <img
                     src={club.imageUrl}
                     alt={club.name}
-                    className="w-full h-full object-cover group-hover:scale-[1.01]"
-                    style={{ transition: 'transform 300ms ease' }}
+                    className="w-full h-full object-cover"
                   />
-                  
-                  {/* Note discrète */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm">
-                    <svg className="w-3 h-3 text-black" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    <span className="text-xs font-semibold text-black">{club.note.toFixed(1)}</span>
-                  </div>
                 </div>
 
-                {/* Infos essentielles */}
-                <div className="px-0.5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1 tracking-tight">{club.name}</h3>
-                      <div className="flex items-center gap-2 text-sm text-black/50 mb-2">
-                        <span className="font-light">
-                          {club.distanceKm !== undefined ? formatDistance(club.distanceKm) : club.distance}
-                        </span>
-                        <span className="text-black/30">·</span>
-                        <span className="font-light">{club.note.toFixed(1)}</span>
-                      </div>
-                    </div>
+                {/* Infos */}
+                <div>
+                  <h3 className="text-sm font-semibold text-black mb-1">{club.name}</h3>
+                  <p className="text-xs text-black/60 mb-2">{club.city}</p>
+                  
+                  <div className="flex items-center gap-3 text-xs text-black/60 mb-2">
+                    <span>{club.note.toFixed(1)} ★</span>
+                    <span>{getNextAvailability(index)}</span>
                   </div>
                   
-                  {/* Prochaine disponibilité - Badge discret */}
-                  <div className="mb-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/5 rounded-md">
-                    <svg className="w-3.5 h-3.5 text-black/60" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-xs text-black/70 font-medium">
-                      {getNextAvailability(index)}
-                    </span>
-                  </div>
-                  
-                  {/* Prix - Secondaire */}
-                  <p className="text-xs text-black/50">
-                    <span className="font-medium text-black/70">{club.prixMin}€</span>
-                    <span className="font-light"> / personne</span>
+                  <p className="text-xs text-black/80 font-medium">
+                    {club.prixMin}€ / personne
                   </p>
                 </div>
               </Link>
             ))}
           </div>
 
-          {/* CTA Voir tout - Discret */}
-          <div className="text-center mt-12">
+          {/* Voir tous */}
+          <div className="text-center mt-8">
             <Link
               href="/player/clubs"
-              className="inline-flex items-center gap-2 text-sm text-black/60 hover:text-black font-medium transition-colors"
+              className="text-sm text-black/60 hover:text-black underline"
             >
               Voir tous les clubs
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* COMMENT ÇA MARCHE - PREMIUM */}
-      <section className="bg-white py-14 md:py-16 border-t border-black/5">
-        <div className="mx-auto max-w-5xl px-6 md:px-8">
-          {/* Header */}
-          <div className="text-center mb-10 max-w-xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-black leading-tight tracking-tight">
-              Comment ça marche
-            </h2>
-          </div>
-
-          {/* 3 étapes - Icône + Titre + Description */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-            {[
-              {
-                title: 'Trouvez un club',
-                description: 'Recherchez par ville ou géolocalisation',
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                  </svg>
-                ),
-              },
-              {
-                title: 'Choisissez un créneau',
-                description: 'Disponibilités en temps réel',
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                  </svg>
-                ),
-              },
-              {
-                title: 'Jouez',
-                description: 'Confirmation immédiate par email',
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ),
-              },
-            ].map((step, i) => (
-              <div 
-                key={i} 
-                className="flex flex-col items-center text-center"
-              >
-                <div className="w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center mb-3">
-                  {step.icon}
-                </div>
-                <h3 className="text-base font-semibold text-black mb-1">{step.title}</h3>
-                <p className="text-sm text-black/50 font-light">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* POSITIONNEMENT - SECTION NOIRE */}
-      <section className="bg-black text-white py-16 md:py-20">
-        <div className="mx-auto max-w-3xl px-6 md:px-8">
-          {/* Message principal */}
-          <div className="text-center flex flex-col items-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-tight tracking-tight">
-              La façon la plus simple de réserver un terrain de padel
-            </h2>
-            
-            {/* CTA principal - TRÈS VISIBLE */}
-            <button
-              type="button"
-              onClick={() => router.push('/player/clubs')}
-              className="inline-flex items-center gap-3 px-14 py-5 bg-white text-black font-bold rounded-xl text-base hover:bg-gray-100 shadow-2xl transition-all mb-10"
-            >
-              Voir les terrains disponibles
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
-
-            {/* 3 bénéfices - Inline compacts */}
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 pt-6 border-t border-white/10">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p className="text-sm font-light text-white/80">Réservation en 30 secondes</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <p className="text-sm font-light text-white/80">Paiement sécurisé</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <p className="text-sm font-light text-white/80">Disponibilités en temps réel</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION POUR LES CLUBS */}
-      <section className="bg-white py-16 md:py-20 border-t border-black/5">
-        <div className="mx-auto max-w-3xl px-6 md:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-black mb-3 leading-tight tracking-tight">
-            Vous êtes un club de padel ?
-          </h2>
-          <p className="text-base md:text-lg text-black/60 mb-8 font-light">
-            Augmentez vos réservations et gérez vos terrains simplement.
+      {/* Comment ça marche - Ligne discrète */}
+      <section className="bg-white py-8 border-t border-black/5">
+        <div className="mx-auto max-w-4xl px-6">
+          <p className="text-center text-sm text-black/60">
+            Trouvez un club → Choisissez un créneau → Jouez
           </p>
-          <Link
-            href="/club-access"
-            className="inline-flex items-center gap-2 px-8 py-3.5 text-sm text-black bg-black/5 hover:bg-black hover:text-white border border-black/10 hover:border-black rounded-xl font-medium transition-all"
-          >
-            Découvrir l'espace club
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
         </div>
       </section>
 
-      {/* FAQ - COMPACT */}
-      <section className="bg-white mb-12 md:mb-16 border-t border-black/5">
-        <div className="mx-auto max-w-5xl px-6 md:px-8 py-10 md:py-12">
+      {/* FAQ */}
+      <section className="bg-white py-12 border-t border-black/5">
+        <div className="mx-auto max-w-3xl px-6">
           {/* Header */}
-          <div className="text-center mb-8 max-w-2xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 leading-tight">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-black">
               Questions fréquentes
             </h2>
-            <p className="text-sm md:text-base text-slate-600 leading-relaxed">
-              Tout ce que vous devez savoir sur Pad'Up
-            </p>
           </div>
 
           {/* Accordéon FAQ */}
-          <div className="space-y-2 max-w-3xl mx-auto">
+          <div className="space-y-2">
             {[
               {
                 question: "Comment réserver un terrain ?",
@@ -529,31 +363,18 @@ export default function AccueilPage() {
                 answer: "Vous recevez automatiquement des notifications par email avant vos réservations. Vous pouvez gérer vos préférences de notification dans votre profil."
               }
             ].map((faq, i) => (
-              <details key={i} className="group border border-slate-200 rounded-lg overflow-hidden hover:border-slate-300 transition-all">
-                <summary className="flex items-center justify-between px-5 md:px-6 py-4 cursor-pointer hover:bg-slate-50 transition-all">
-                  <span className="text-sm md:text-base font-semibold text-slate-900 pr-4">{faq.question}</span>
-                  <svg className="w-4 h-4 text-slate-600 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <details key={i} className="group border border-black/10 rounded-lg overflow-hidden">
+                <summary className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-black/5">
+                  <span className="text-sm font-medium text-black pr-4">{faq.question}</span>
+                  <svg className="w-4 h-4 text-black/60 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="px-5 md:px-6 pb-4 pt-2 text-xs md:text-sm text-slate-600 leading-relaxed">
+                <div className="px-4 pb-3 pt-1 text-xs text-black/60">
                   <p>{faq.answer}</p>
                 </div>
               </details>
             ))}
-          </div>
-
-          {/* CTA Footer discret */}
-          <div className="mt-10 text-center">
-            <Link
-              href="/player/clubs"
-              className="inline-flex items-center gap-2 px-8 py-3 text-sm text-slate-700 hover:text-white bg-slate-100 hover:bg-black rounded-lg font-medium transition-all shadow-sm"
-            >
-              Trouver un club
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
           </div>
         </div>
       </section>
