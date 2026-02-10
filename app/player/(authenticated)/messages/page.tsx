@@ -112,6 +112,8 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
 
   // Bloquer le scroll du body quand une conversation est ouverte sur mobile
   useEffect(() => {
@@ -119,21 +121,60 @@ export default function MessagesPage() {
       document.body.style.overflow = 'hidden'
       document.body.style.position = 'fixed'
       document.body.style.width = '100%'
+      document.body.style.height = '100%'
     } else {
       document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.width = ''
+      document.body.style.height = ''
     }
 
     return () => {
       document.body.style.overflow = ''
       document.body.style.position = ''
       document.body.style.width = ''
+      document.body.style.height = ''
+    }
+  }, [selectedConversation])
+
+  // Gérer le clavier mobile et ajuster la vue
+  useEffect(() => {
+    if (typeof window === 'undefined' || !selectedConversation) return
+
+    const handleVisualViewportResize = () => {
+      if (window.visualViewport) {
+        const viewport = window.visualViewport
+        const windowHeight = window.innerHeight
+        const viewportHeight = viewport.height
+        const diff = windowHeight - viewportHeight
+        
+        // Le clavier est ouvert si la différence est significative
+        if (diff > 150) {
+          setKeyboardHeight(diff)
+          // Scroll vers le bas après un court délai
+          setTimeout(() => {
+            if (messagesContainerRef.current) {
+              messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+            }
+          }, 100)
+        } else {
+          setKeyboardHeight(0)
+        }
+      }
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualViewportResize)
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleVisualViewportResize)
+      }
     }
   }, [selectedConversation])
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+    }
   }
 
   const handleSendMessage = () => {
@@ -334,9 +375,15 @@ export default function MessagesPage() {
 
       {/* Vue mobile plein écran pour la conversation */}
       {selectedConversation && (
-        <div className="md:hidden fixed inset-0 bg-white z-50 flex flex-col">
+        <div 
+          className="md:hidden fixed inset-0 bg-white z-50 flex flex-col"
+          style={{
+            height: '100vh',
+            height: '100dvh', // Dynamic viewport height
+          }}
+        >
           {/* En-tête de la conversation */}
-          <div className="flex-shrink-0 p-4 border-b border-gray-200 flex items-center gap-3 bg-white">
+          <div className="flex-shrink-0 p-3 border-b border-gray-200 flex items-center gap-3 bg-white">
             {/* Bouton retour */}
             <button
               onClick={() => setSelectedConversation(null)}
@@ -351,7 +398,7 @@ export default function MessagesPage() {
               {getAvatarInitials(selectedConversation.contact)}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-bold text-gray-900 truncate">{selectedConversation.contact}</h2>
+              <h2 className="font-bold text-gray-900 truncate text-base">{selectedConversation.contact}</h2>
               <p className="text-xs text-gray-500 truncate">
                 {selectedConversation.type === 'club' ? 'Club de padel' : 
                  selectedConversation.type === 'system' ? 'Notifications Pad\'Up' : 'Joueur'}
@@ -359,34 +406,55 @@ export default function MessagesPage() {
             </div>
           </div>
 
-          {/* Messages - Zone scrollable */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 overscroll-contain">
-            {selectedConversation.messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`max-w-[75%] ${msg.isFromMe ? 'order-2' : 'order-1'}`}>
-                  <div
-                    className={`rounded-2xl px-4 py-3 ${
-                      msg.isFromMe
-                        ? 'bg-slate-900 text-white rounded-br-md'
-                        : 'bg-white text-gray-900 shadow-sm rounded-bl-md'
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap break-words text-[15px]">{msg.text}</p>
+          {/* Messages - Zone scrollable avec hauteur dynamique */}
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 bg-gray-50 overscroll-contain"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y',
+              marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
+            }}
+          >
+            <div className="space-y-3">
+              {selectedConversation.messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-[80%] ${msg.isFromMe ? 'order-2' : 'order-1'}`}>
+                    <div
+                      className={`rounded-2xl px-4 py-2.5 ${
+                        msg.isFromMe
+                          ? 'bg-slate-900 text-white rounded-br-md'
+                          : 'bg-white text-gray-900 shadow-sm rounded-bl-md'
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">{msg.text}</p>
+                    </div>
+                    <p className={`text-[11px] text-gray-500 mt-1 px-2 ${msg.isFromMe ? 'text-right' : 'text-left'}`}>
+                      {msg.timestamp}
+                    </p>
                   </div>
-                  <p className={`text-xs text-gray-500 mt-1 px-2 ${msg.isFromMe ? 'text-right' : 'text-left'}`}>
-                    {msg.timestamp}
-                  </p>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
 
-          {/* Zone de saisie - Fixe en bas */}
-          <div className="flex-shrink-0 p-3 border-t border-gray-200 bg-white safe-area-bottom">
+          {/* Zone de saisie - Fixe en bas, s'ajuste au clavier */}
+          <div 
+            className="flex-shrink-0 p-3 border-t border-gray-200 bg-white"
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+              transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'translateY(0)',
+              transition: 'transform 0.2s ease-out',
+            }}
+          >
             <div className="flex items-end gap-2">
               <input
                 ref={inputRef}
@@ -394,9 +462,11 @@ export default function MessagesPage() {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                onFocus={scrollToBottom}
+                onFocus={() => {
+                  setTimeout(scrollToBottom, 300)
+                }}
                 placeholder="Écrivez votre message..."
-                className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-400 text-[16px] resize-none"
+                className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-400 text-[16px]"
                 style={{ fontSize: '16px' }} // Évite le zoom sur iOS
               />
               <button
