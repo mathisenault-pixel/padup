@@ -19,25 +19,24 @@ export default function PlayerNav() {
 
   return (
     <>
-      {/* Navigation mobile - Sans Messages */}
+      {/* Navigation mobile */}
       <nav className="lg:hidden flex items-center gap-1">
         {navItems.filter(item => !item.desktopOnly).map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={`px-3 py-2 text-sm whitespace-nowrap ${
+            className={`px-3 py-2 text-sm whitespace-nowrap transition-colors ${
               isActive(item.href)
-                ? 'text-black font-semibold border-b-2 border-black'
-                : 'text-black/50 font-light hover:text-black'
+                ? 'text-white font-normal border-b border-white'
+                : 'text-white/50 font-light hover:text-white/80'
             }`}
-            style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
           >
             {item.label}
           </Link>
         ))}
       </nav>
 
-      {/* Navigation desktop - Minimaliste avec underline */}
+      {/* Navigation desktop - Dark */}
       <nav className="hidden lg:flex items-center gap-1 group">
         {navItems.map((item) => {
           const active = isActive(item.href)
@@ -46,16 +45,13 @@ export default function PlayerNav() {
               key={item.href}
               href={item.href}
               className={`
-                relative px-4 py-2 text-[14px] whitespace-nowrap tracking-wide
-                ${active ? 'text-black font-medium' : 'text-black/50 font-light hover:text-black'}
+                relative px-4 py-2 text-[14px] whitespace-nowrap tracking-wide transition-colors
+                ${active ? 'text-white font-normal' : 'text-white/50 font-light hover:text-white/80'}
                 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] 
-                after:bg-black
+                after:bg-white after:transition-opacity
                 ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
                 hover:after:!opacity-100
               `}
-              style={{ 
-                transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
-              }}
             >
               {item.label}
             </Link>
