@@ -146,16 +146,16 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero - ULTRA PREMIUM - Full Screen */}
-      <section className="px-6 pt-24 sm:pt-28 pb-8 md:pb-12 min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)] flex items-center justify-center">
+      <section className="px-4 pt-20 sm:pt-24 pb-8 md:pb-12 min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-80px)] flex items-center justify-center">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center">
-            <div className="inline-block mb-8 relative z-0">
-              <span className="px-8 py-3 bg-black text-white text-sm font-medium rounded-full tracking-wide">
+            <div className="inline-block mb-8">
+              <span className="px-4 py-2.5 sm:px-8 sm:py-3 bg-black text-white text-xs sm:text-sm font-medium rounded-full tracking-wide whitespace-nowrap">
                 Réserver un terrain n'a jamais été aussi simple
               </span>
             </div>
             
-            <h1 className="text-7xl md:text-8xl font-black text-black mb-8 leading-[0.95] tracking-tight">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-black mb-6 sm:mb-8 leading-[0.95] tracking-tight px-2">
               Votre terrain de padel. En quelques secondes
             </h1>
             
