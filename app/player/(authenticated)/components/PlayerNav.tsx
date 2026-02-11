@@ -30,8 +30,8 @@ export default function PlayerNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`px-3 py-2 text-sm font-normal whitespace-nowrap transition-opacity hover:opacity-70 ${
-              isActive(item.href) ? 'border-b border-black' : ''
+            className={`px-3.5 py-2.5 text-[15px] font-normal whitespace-nowrap transition-opacity hover:opacity-70 ${
+              isActive(item.href) ? 'border-b-2 border-black' : ''
             }`}
             style={{ color: '#000000' }}
           >
@@ -49,8 +49,8 @@ export default function PlayerNav() {
               key={item.href}
               href={item.href}
               className={`
-                relative px-4 py-2 text-[14px] font-normal whitespace-nowrap tracking-wide transition-opacity hover:opacity-70
-                after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] 
+                relative px-4 py-2.5 text-[15px] font-normal whitespace-nowrap tracking-wide transition-opacity hover:opacity-70
+                after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1.5px] 
                 after:bg-black after:transition-opacity
                 ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
                 hover:after:!opacity-100

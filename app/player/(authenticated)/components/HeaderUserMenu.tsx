@@ -24,11 +24,11 @@ export default function HeaderUserMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 text-black/70 hover:text-black transition-colors"
+        className="p-2.5 text-black/70 hover:text-black transition-colors"
         aria-label="Menu utilisateur"
       >
         {/* Icône hamburger : 3 barres horizontales */}
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
