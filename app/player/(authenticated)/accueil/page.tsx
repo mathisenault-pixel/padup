@@ -34,6 +34,17 @@ type Club = {
  * Coordonnées GPS des clubs (hardcodé pour MVP)
  * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
  */
+// Photo de fond Hero : utilisez '/images/accueil/hero-padel.jpg' pour votre propre image
+const HERO_BG_IMAGE = 'https://images.unsplash.com/photo-1622163642998-1ce230a6c914?auto=format&fit=crop&w=1920'
+
+/** 4 clubs "bientôt disponibles" (cartes non cliquables) */
+const COMING_SOON_CLUBS = [
+  { name: 'Padel Club Nord', city: 'Ouverture bientôt', imageUrl: getClubImage('a1b2c3d4-e5f6-4789-a012-3456789abcde') },
+  { name: 'Arena Padel Sud', city: 'Ouverture bientôt', imageUrl: getClubImage('b2c3d4e5-f6a7-4890-b123-456789abcdef') },
+  { name: 'Swing Padel Center', city: 'Ouverture bientôt', imageUrl: getClubImage('c3d4e5f6-a7b8-4901-c234-56789abcdef0') },
+  { name: 'Urban Padel Pro', city: 'Ouverture bientôt', imageUrl: getClubImage('d4e5f6a7-b8c9-4012-d345-6789abcdef01') },
+]
+
 const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
   'a1b2c3d4-e5f6-4789-a012-3456789abcde': { lat: 43.9781, lng: 4.6911 }, // Le Hangar - Rochefort-du-Gard
   'b2c3d4e5-f6a7-4890-b123-456789abcdef': { lat: 43.9608, lng: 4.8583 }, // Paul & Louis - Le Pontet
@@ -226,32 +237,38 @@ export default function AccueilPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero - Version mobile simple */}
-      <section className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen">
-        <div 
-          className="md:absolute md:top-1/2 md:left-1/2 md:w-full md:px-4 md:[transform:translate(-50%,calc(-50%-0.8cm))]"
-        >
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center">
-              {/* Badge */}
-              <div className="inline-block mb-6">
-                <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
-                  Réserver un terrain n'a jamais été aussi simple
-                </span>
-              </div>
-              
-              {/* Titre */}
-              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
-                Votre terrain de padel.<br />En quelques secondes
-              </h1>
-              
-              {/* Sous-texte */}
-              <p className="text-base sm:text-lg md:text-xl text-black/60 mb-8 max-w-2xl mx-auto font-light">
-                Disponibilités en temps réel, réservation sans appel ni attente.
-              </p>
+      {/* Hero - Photo de fond padel plein écran */}
+      <section
+        className="relative min-h-screen bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.9) 100%), url('${HERO_BG_IMAGE}')`,
+        }}
+      >
+        <div className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen">
+          <div 
+            className="md:absolute md:top-1/2 md:left-1/2 md:w-full md:px-4 md:[transform:translate(-50%,calc(-50%-0.8cm))]"
+          >
+            <div className="container mx-auto max-w-6xl">
+              <div className="text-center">
+                {/* Badge */}
+                <div className="inline-block mb-6">
+                  <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
+                    Réserver un terrain n'a jamais été aussi simple
+                  </span>
+                </div>
+                
+                {/* Titre */}
+                <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
+                  Votre terrain de padel.<br />En quelques secondes
+                </h1>
+                
+                {/* Sous-texte */}
+                <p className="text-base sm:text-lg md:text-xl text-black/60 mb-8 max-w-2xl mx-auto font-light">
+                  Disponibilités en temps réel, réservation sans appel ni attente.
+                </p>
 
-              {/* BARRE DE RECHERCHE */}
-              <div className="max-w-2xl mx-auto mb-6">
+                {/* BARRE DE RECHERCHE */}
+                <div className="max-w-2xl mx-auto mb-6">
                 <SmartSearchBar
                   placeholder="Où souhaitez-vous jouer ?"
                   onSearch={(query) => {
@@ -297,8 +314,9 @@ export default function AccueilPage() {
             <h2 className="text-2xl md:text-3xl font-bold text-black">Les meilleurs clubs près de chez vous</h2>
           </div>
 
-          {/* Grille */}
+          {/* Grille : clubs disponibles + clubs bientôt */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Cartes cliquables */}
             {clubsWithDistance.map((club, index) => (
               <Link
                 key={club.id}
@@ -340,6 +358,38 @@ export default function AccueilPage() {
                 </div>
               </Link>
             ))}
+
+            {/* Cartes bientôt disponibles (non cliquables) */}
+            {COMING_SOON_CLUBS.map((club, index) => (
+              <div
+                key={`bientot-${index}`}
+                className="opacity-85 border border-black/10 rounded-lg overflow-hidden cursor-not-allowed select-none"
+                role="presentation"
+              >
+                <div className="relative h-48 overflow-hidden bg-gray-100">
+                  <img
+                    src={club.imageUrl}
+                    alt={club.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium bg-black/70 text-white rounded-full">
+                    Bientôt
+                  </span>
+                </div>
+
+                <div className="p-4">
+                  <h3 className="text-base font-semibold text-black mb-2">{club.name}</h3>
+                  
+                  <p className="text-sm text-black/60 mb-3">
+                    {club.city}
+                  </p>
+                  
+                  <p className="text-sm text-black/50 italic">
+                    Ouverture prochainement
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Lien Voir tout */}
@@ -350,78 +400,6 @@ export default function AccueilPage() {
             >
               Voir tous les clubs
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 3 ÉTAPES - PREMIUM */}
-      <section className="bg-white mt-16 md:mt-20 mb-16 md:mb-20 border-t border-black/5">
-        <div className="mx-auto max-w-6xl px-6 md:px-8 py-12 md:py-16">
-          {/* Header */}
-          <div className="text-center mb-12 max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-black mb-3 leading-tight tracking-tight">
-              Réserver n'a jamais été aussi simple
-            </h2>
-            <p className="text-sm md:text-base text-black/50 leading-relaxed font-light">
-              Confirmation immédiate et rappels automatiques inclus
-            </p>
-          </div>
-
-          {/* 3 étapes verticales */}
-          <div className="flex flex-col gap-8 max-w-3xl mx-auto">
-            {[
-              {
-                number: '1',
-                title: 'Trouvez un club',
-                description: 'Recherchez par ville ou utilisez votre localisation',
-                icon: (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                  </svg>
-                ),
-              },
-              {
-                number: '2',
-                title: 'Choisissez un créneau',
-                description: 'Disponibilités en temps réel, réservation instantanée',
-                icon: (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                  </svg>
-                ),
-              },
-              {
-                number: '3',
-                title: 'Jouez',
-                description: 'Présentez-vous au club, payez sur place et jouez',
-                icon: (
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ),
-              },
-            ].map((step, i) => (
-              <div 
-                key={i} 
-                className="flex items-start gap-6"
-              >
-                {/* Icône + Numéro à gauche */}
-                <div className="relative flex-shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg">
-                    {step.icon}
-                  </div>
-                  <div className="absolute -top-2 -left-2 w-10 h-10 rounded-full bg-black/5 flex items-center justify-center">
-                    <span className="text-lg font-bold text-black/30">{step.number}</span>
-                  </div>
-                </div>
-                
-                {/* Titre + Description à droite */}
-                <div className="flex-1 pt-2">
-                  <h3 className="text-xl font-semibold text-black mb-2 tracking-tight">{step.title}</h3>
-                  <p className="text-sm text-black/60 leading-relaxed font-light">{step.description}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
