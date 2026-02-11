@@ -244,63 +244,47 @@ export default function AccueilPage() {
           backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.9) 100%), url('${HERO_BG_IMAGE}')`,
         }}
       >
-        <div className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen">
-          <div 
-            className="md:absolute md:top-1/2 md:left-1/2 md:w-full md:px-4 md:[transform:translate(-50%,calc(-50%-0.8cm))]"
-          >
-            <div className="container mx-auto max-w-6xl">
-              <div className="text-center">
-                {/* Badge */}
-                <div className="inline-block mb-6">
-                  <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
-                    Réserver un terrain n'a jamais été aussi simple
-                  </span>
-                </div>
-                
-                {/* Titre */}
-                <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
-                  Votre terrain de padel.<br />En quelques secondes
-                </h1>
-                
-                {/* Sous-texte */}
-                <p className="text-base sm:text-lg md:text-xl text-black/60 mb-8 max-w-2xl mx-auto font-light">
-                  Disponibilités en temps réel, réservation sans appel ni attente.
+        <div className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen flex md:items-center md:justify-center">
+          <div className="container mx-auto max-w-6xl text-center w-full">
+            <div className="inline-block mb-6">
+              <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
+                Réserver un terrain n'a jamais été aussi simple
+              </span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
+              Votre terrain de padel.<br />En quelques secondes
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-black/60 mb-8 max-w-2xl mx-auto font-light">
+              Disponibilités en temps réel, réservation sans appel ni attente.
+            </p>
+            <div className="max-w-2xl mx-auto mb-6">
+              <SmartSearchBar
+                placeholder="Où souhaitez-vous jouer ?"
+                onSearch={(query) => router.push(`/player/clubs?q=${encodeURIComponent(query)}`)}
+                suggestions={[
+                  'Le Hangar Sport & Co',
+                  'Paul & Louis Sport',
+                  'ZE Padel',
+                  'QG Padel Club',
+                  ...getCitySuggestions()
+                ]}
+                storageKey="search-history-accueil"
+                compact={false}
+              />
+              {showSearchError && (
+                <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
+                  Entrez une ville ou un club
                 </p>
-
-                {/* BARRE DE RECHERCHE */}
-                <div className="max-w-2xl mx-auto mb-6">
-                <SmartSearchBar
-                  placeholder="Où souhaitez-vous jouer ?"
-                  onSearch={(query) => {
-                    router.push(`/player/clubs?q=${encodeURIComponent(query)}`)
-                  }}
-                  suggestions={[
-                    'Le Hangar Sport & Co',
-                    'Paul & Louis Sport',
-                    'ZE Padel',
-                    'QG Padel Club',
-                    ...getCitySuggestions()
-                  ]}
-                  storageKey="search-history-accueil"
-                  compact={false}
-                />
-                {showSearchError && (
-                  <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
-                    Entrez une ville ou un club
-                  </p>
-                )}
-              </div>
-
-              {/* CTA PRINCIPAL */}
-              <div className="max-w-2xl mx-auto">
-                <button
-                  type="button"
-                  onClick={handleCTAClick}
-                  className="w-full sm:w-auto px-10 py-4 bg-black text-white font-medium rounded-lg tracking-wide text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
-                >
-                  Voir les terrains disponibles
-                </button>
-              </div>
+              )}
+            </div>
+            <div className="max-w-2xl mx-auto">
+              <button
+                type="button"
+                onClick={handleCTAClick}
+                className="w-full sm:w-auto px-10 py-4 bg-black text-white font-medium rounded-lg tracking-wide text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
+              >
+                Voir les terrains disponibles
+              </button>
             </div>
           </div>
         </div>
