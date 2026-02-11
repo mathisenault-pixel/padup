@@ -47,7 +47,8 @@ export default function PlayerAuthLayout({
               {/* Espace club */}
               <Link
                 href="/club-access"
-                className="hidden md:inline-flex px-3 py-2 text-[14px] font-light text-black/60 hover:text-black tracking-wide transition-colors"
+                className="hidden md:inline-flex px-4 py-2 text-[14px] font-normal tracking-wide transition-opacity hover:opacity-70"
+                style={{ color: '#000000' }}
               >
                 Espace club
               </Link>

@@ -9,7 +9,6 @@ import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 // Nécessaire car supabaseBrowser accède à document.cookie
 export const dynamic = 'force-dynamic'
 import SmartSearchBar from '../components/SmartSearchBar'
-import UseMyLocationButton from '@/components/UseMyLocationButton'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { getCitySuggestions } from '@/lib/cities'
 import { haversineKm, formatTravelTime, estimateMinutes, formatDistance } from '@/lib/geoUtils'
@@ -129,6 +128,52 @@ export default function AccueilPage() {
   }, [])
 
   // ============================================
+  // DEMANDE AUTOMATIQUE DE LOCALISATION
+  // ============================================
+  useEffect(() => {
+    // Vérifier si déjà demandé dans cette session
+    const hasRequestedLocation = sessionStorage.getItem('locationRequested')
+    
+    if (hasRequestedLocation === 'true') {
+      console.log('[GEOLOCATION] Already requested in this session, skipping')
+      return
+    }
+
+    // Vérifier si la géolocalisation est disponible
+    if (!navigator.geolocation) {
+      console.log('[GEOLOCATION] Not available in this browser')
+      sessionStorage.setItem('locationRequested', 'true')
+      return
+    }
+
+    console.log('[GEOLOCATION] Auto-requesting user location...')
+    sessionStorage.setItem('locationRequested', 'true')
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        }
+        console.log('[GEOLOCATION] ✅ Location accepted:', coords)
+        setUserCoords(coords)
+        setLocationStatus('success')
+        setLocationError(null)
+      },
+      (error) => {
+        console.log('[GEOLOCATION] ❌ Location refused or error:', error.message)
+        setLocationStatus('error')
+        setLocationError('Localisation refusée')
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 300000, // 5 minutes de cache
+      }
+    )
+  }, [])
+
+  // ============================================
   // CALCUL DES DISTANCES ET TRI
   // ============================================
   const clubsWithDistance = useMemo(() => {
@@ -177,15 +222,6 @@ export default function AccueilPage() {
     }
     // Naviguer vers la page clubs avec le filtre
     router.push(`/player/clubs?q=${encodeURIComponent(currentQuery)}`)
-  }
-
-  const handleEnterCity = () => {
-    // Scroll vers le hero et focus la search
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    setTimeout(() => {
-      const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement
-      searchInput?.focus()
-    }, 300)
   }
 
   return (
@@ -258,38 +294,7 @@ export default function AccueilPage() {
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-black mb-6">Les meilleurs clubs près de chez vous</h2>
-            
-            <div className="flex items-center gap-3">
-              <UseMyLocationButton
-                onCoords={(coords) => {
-                  setUserCoords(coords);
-                  setLocationStatus('success');
-                  setLocationError(null);
-                }}
-                onError={(error) => {
-                  setLocationStatus('error');
-                  setLocationError(error);
-                }}
-              />
-              <button
-                type="button"
-                onClick={handleEnterCity}
-                className="text-sm text-black/60 hover:text-black underline transition-colors"
-              >
-                Entrer une ville
-              </button>
-            </div>
-            
-            {/* Messages status */}
-            {locationStatus === 'success' && userCoords && (
-              <p className="mt-3 text-xs text-black/60">Clubs triés par distance</p>
-            )}
-            {locationStatus === 'error' && locationError && (
-              <p className="mt-3 text-xs text-black/60">
-                {locationError} — <button onClick={handleEnterCity} className="underline">entrez une ville</button>
-              </p>
-            )}
+            <h2 className="text-2xl md:text-3xl font-bold text-black">Les meilleurs clubs près de chez vous</h2>
           </div>
 
           {/* Grille */}
