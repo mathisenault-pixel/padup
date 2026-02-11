@@ -12,11 +12,24 @@ export default function PlayerAuthLayout({
 }) {
   const pathname = usePathname()
   const isAccueil = pathname === '/player/accueil'
+  const heroBgImage = 'https://images.pexels.com/photos/1553783/pexels-photo-1553783.jpeg'
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header - White */}
-      <header className="sticky top-0 z-50 bg-white border-b border-black/10 pt-[env(safe-area-inset-top)]">
+    <div
+      className={`min-h-screen ${isAccueil ? '' : 'bg-white'}`}
+      style={isAccueil ? {
+        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${heroBgImage}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        backgroundAttachment: 'scroll',
+      } : undefined}
+    >
+      {/* Header - transparent sur accueil pour voir l'image derrière */}
+      <header
+        className={`sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] ${
+          isAccueil ? 'bg-white/75 backdrop-blur-sm border-black/10' : 'bg-white border-black/10'
+        }`}
+      >
         <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12 md:h-14">
             
@@ -64,7 +77,7 @@ export default function PlayerAuthLayout({
         </div>
 
         {/* Mobile Navigation */}
-        <div className="lg:hidden border-t border-black/5 px-2 py-2 bg-white overflow-x-auto">
+        <div className={`lg:hidden border-t border-black/5 px-2 py-2 overflow-x-auto ${isAccueil ? 'bg-white/75 backdrop-blur-sm' : 'bg-white'}`}>
           <div className="min-w-max">
             <PlayerNav />
           </div>

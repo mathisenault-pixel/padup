@@ -34,9 +34,6 @@ type Club = {
  * Coordonnées GPS des clubs (hardcodé pour MVP)
  * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
  */
-// Photo de fond Hero : déposez hero-padel.jpg dans public/images/accueil/ pour utiliser la vôtre
-const HERO_BG_IMAGE = 'https://images.pexels.com/photos/1553783/pexels-photo-1553783.jpeg'
-
 /** 4 clubs "bientôt disponibles" (cartes non cliquables) - pas de photo existante */
 const COMING_SOON_CLUBS = [
   { name: 'Club de padel', city: 'Ouverture bientôt' },
@@ -236,14 +233,9 @@ export default function AccueilPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero - Photo de fond padel plein écran, visible jusqu'au-dessus de "Clubs" */}
-      <section
-        className="relative min-h-screen bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
-        }}
-      >
+    <div>
+      {/* Hero - fond fourni par le layout (image derrière les onglets) */}
+      <section className="relative min-h-screen">
         <div className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen flex md:items-center md:justify-center">
           <div className="container mx-auto max-w-6xl text-center w-full">
             <div className="inline-block mb-6">
