@@ -52,6 +52,7 @@ export default function RootLayout({
         </noscript>
 
         <ReservationProvider>
+          <DebugOverflow />
           {children}
           <Footer />
         </ReservationProvider>
