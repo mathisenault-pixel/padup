@@ -21,7 +21,11 @@
     "note": "Rating",
     "prixH": "Price/h",
     "annuler": "Cancel",
-    "confirmer": "Confirm"
+    "confirmer": "Confirm",
+    "searchOu": "Where",
+    "searchPlaceholder": "Search a club or city",
+    "searchDates": "Dates",
+    "searchQuand": "When?"
   },
   "nav": {
     "sInscrire": "Sign up",

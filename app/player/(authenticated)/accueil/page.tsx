@@ -76,6 +76,8 @@ export default function AccueilPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   const [clubs, setClubs] = useState<Club[]>([])
+  const [searchOu, setSearchOu] = useState('')
+  const [searchQuand, setSearchQuand] = useState('')
 
   // ============================================
   // CHARGEMENT DES CLUBS DEPUIS SUPABASE
@@ -213,11 +215,69 @@ export default function AccueilPage() {
     setShowReservationModal(true)
   }
 
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (searchOu.trim()) params.set('q', searchOu.trim())
+    if (searchQuand.trim()) params.set('date', searchQuand.trim())
+    router.push(`/player/clubs${params.toString() ? `?${params.toString()}` : ''}`)
+  }
+
   return (
     <div className="overflow-x-hidden">
       {/* Clubs - mobile: +1.5cm + 2.8cm pour dégager le titre sous la navbar ; desktop: +2.8cm sous les onglets */}
       <section className="pt-[calc(5rem+1.5cm+2.8cm)] md:pt-[calc(6rem+2.8cm)] pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
+          {/* Barre de recherche */}
+          <div className="mb-6 md:mb-8">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-0 sm:gap-0 bg-white border-2 border-black/10 rounded-2xl shadow-sm overflow-hidden">
+              {/* Partie gauche : Où */}
+              <div className="flex-1 min-w-0 p-3 sm:p-4">
+                <label className="block text-xs font-semibold text-black/70 mb-1.5 uppercase tracking-wide">
+                  {t('accueil.searchOu')}
+                </label>
+                <input
+                  type="text"
+                  value={searchOu}
+                  onChange={(e) => setSearchOu(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder={t('accueil.searchPlaceholder')}
+                  className="w-full text-sm sm:text-base text-black placeholder:text-black/40 bg-transparent focus:outline-none"
+                />
+              </div>
+
+              {/* Trait vertical */}
+              <div className="hidden sm:block w-px bg-black/15 self-stretch min-h-[3rem]" aria-hidden />
+              <div className="sm:hidden h-px bg-black/15 mx-3" aria-hidden />
+
+              {/* Partie droite : Dates */}
+              <div className="flex-1 min-w-0 p-3 sm:p-4">
+                <label className="block text-xs font-semibold text-black/70 mb-1.5 uppercase tracking-wide">
+                  {t('accueil.searchDates')}
+                </label>
+                <input
+                  type="text"
+                  value={searchQuand}
+                  onChange={(e) => setSearchQuand(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder={t('accueil.searchQuand')}
+                  className="w-full text-sm sm:text-base text-black placeholder:text-black/40 bg-transparent focus:outline-none"
+                />
+              </div>
+
+              {/* Bouton loupe */}
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="flex items-center justify-center p-4 bg-black text-white hover:bg-black/90 transition-colors shrink-0"
+                aria-label="Rechercher"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-black">{t('accueil.clubsTitle')}</h2>

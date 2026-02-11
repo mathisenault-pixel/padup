@@ -21,7 +21,11 @@
     "note": "Note",
     "prixH": "Prix/h",
     "annuler": "Annuler",
-    "confirmer": "Confirmer"
+    "confirmer": "Confirmer",
+    "searchOu": "Où",
+    "searchPlaceholder": "Rechercher un club ou une ville",
+    "searchDates": "Dates",
+    "searchQuand": "Quand ?"
   },
   "nav": {
     "sInscrire": "S'inscrire",
