@@ -8,16 +8,16 @@ export default function Footer() {
   const { t } = useLocale()
 
   return (
-    <footer className="bg-[#F0F0F0] text-slate-700">
+    <footer className="bg-[#F0F0F0] text-black">
       {/* CTA band */}
       <div className="border-b border-slate-200">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-xl font-semibold text-slate-900">
+              <p className="text-xl font-semibold text-black">
                 {t('footer.ctaTitle')}
               </p>
-              <p className="mt-1 text-sm text-slate-600">
+              <p className="mt-1 text-sm text-black">
                 {t('footer.ctaSubtitle')}
               </p>
             </div>
@@ -31,7 +31,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="/player/reservations"
-                className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-200/50"
+                className="inline-flex items-center justify-center rounded-xl border border-black/30 px-5 py-3 text-sm font-semibold text-black hover:bg-black/5"
               >
                 {t('footer.mesReservations')}
               </Link>
@@ -53,21 +53,21 @@ export default function Footer() {
                 height={36}
                 className="rounded-full"
               />
-              <span className="text-base font-semibold text-slate-900">Pad&apos;Up</span>
+              <span className="text-base font-semibold text-black">Pad&apos;Up</span>
             </div>
-            <p className="mt-3 text-sm text-slate-600">
+            <p className="mt-3 text-sm text-black">
               {t('footer.tagline')}
             </p>
 
             <div className="mt-5 flex items-center gap-3">
-              <a className="rounded-lg p-2 hover:bg-slate-200/50" href="#" aria-label="Facebook">
-                <span className="text-slate-700">f</span>
+              <a className="rounded-lg p-2 hover:bg-black/10" href="#" aria-label="Facebook">
+                <span className="text-black">f</span>
               </a>
-              <a className="rounded-lg p-2 hover:bg-slate-200/50" href="#" aria-label="Instagram">
-                <span className="text-slate-700">ig</span>
+              <a className="rounded-lg p-2 hover:bg-black/10" href="#" aria-label="Instagram">
+                <span className="text-black">ig</span>
               </a>
-              <a className="rounded-lg p-2 hover:bg-slate-200/50" href="#" aria-label="X">
-                <span className="text-slate-700">x</span>
+              <a className="rounded-lg p-2 hover:bg-black/10" href="#" aria-label="X">
+                <span className="text-black">x</span>
               </a>
             </div>
           </div>
@@ -114,11 +114,11 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-slate-200">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 text-sm text-black md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Pad&apos;Up. {t('footer.copyright')}</p>
           <div className="flex gap-4">
-            <Link className="hover:text-slate-900" href="/confidentialite">{t('footer.confidentialite')}</Link>
-            <Link className="hover:text-slate-900" href="/conditions-utilisation">{t('footer.conditions')}</Link>
+            <Link className="text-black hover:opacity-70" href="/confidentialite">{t('footer.confidentialite')}</Link>
+            <Link className="text-black hover:opacity-70" href="/conditions-utilisation">{t('footer.conditions')}</Link>
           </div>
         </div>
       </div>
@@ -135,11 +135,11 @@ function FooterCol({
 }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-slate-900">{title}</p>
+      <p className="text-sm font-semibold text-black">{title}</p>
       <ul className="mt-4 space-y-2">
         {links.map((l) => (
           <li key={l.href}>
-            <Link className="text-sm text-slate-600 hover:text-slate-900" href={l.href}>
+            <Link className="text-sm text-black hover:opacity-70" href={l.href}>
               {l.label}
             </Link>
           </li>
