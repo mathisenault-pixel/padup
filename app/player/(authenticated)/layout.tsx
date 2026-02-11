@@ -12,16 +12,9 @@ export default function PlayerAuthLayout({
 }) {
   const pathname = usePathname()
   const isAccueil = pathname === '/player/accueil'
-  const heroBgImage = 'https://images.pexels.com/photos/33226056/pexels-photo-33226056.jpeg'
 
   return (
-    <div
-      className={`min-h-screen ${isAccueil ? 'bg-cover bg-no-repeat hero-bg-position' : 'bg-white'}`}
-      style={isAccueil ? {
-        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${heroBgImage}')`,
-        backgroundAttachment: 'scroll',
-      } : undefined}
-    >
+    <div className={`min-h-screen ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fixed, transparent sur accueil */}
       <header
         className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] ${

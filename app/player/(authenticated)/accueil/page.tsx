@@ -30,6 +30,8 @@ type Club = {
   prixMin: number
 }
 
+const HERO_BG_IMAGE = 'https://images.pexels.com/photos/33226056/pexels-photo-33226056.jpeg'
+
 /**
  * Coordonnées GPS des clubs (hardcodé pour MVP)
  * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
@@ -234,8 +236,14 @@ export default function AccueilPage() {
 
   return (
     <div>
-      {/* Hero - min-h-screen, image en fond, contenu centré verticalement */}
-      <section className="relative min-h-screen flex items-center justify-center">
+      {/* Hero - fond sur la section (pas de conditional layout = pas de flash) */}
+      <section
+        className="relative min-h-screen flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
+          backgroundAttachment: 'scroll',
+        }}
+      >
         <div className="w-full px-4 py-16">
           <div className="container mx-auto max-w-6xl text-center w-full">
             <div className="inline-block mb-6">
