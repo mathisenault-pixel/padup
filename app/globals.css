@@ -162,6 +162,7 @@ h6 {
 }
 
 /* Hero accueil : cadrage définitif, !important pour bloquer tout override */
+/* 48% x : décalage léger ~1cm à droite */
 .hero-bg-position {
-  background-position: center 70% !important;
+  background-position: 48% 70% !important;
 }
