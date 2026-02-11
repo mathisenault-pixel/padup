@@ -67,7 +67,8 @@ export default function AuthStatus() {
       <button
         type="button"
         onClick={() => router.push(user ? '/player/compte' : '/login')}
-        className="px-4 py-2 text-[13px] font-normal bg-black hover:opacity-90 text-white rounded-lg tracking-wide transition-opacity"
+        className="px-4 py-2 text-[13px] font-normal bg-white hover:bg-black/5 border border-black/10 rounded-lg tracking-wide transition-all"
+        style={{ color: '#000000' }}
       >
         Mon compte
       </button>

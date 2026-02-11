@@ -191,8 +191,10 @@ export default function AccueilPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero - Version mobile simple */}
-      <section className="pt-10 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen">
-        <div className="md:absolute md:top-1/2 md:left-1/2 md:w-full md:px-4 md:-translate-x-1/2 md:-translate-y-1/2">
+      <section className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen">
+        <div 
+          className="md:absolute md:top-1/2 md:left-1/2 md:w-full md:px-4 md:[transform:translate(-50%,calc(-50%-0.8cm))]"
+        >
           <div className="container mx-auto max-w-6xl">
             <div className="text-center">
               {/* Badge */}
