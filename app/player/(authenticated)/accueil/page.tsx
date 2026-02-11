@@ -235,17 +235,17 @@ export default function AccueilPage() {
   }
 
   return (
-    <div>
-      {/* Hero - fond sur la section (pas de conditional layout = pas de flash) */}
+    <div className="overflow-x-hidden">
+      {/* Hero - full width edge-to-edge, aucun container sur le hero */}
       <section
-        className="relative min-h-screen flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
+        className="relative w-screen min-h-screen overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
           backgroundAttachment: 'scroll',
         }}
       >
         <div className="w-full px-4 py-16">
-          <div className="container mx-auto max-w-6xl text-center w-full">
+          <div className="max-w-6xl mx-auto text-center w-full">
             <div className="inline-block mb-6">
               <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
                 Réserver un terrain n'a jamais été aussi simple
