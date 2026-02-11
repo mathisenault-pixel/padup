@@ -152,3 +152,8 @@ h6 {
   background-color: #000000;
   color: #ffffff;
 }
+
+/* Hero accueil : cadrage image définitif (SSR, pas d'override hydration) */
+.hero-bg-position {
+  background-position: center 85%;
+}

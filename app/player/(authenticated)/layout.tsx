@@ -16,11 +16,9 @@ export default function PlayerAuthLayout({
 
   return (
     <div
-      className={`min-h-screen ${isAccueil ? '' : 'bg-white'}`}
+      className={`min-h-screen ${isAccueil ? 'bg-cover bg-no-repeat hero-bg-position' : 'bg-white'}`}
       style={isAccueil ? {
         backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${heroBgImage}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center 85%',
         backgroundAttachment: 'scroll',
       } : undefined}
     >
