@@ -14,7 +14,7 @@ export default function PlayerAuthLayout({
   const isAccueil = pathname === '/player/accueil'
 
   return (
-    <div className={`min-h-screen ${isAccueil ? '' : 'overflow-x-hidden bg-white'}`}>
+    <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fixed, transparent sur accueil */}
       <header
         className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] ${
@@ -75,8 +75,8 @@ export default function PlayerAuthLayout({
         </div>
       </header>
 
-      {/* Main - pas de pt sur accueil (hero en haut), pt pour les autres pages */}
-      <main className={isAccueil ? '' : 'pt-14 md:pt-16 min-h-screen'}>
+      {/* Main - w-full overflow-x-hidden pour éviter bande blanche / scroll horizontal */}
+      <main className={`w-full overflow-x-hidden ${isAccueil ? '' : 'pt-14 md:pt-16 min-h-screen'}`}>
         {children}
       </main>
     </div>

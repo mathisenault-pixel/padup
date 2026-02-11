@@ -236,9 +236,9 @@ export default function AccueilPage() {
 
   return (
     <div>
-      {/* Hero - full-bleed bord-à-bord (pas d'overflow-x ici : rogne le hero) */}
+      {/* Hero - cadrage image OK, contenu centré */}
       <section
-        className="relative min-h-screen overflow-hidden left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
+        className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
           backgroundAttachment: 'scroll',
