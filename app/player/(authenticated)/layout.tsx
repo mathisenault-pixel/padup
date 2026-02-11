@@ -39,12 +39,9 @@ export default function PlayerAuthLayout({
               <PlayerNav />
             </div>
 
-            {/* Actions à droite (style Planity) */}
+            {/* Actions à droite (style Planity) - mobile: Messages | Langue | 3 barres */}
             <div className="flex items-center gap-1 md:gap-2">
-              {/* Langue + Menu utilisateur (S'inscrire / Se connecter) - toujours visibles */}
-              <LanguageSwitcher />
-              <HeaderUserMenu />
-              {/* Messages - Visible uniquement sur mobile (icône seulement) */}
+              {/* Messages - premier à gauche sur mobile */}
               <Link
                 href="/player/messages"
                 className="lg:hidden px-2 py-2 text-black/60 hover:text-black transition-colors"
@@ -53,6 +50,10 @@ export default function PlayerAuthLayout({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
               </Link>
+              {/* Langue */}
+              <LanguageSwitcher />
+              {/* Menu hamburger (3 barres) */}
+              <HeaderUserMenu />
 
               {/* Espace club - masqué sur accueil */}
               {!isAccueil && (
