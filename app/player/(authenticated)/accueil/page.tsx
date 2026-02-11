@@ -235,8 +235,8 @@ export default function AccueilPage() {
   }
 
   return (
-    <div className="overflow-x-hidden">
-      {/* Hero - full-bleed bord-à-bord (sort du layout contraint) */}
+    <div>
+      {/* Hero - full-bleed bord-à-bord (pas d'overflow-x ici : rogne le hero) */}
       <section
         className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen min-h-screen overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
         style={{
@@ -290,6 +290,8 @@ export default function AccueilPage() {
         </div>
       </section>
 
+      {/* Contenu sous le hero : overflow-x pour éviter scroll horizontal */}
+      <div className="overflow-x-hidden">
       {/* Clubs */}
       <section className="pt-12 md:pt-16 pb-16 md:pb-20 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
@@ -504,6 +506,7 @@ export default function AccueilPage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* Modal */}
       {showReservationModal && selectedClub && (

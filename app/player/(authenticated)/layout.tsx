@@ -14,7 +14,7 @@ export default function PlayerAuthLayout({
   const isAccueil = pathname === '/player/accueil'
 
   return (
-    <div className={`min-h-screen overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
+    <div className={`min-h-screen ${isAccueil ? '' : 'overflow-x-hidden bg-white'}`}>
       {/* Navbar - fixed, transparent sur accueil */}
       <header
         className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] ${
