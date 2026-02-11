@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import { useLocale } from '@/state/LocaleContext'
 
 // ✅ Force dynamic rendering (pas de pre-render statique)
 // Nécessaire car supabaseBrowser accède à document.cookie
@@ -51,23 +52,22 @@ const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
  * Génère une prochaine disponibilité mock réaliste
  * TODO: Remplacer par les vraies données depuis l'API
  */
-function getNextAvailability(index: number): string {
+function getNextAvailability(index: number, t: (k: string) => string): string {
   const now = new Date()
   const currentHour = now.getHours()
-  
-  // Si on est le matin (avant 14h), montrer une dispo ce jour
+
   if (currentHour < 14) {
     const hours = [18, 19, 20, 21][index % 4]
-    return `Dispo dès ${hours}:00`
+    return `${t('common.dispoDes')} ${hours}:00`
   }
-  
-  // Sinon, montrer demain
+
   const hours = [9, 10, 14, 18][index % 4]
-  return `Demain ${hours}:00`
+  return `${t('common.demain')} ${hours}:00`
 }
 
 export default function AccueilPage() {
   const router = useRouter()
+  const { t } = useLocale()
   const [showReservationModal, setShowReservationModal] = useState(false)
   const [selectedClub, setSelectedClub] = useState<Club | null>(null)
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
@@ -215,12 +215,12 @@ export default function AccueilPage() {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Clubs - première section visible (pt-20/24 = header + respiration) */}
-      <section className="pt-20 md:pt-24 pb-0 px-6 bg-white">
+      {/* Clubs - mobile: +1.5cm pour dégager le titre sous la navbar */}
+      <section className="pt-[calc(5rem+1.5cm)] md:pt-24 pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-black">Les meilleurs clubs près de chez vous</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-black">{t('accueil.clubsTitle')}</h2>
           </div>
 
           {/* Grille : clubs disponibles + clubs bientôt */}
@@ -258,11 +258,11 @@ export default function AccueilPage() {
                   </p>
                   
                   <p className="text-sm text-black mb-2">
-                    {getNextAvailability(index)}
+                    {getNextAvailability(index, t)}
                   </p>
                   
                   <p className="text-sm text-black/80">
-                    À partir de <span className="font-semibold">{club.prixMin} €</span> / pers
+                    {t('accueil.aPartirDe')} <span className="font-semibold">{club.prixMin} €</span> / {t('accueil.pers')}
                   </p>
                 </div>
               </Link>
@@ -278,7 +278,7 @@ export default function AccueilPage() {
                 <div className="relative h-48 overflow-hidden bg-slate-200 flex items-center justify-center">
                   <span className="text-slate-400 text-sm font-medium">—</span>
                   <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium bg-black/70 text-white rounded-full">
-                    Bientôt
+                    {t('accueil.bientot')}
                   </span>
                 </div>
 
@@ -290,7 +290,7 @@ export default function AccueilPage() {
                   </p>
                   
                   <p className="text-sm text-black/50 italic">
-                    Ouverture prochainement
+                    {t('accueil.ouvertureProchainement')}
                   </p>
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function AccueilPage() {
               href="/player/clubs"
               className="text-sm text-black/60 hover:text-black underline transition-colors"
             >
-              Voir tous les clubs
+              {t('accueil.voirTousClubs')}
             </Link>
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function AccueilPage() {
           {/* Contenu centré */}
           <div className="max-w-2xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4 leading-tight tracking-tight">
-              Réservez votre terrain en quelques clics
+              {t('accueil.ctaTitle')}
             </h2>
             
             {/* CTA principal unique */}
@@ -324,7 +324,7 @@ export default function AccueilPage() {
               onClick={() => router.push('/player/clubs')}
               className="inline-flex items-center gap-3 px-10 py-4 bg-black text-white font-semibold rounded-xl tracking-wide hover:bg-black/90 shadow-lg transition-all mt-6"
             >
-              Voir les terrains disponibles
+              {t('accueil.voirTerrainsDisponibles')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -339,8 +339,8 @@ export default function AccueilPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold text-black mb-1">Réservation en 30 secondes</p>
-              <p className="text-xs text-black/50 font-light">Simple et rapide</p>
+              <p className="text-sm font-semibold text-black mb-1">{t('accueil.reservation30s')}</p>
+              <p className="text-xs text-black/50 font-light">{t('accueil.simpleRapide')}</p>
             </div>
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-10 h-10 bg-black/5 rounded-full mb-3">
@@ -348,8 +348,8 @@ export default function AccueilPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold text-black mb-1">Paiement sécurisé</p>
-              <p className="text-xs text-black/50 font-light">Sur place au club</p>
+              <p className="text-sm font-semibold text-black mb-1">{t('accueil.paiementSecurise')}</p>
+              <p className="text-xs text-black/50 font-light">{t('accueil.surPlaceAuClub')}</p>
             </div>
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-10 h-10 bg-black/5 rounded-full mb-3">
@@ -357,8 +357,8 @@ export default function AccueilPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <p className="text-sm font-semibold text-black mb-1">Disponibilités en temps réel</p>
-              <p className="text-xs text-black/50 font-light">Sans appeler le club</p>
+              <p className="text-sm font-semibold text-black mb-1">{t('accueil.disposTempsReel')}</p>
+              <p className="text-xs text-black/50 font-light">{t('accueil.sansAppeler')}</p>
             </div>
           </div>
         </div>
@@ -370,46 +370,31 @@ export default function AccueilPage() {
           {/* Header */}
           <div className="text-center mb-8 max-w-2xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 leading-tight">
-              Questions fréquentes
+              {t('accueil.faqTitle')}
             </h2>
             <p className="text-sm md:text-base text-slate-600 leading-relaxed">
-              Tout ce que vous devez savoir sur Pad'Up
+              {t('accueil.faqSubtitle')}
             </p>
           </div>
 
           {/* Accordéon FAQ */}
           <div className="space-y-2 max-w-3xl mx-auto">
             {[
-              {
-                question: "Comment réserver un terrain ?",
-                answer: "Il vous suffit de rechercher un club, de sélectionner le créneau horaire souhaité et de confirmer votre réservation. Vous recevrez une confirmation immédiate par email."
-              },
-              {
-                question: "Le paiement est-il sécurisé ?",
-                answer: "Oui, vous payez directement sur place au club. Aucune carte bancaire n'est requise lors de la réservation en ligne, ce qui garantit une sécurité maximale."
-              },
-              {
-                question: "Puis-je annuler ma réservation ?",
-                answer: "Oui, vous pouvez annuler votre réservation depuis votre espace personnel. Les conditions d'annulation dépendent de chaque club et sont indiquées lors de la réservation."
-              },
-              {
-                question: "Y a-t-il des frais de service ?",
-                answer: "Non, Pad'Up est 100% gratuit pour les joueurs. Vous ne payez que le prix du terrain directement au club."
-              },
-              {
-                question: "Comment recevoir les rappels de mes matchs ?",
-                answer: "Vous recevez automatiquement des notifications par email avant vos réservations. Vous pouvez gérer vos préférences de notification dans votre profil."
-              }
+              { q: 'faq.q1', a: 'faq.a1' },
+              { q: 'faq.q2', a: 'faq.a2' },
+              { q: 'faq.q3', a: 'faq.a3' },
+              { q: 'faq.q4', a: 'faq.a4' },
+              { q: 'faq.q5', a: 'faq.a5' },
             ].map((faq, i) => (
               <details key={i} className="group border border-slate-200 rounded-lg overflow-hidden hover:border-slate-300 transition-all">
                 <summary className="flex items-center justify-between px-5 md:px-6 py-4 cursor-pointer hover:bg-slate-50 transition-all">
-                  <span className="text-sm md:text-base font-semibold text-slate-900 pr-4">{faq.question}</span>
+                  <span className="text-sm md:text-base font-semibold text-slate-900 pr-4">{t(faq.q)}</span>
                   <svg className="w-4 h-4 text-slate-600 group-open:rotate-180 transition-transform flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
                 <div className="px-5 md:px-6 pb-4 pt-2 text-xs md:text-sm text-slate-600 leading-relaxed">
-                  <p>{faq.answer}</p>
+                  <p>{t(faq.a)}</p>
                 </div>
               </details>
             ))}
@@ -421,7 +406,7 @@ export default function AccueilPage() {
               href="/player/clubs"
               className="inline-flex items-center gap-2 px-8 py-3 text-sm text-slate-700 hover:text-white bg-slate-100 hover:bg-black rounded-lg font-medium transition-all shadow-sm"
             >
-              Trouver un club
+              {t('accueil.trouverUnClub')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -453,15 +438,15 @@ export default function AccueilPage() {
             <div className="grid grid-cols-3 gap-3 mb-6">
               <div className="bg-gray-50 rounded-xl p-4 text-center">
                 <p className="text-2xl font-black text-gray-900 mb-1">{selectedClub.nombreTerrains}</p>
-                <p className="text-xs font-bold text-gray-600 uppercase">Terrains</p>
+                <p className="text-xs font-bold text-gray-600 uppercase">{t('accueil.terrains')}</p>
               </div>
               <div className="bg-slate-100 rounded-xl p-4 text-center">
                 <p className="text-2xl font-black text-slate-900 mb-1">{selectedClub.note.toFixed(1)}★</p>
-                <p className="text-xs font-bold text-slate-700 uppercase">Note</p>
+                <p className="text-xs font-bold text-slate-700 uppercase">{t('accueil.note')}</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-4 text-center">
                 <p className="text-2xl font-black text-gray-900 mb-1">{selectedClub.prixMin}€</p>
-                <p className="text-xs font-bold text-gray-600 uppercase">Prix/h</p>
+                <p className="text-xs font-bold text-gray-600 uppercase">{t('accueil.prixH')}</p>
               </div>
             </div>
 
@@ -471,7 +456,7 @@ export default function AccueilPage() {
                 onClick={() => setShowReservationModal(false)}
                 className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold rounded-full transition-all"
               >
-                Annuler
+                {t('accueil.annuler')}
               </button>
               <button
                 type="button"
@@ -481,7 +466,7 @@ export default function AccueilPage() {
                 }}
                 className="flex-1 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-full transition-all"
               >
-                Confirmer
+                {t('accueil.confirmer')}
               </button>
             </div>
           </div>

@@ -1,0 +1,48 @@
+{
+  "accueil": {
+    "clubsTitle": "Los mejores clubs cerca de ti",
+    "voirTousClubs": "Ver todos los clubs",
+    "bientot": "Próximamente",
+    "ouvertureProchainement": "Apertura próximamente",
+    "aPartirDe": "Desde",
+    "pers": "pers",
+    "ctaTitle": "Reserva tu pista en unos clics",
+    "voirTerrainsDisponibles": "Ver pistas disponibles",
+    "reservation30s": "Reserva en 30 segundos",
+    "simpleRapide": "Simple y rápido",
+    "paiementSecurise": "Pago seguro",
+    "surPlaceAuClub": "En el club",
+    "disposTempsReel": "Disponibilidad en tiempo real",
+    "sansAppeler": "Sin llamar",
+    "faqTitle": "Preguntas frecuentes",
+    "faqSubtitle": "Todo lo que debes saber sobre Pad'Up",
+    "trouverUnClub": "Encontrar un club",
+    "terrains": "Pistas",
+    "note": "Nota",
+    "prixH": "Precio/h",
+    "annuler": "Cancelar",
+    "confirmer": "Confirmar"
+  },
+  "nav": {
+    "sInscrire": "Registrarse",
+    "seConnecter": "Iniciar sesión",
+    "espaceClub": "Área club",
+    "monCompte": "Mi cuenta"
+  },
+  "common": {
+    "dispoDes": "Disponible desde",
+    "demain": "Mañana"
+  },
+  "faq": {
+    "q1": "¿Cómo reservo una pista?",
+    "a1": "Solo tienes que buscar un club, seleccionar el horario deseado y confirmar tu reserva. Recibirás una confirmación inmediata por email.",
+    "q2": "¿Es seguro el pago?",
+    "a2": "Sí, pagas directamente en el club. No se requiere tarjeta bancaria para reservar online, lo que garantiza máxima seguridad.",
+    "q3": "¿Puedo cancelar mi reserva?",
+    "a3": "Sí, puedes cancelar tu reserva desde tu espacio personal. Las condiciones dependen de cada club y se indican al reservar.",
+    "q4": "¿Hay gastos de servicio?",
+    "a4": "No, Pad'Up es 100% gratuito para jugadores. Solo pagas el precio de la pista directamente en el club.",
+    "q5": "¿Cómo recibo recordatorios de mis partidos?",
+    "a5": "Recibes automáticamente notificaciones por email antes de tus reservas. Puedes gestionar tus preferencias en tu perfil."
+  }
+}

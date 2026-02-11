@@ -1,0 +1,48 @@
+{
+  "accueil": {
+    "clubsTitle": "Les meilleurs clubs près de chez vous",
+    "voirTousClubs": "Voir tous les clubs",
+    "bientot": "Bientôt",
+    "ouvertureProchainement": "Ouverture prochainement",
+    "aPartirDe": "À partir de",
+    "pers": "pers",
+    "ctaTitle": "Réservez votre terrain en quelques clics",
+    "voirTerrainsDisponibles": "Voir les terrains disponibles",
+    "reservation30s": "Réservation en 30 secondes",
+    "simpleRapide": "Simple et rapide",
+    "paiementSecurise": "Paiement sécurisé",
+    "surPlaceAuClub": "Sur place au club",
+    "disposTempsReel": "Disponibilités en temps réel",
+    "sansAppeler": "Sans appeler le club",
+    "faqTitle": "Questions fréquentes",
+    "faqSubtitle": "Tout ce que vous devez savoir sur Pad'Up",
+    "trouverUnClub": "Trouver un club",
+    "terrains": "Terrains",
+    "note": "Note",
+    "prixH": "Prix/h",
+    "annuler": "Annuler",
+    "confirmer": "Confirmer"
+  },
+  "nav": {
+    "sInscrire": "S'inscrire",
+    "seConnecter": "Se connecter",
+    "espaceClub": "Espace club",
+    "monCompte": "Mon compte"
+  },
+  "common": {
+    "dispoDes": "Dispo dès",
+    "demain": "Demain"
+  },
+  "faq": {
+    "q1": "Comment réserver un terrain ?",
+    "a1": "Il vous suffit de rechercher un club, de sélectionner le créneau horaire souhaité et de confirmer votre réservation. Vous recevrez une confirmation immédiate par email.",
+    "q2": "Le paiement est-il sécurisé ?",
+    "a2": "Oui, vous payez directement sur place au club. Aucune carte bancaire n'est requise lors de la réservation en ligne, ce qui garantit une sécurité maximale.",
+    "q3": "Puis-je annuler ma réservation ?",
+    "a3": "Oui, vous pouvez annuler votre réservation depuis votre espace personnel. Les conditions d'annulation dépendent de chaque club et sont indiquées lors de la réservation.",
+    "q4": "Y a-t-il des frais de service ?",
+    "a4": "Non, Pad'Up est 100% gratuit pour les joueurs. Vous ne payez que le prix du terrain directement au club.",
+    "q5": "Comment recevoir les rappels de mes matchs ?",
+    "a5": "Vous recevez automatiquement des notifications par email avant vos réservations. Vous pouvez gérer vos préférences de notification dans votre profil."
+  }
+}

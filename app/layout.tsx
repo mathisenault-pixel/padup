@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ReservationProvider } from "@/state/ReservationContext";
+import { LocaleProvider } from "@/state/LocaleContext";
 import Footer from "@/components/Footer";
 
 const geistSans = Geist({
@@ -50,10 +51,12 @@ export default function RootLayout({
           />
         </noscript>
 
-        <ReservationProvider>
-          {children}
-          <Footer />
-        </ReservationProvider>
+        <LocaleProvider>
+          <ReservationProvider>
+            {children}
+            <Footer />
+          </ReservationProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

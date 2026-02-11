@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { useLocale } from '@/state/LocaleContext'
 
 export default function HeaderUserMenu() {
+  const { t } = useLocale()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -38,14 +40,14 @@ export default function HeaderUserMenu() {
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2.5 text-sm font-medium text-black hover:bg-black/5 transition-colors"
           >
-            S&apos;inscrire
+            {t('nav.sInscrire')}
           </Link>
           <Link
             href="/login"
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2.5 text-sm font-medium text-black hover:bg-black/5 transition-colors"
           >
-            Se connecter
+            {t('nav.seConnecter')}
           </Link>
         </div>
       )}

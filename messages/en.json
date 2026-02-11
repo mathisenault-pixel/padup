@@ -1,0 +1,48 @@
+{
+  "accueil": {
+    "clubsTitle": "The best clubs near you",
+    "voirTousClubs": "See all clubs",
+    "bientot": "Coming soon",
+    "ouvertureProchainement": "Opening soon",
+    "aPartirDe": "From",
+    "pers": "p/person",
+    "ctaTitle": "Book your court in a few clicks",
+    "voirTerrainsDisponibles": "See available courts",
+    "reservation30s": "Booking in 30 seconds",
+    "simpleRapide": "Simple and fast",
+    "paiementSecurise": "Secure payment",
+    "surPlaceAuClub": "At the club",
+    "disposTempsReel": "Real-time availability",
+    "sansAppeler": "No need to call",
+    "faqTitle": "Frequently asked questions",
+    "faqSubtitle": "Everything you need to know about Pad'Up",
+    "trouverUnClub": "Find a club",
+    "terrains": "Courts",
+    "note": "Rating",
+    "prixH": "Price/h",
+    "annuler": "Cancel",
+    "confirmer": "Confirm"
+  },
+  "nav": {
+    "sInscrire": "Sign up",
+    "seConnecter": "Log in",
+    "espaceClub": "Club area",
+    "monCompte": "My account"
+  },
+  "common": {
+    "dispoDes": "Available from",
+    "demain": "Tomorrow"
+  },
+  "faq": {
+    "q1": "How do I book a court?",
+    "a1": "Simply search for a club, select your preferred time slot and confirm your booking. You will receive an immediate confirmation by email.",
+    "q2": "Is payment secure?",
+    "a2": "Yes, you pay directly at the club. No credit card is required when booking online, which ensures maximum security.",
+    "q3": "Can I cancel my booking?",
+    "a3": "Yes, you can cancel your booking from your personal space. Cancellation conditions depend on each club and are indicated when booking.",
+    "q4": "Are there any service fees?",
+    "a4": "No, Pad'Up is 100% free for players. You only pay the court price directly at the club.",
+    "q5": "How do I get match reminders?",
+    "a5": "You automatically receive email notifications before your bookings. You can manage your notification preferences in your profile."
+  }
+}
