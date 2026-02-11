@@ -20,7 +20,7 @@ export default function PlayerAuthLayout({
       style={isAccueil ? {
         backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${heroBgImage}')`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center 75%',
+        backgroundPosition: 'center 85%',
         backgroundAttachment: 'scroll',
       } : undefined}
     >
