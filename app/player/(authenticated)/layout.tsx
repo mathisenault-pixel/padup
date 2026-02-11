@@ -12,7 +12,7 @@ export default function PlayerAuthLayout({
 }) {
   const pathname = usePathname()
   const isAccueil = pathname === '/player/accueil'
-  const heroBgImage = 'https://images.pexels.com/photos/1553783/pexels-photo-1553783.jpeg'
+  const heroBgImage = 'https://images.pexels.com/photos/35248383/pexels-photo-35248383.jpeg'
 
   return (
     <div
