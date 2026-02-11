@@ -24,10 +24,10 @@ export default function PlayerAuthLayout({
         backgroundAttachment: 'scroll',
       } : undefined}
     >
-      {/* Header - transparent sur accueil pour voir l'image derrière */}
+      {/* Navbar - fixed, transparent sur accueil */}
       <header
-        className={`sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] ${
-          isAccueil ? 'bg-white/75 backdrop-blur-sm border-black/10' : 'bg-white border-black/10'
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] ${
+          isAccueil ? 'bg-transparent backdrop-blur-sm border-b border-black/5' : 'bg-white border-b border-black/10'
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8">
@@ -77,15 +77,15 @@ export default function PlayerAuthLayout({
         </div>
 
         {/* Mobile Navigation */}
-        <div className={`lg:hidden border-t border-black/5 px-2 py-2 overflow-x-auto ${isAccueil ? 'bg-white/75 backdrop-blur-sm' : 'bg-white'}`}>
+        <div className={`lg:hidden border-t px-2 py-2 overflow-x-auto ${isAccueil ? 'bg-transparent border-black/5' : 'bg-white border-black/5'}`}>
           <div className="min-w-max">
             <PlayerNav />
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-64px)]">
+      {/* Main - pas de pt sur accueil (hero en haut), pt pour les autres pages */}
+      <main className={isAccueil ? '' : 'pt-14 md:pt-16 min-h-screen'}>
         {children}
       </main>
     </div>

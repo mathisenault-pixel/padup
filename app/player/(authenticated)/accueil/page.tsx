@@ -234,9 +234,9 @@ export default function AccueilPage() {
 
   return (
     <div>
-      {/* Hero - fond fourni par le layout (image derrière les onglets) */}
-      <section className="relative min-h-screen">
-        <div className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen flex md:items-center md:justify-center">
+      {/* Hero - min-h-screen, image en fond, contenu centré verticalement */}
+      <section className="relative min-h-screen flex items-center justify-center">
+        <div className="w-full px-4 py-16">
           <div className="container mx-auto max-w-6xl text-center w-full">
             <div className="inline-block mb-6">
               <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
