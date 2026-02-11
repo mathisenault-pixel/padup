@@ -215,8 +215,8 @@ export default function AccueilPage() {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Clubs - première section visible */}
-      <section className="pt-14 md:pt-16 pb-0 px-6 bg-white">
+      {/* Clubs - première section visible (pt-20/24 = header + respiration) */}
+      <section className="pt-20 md:pt-24 pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
