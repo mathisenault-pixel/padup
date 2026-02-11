@@ -1,10 +1,14 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import PlayerNav from './components/PlayerNav'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import HeaderUserMenu from './components/HeaderUserMenu'
+import AccueilSearchBar from './components/AccueilSearchBar'
+
+const SCROLL_THRESHOLD = 80
 
 export default function PlayerAuthLayout({
   children,
@@ -13,16 +17,31 @@ export default function PlayerAuthLayout({
 }) {
   const pathname = usePathname()
   const isAccueil = pathname === '/player/accueil'
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(typeof window !== 'undefined' ? window.scrollY > SCROLL_THRESHOLD : false)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const showCompactSearch = isAccueil && isScrolled
 
   return (
     <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
-      {/* Navbar - fixed, transparent sur accueil */}
+      {/* Navbar - fond gris ; au scroll : onglets masqués, barre de recherche réduite ÷1,5 */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] ${
-          isAccueil ? 'bg-transparent backdrop-blur-sm border-b border-black/5' : 'bg-white border-b border-black/10'
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300`}
       >
-        <div className="max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8">
+        {/* Logo + nav + actions - masqués au scroll sur accueil */}
+        <div
+          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 overflow-hidden transition-all duration-300 ${
+            showCompactSearch ? 'max-h-0 opacity-0' : 'max-h-[6rem] md:max-h-[4rem] opacity-100'
+          }`}
+        >
           <div className="flex items-center justify-between h-12 md:h-14">
             
             {/* Logo */}
@@ -56,14 +75,17 @@ export default function PlayerAuthLayout({
             </div>
 
           </div>
-        </div>
 
-        {/* Mobile Navigation */}
-        <div className={`lg:hidden border-t-2 px-2.5 py-2.5 overflow-x-auto ${isAccueil ? 'bg-transparent border-black/10' : 'bg-white border-black/10'}`}>
-          <div className="min-w-max">
-            <PlayerNav />
+          {/* Mobile Navigation */}
+          <div className="lg:hidden px-2.5 py-2.5 overflow-x-auto">
+            <div className="min-w-max">
+              <PlayerNav />
+            </div>
           </div>
         </div>
+
+        {/* Barre de recherche (accueil uniquement) - réduite ÷1,5 au scroll */}
+        {isAccueil && <AccueilSearchBar compact={showCompactSearch} />}
       </header>
 
       {/* Main - w-full overflow-x-hidden pour éviter bande blanche / scroll horizontal */}
