@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import { useLocale } from '@/state/LocaleContext'
 import type { User } from '@supabase/supabase-js'
 
 type ProfilInfo = {
@@ -20,6 +21,7 @@ type ProfilInfo = {
 }
 
 export default function AccountPage() {
+  const { t } = useLocale()
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [isLoadingAuth, setIsLoadingAuth] = useState(true)
@@ -200,7 +202,7 @@ export default function AccountPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-semibold">Chargement...</p>
+          <p className="text-gray-600 font-semibold">{t('compte.chargement')}</p>
         </div>
       </div>
     )
@@ -221,7 +223,7 @@ export default function AccountPage() {
             <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span className="font-semibold text-green-700">Modifications enregistrées avec succès !</span>
+            <span className="font-semibold text-green-700">{t('compte.modificationsOk')}</span>
           </div>
         )}
         
@@ -543,15 +545,15 @@ export default function AccountPage() {
             {/* Header */}
             <div className="flex items-start justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Profil</h2>
-                <p className="text-sm text-slate-500 mt-1">Vos informations personnelles</p>
+                <h2 className="text-xl font-semibold text-slate-900">{t('compte.profil')}</h2>
+                <p className="text-sm text-slate-500 mt-1">{t('compte.infosPersonnelles')}</p>
               </div>
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="h-10 px-4 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors flex-shrink-0"
                 >
-                  Modifier
+                  {t('compte.modifier')}
                 </button>
               ) : (
                 <div className="flex gap-2">
@@ -559,13 +561,13 @@ export default function AccountPage() {
                     onClick={() => setIsEditing(false)}
                     className="h-10 px-4 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors"
                   >
-                    Annuler
+                    {t('compte.annuler')}
                   </button>
                   <button
                     onClick={handleSave}
                     className="h-10 px-4 text-sm font-semibold text-white bg-slate-900 rounded-xl hover:bg-slate-800 transition-colors"
                   >
-                    Enregistrer
+                    {t('compte.enregistrer')}
                   </button>
                 </div>
               )}
@@ -809,22 +811,22 @@ export default function AccountPage() {
         {/* SECTION PARAMÈTRES (anciennement dans parametres/page.tsx) */}
         <div className="space-y-6 max-w-4xl mx-auto mt-12">
           <div className="mb-8">
-            <h2 className="text-3xl font-black text-gray-900 mb-2">Paramètres du compte</h2>
-            <p className="text-lg text-gray-600">Gérez votre sécurité et vos préférences</p>
+            <h2 className="text-3xl font-black text-gray-900 mb-2">{t('compte.parametresCompte')}</h2>
+            <p className="text-lg text-gray-600">{t('compte.gererSecurite')}</p>
           </div>
 
           {/* Section Mot de passe */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">Mot de passe</h3>
-              <p className="text-gray-600">Changez votre mot de passe de connexion</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">{t('compte.motDePasse')}</h3>
+              <p className="text-gray-600">{t('compte.changerMdp')}</p>
             </div>
             
             <form onSubmit={handlePasswordChange}>
               <div className="space-y-4 mb-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Mot de passe actuel
+                    {t('compte.mdpActuel')}
                   </label>
                   <input
                     type="password"
@@ -838,7 +840,7 @@ export default function AccountPage() {
                 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Nouveau mot de passe
+                    {t('compte.nouveauMdp')}
                   </label>
                   <input
                     type="password"
@@ -848,12 +850,12 @@ export default function AccountPage() {
                     placeholder="••••••••"
                     required
                   />
-                  <p className="text-sm text-gray-500 mt-1">Minimum 6 caractères</p>
+                  <p className="text-sm text-gray-500 mt-1">{t('compte.min6caracteres')}</p>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Confirmer le nouveau mot de passe
+                    {t('compte.confirmerMdp')}
                   </label>
                   <input
                     type="password"
@@ -870,7 +872,7 @@ export default function AccountPage() {
                 type="submit"
                 className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all"
               >
-                Changer le mot de passe
+                {t('compte.changerMdpBtn')}
               </button>
             </form>
           </div>
@@ -878,8 +880,8 @@ export default function AccountPage() {
           {/* Section Notifications */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">Notifications</h3>
-              <p className="text-gray-600">Gérez vos préférences de notifications</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">{t('compte.notifications')}</h3>
+              <p className="text-gray-600">{t('compte.gererNotifications')}</p>
             </div>
             
             <div className="space-y-4">
@@ -892,8 +894,8 @@ export default function AccountPage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900">Notifications par email</div>
-                    <div className="text-sm text-gray-600">Réservations, rappels, actualités</div>
+                    <div className="font-bold text-gray-900">{t('compte.notifEmail')}</div>
+                    <div className="text-sm text-gray-600">{t('compte.notifEmailDesc')}</div>
                   </div>
                 </div>
                 <button
@@ -922,8 +924,8 @@ export default function AccountPage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900">Notifications par SMS</div>
-                    <div className="text-sm text-gray-600">Rappels urgents uniquement</div>
+                    <div className="font-bold text-gray-900">{t('compte.notifSms')}</div>
+                    <div className="text-sm text-gray-600">{t('compte.notifSmsDesc')}</div>
                   </div>
                 </div>
                 <button
@@ -952,8 +954,8 @@ export default function AccountPage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900">Notifications push</div>
-                    <div className="text-sm text-gray-600">Notifications dans l'application</div>
+                    <div className="font-bold text-gray-900">{t('compte.notifPush')}</div>
+                    <div className="text-sm text-gray-600">{t('compte.notifPushDesc')}</div>
                   </div>
                 </div>
                 <button
@@ -978,24 +980,24 @@ export default function AccountPage() {
           {/* Section Confidentialité */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">Confidentialité et sécurité</h3>
-              <p className="text-gray-600">Gérez vos données et votre compte</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">{t('compte.confidentialite')}</h3>
+              <p className="text-gray-600">{t('compte.gererDonnees')}</p>
             </div>
             
             <div className="space-y-3">
               <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-xl font-semibold text-gray-900 transition-all">
-                Télécharger mes données
+                {t('compte.telechargerDonnees')}
               </button>
               
               <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-xl font-semibold text-gray-900 transition-all">
-                Historique de connexion
+                {t('compte.historiqueConnexion')}
               </button>
               
               <button 
                 onClick={handleSignOut}
                 className="w-full text-left px-4 py-3 bg-red-50 hover:bg-red-100 rounded-xl font-semibold text-red-600 transition-all"
               >
-                Me déconnecter de ce compte
+                {t('compte.deconnecter')}
               </button>
             </div>
           </div>

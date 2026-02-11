@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale } from '@/state/LocaleContext'
+
 type FilterChip = {
   id: string
   label: string
@@ -13,11 +15,12 @@ type ActiveFiltersChipsProps = {
 }
 
 export default function ActiveFiltersChips({ chips, onClearAll }: ActiveFiltersChipsProps) {
+  const { t } = useLocale()
   if (chips.length === 0) return null
 
   return (
     <div className="flex items-center gap-2 flex-wrap py-3">
-      <span className="text-xs font-medium text-slate-500 uppercase">Filtres actifs:</span>
+      <span className="text-xs font-medium text-slate-500 uppercase">{t('common.filtresActifs')}</span>
       {chips.map((chip) => (
         <button
           key={chip.id}
@@ -36,7 +39,7 @@ export default function ActiveFiltersChips({ chips, onClearAll }: ActiveFiltersC
           onClick={onClearAll}
           className="text-xs font-medium text-slate-600 hover:text-slate-900 underline decoration-dotted underline-offset-4 transition-colors"
         >
-          Tout effacer
+          {t('common.toutEffacer')}
         </button>
       )}
     </div>

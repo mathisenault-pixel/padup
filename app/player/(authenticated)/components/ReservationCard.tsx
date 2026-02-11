@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useLocale } from '@/state/LocaleContext'
 
 type ReservationCardProps = {
   id: string
@@ -28,6 +29,7 @@ export default function ReservationCard({
   onClick,
   drivingInfo
 }: ReservationCardProps) {
+  const { t } = useLocale()
   return (
     <Link
       href={href}
@@ -46,7 +48,7 @@ export default function ReservationCard({
       {/* Texte */}
       <div className="p-4 min-h-[80px]">
         <p className="text-xs font-normal text-slate-500 mb-1">
-          Découvrez
+          {t('common.decouvrez')}
         </p>
         <h3 className="text-base font-semibold text-slate-900 leading-tight mb-1">
           {clubName}

@@ -35,7 +35,7 @@ function getNested(obj: Messages, path: string): string | undefined {
 interface LocaleContextType {
   locale: Locale
   setLocale: (locale: Locale) => void
-  t: (key: string) => string
+  t: (key: string, values?: Record<string, string | number>) => string
   locales: typeof LOCALES
 }
 
@@ -60,9 +60,15 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const t = useCallback(
-    (key: string): string => {
-      const value = getNested(MESSAGES[locale] as Messages, key)
-      return value ?? key
+    (key: string, values?: Record<string, string | number>): string => {
+      let value = getNested(MESSAGES[locale] as Messages, key)
+      if (value == null) return key
+      if (values) {
+        for (const [k, v] of Object.entries(values)) {
+          value = value.replace(new RegExp(`\\{\\{\\s*${k}\\s*\\}\\}`, 'g'), String(v))
+        }
+      }
+      return value
     },
     [locale]
   )

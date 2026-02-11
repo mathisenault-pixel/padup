@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import PlayerNav from './components/PlayerNav'
-import AuthStatus from './components/AuthStatus'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import HeaderUserMenu from './components/HeaderUserMenu'
 
@@ -54,20 +53,6 @@ export default function PlayerAuthLayout({
               <LanguageSwitcher />
               {/* Menu hamburger (3 barres) */}
               <HeaderUserMenu />
-
-              {/* Espace club - masqué sur accueil */}
-              {!isAccueil && (
-                <Link
-                  href="/club-access"
-                  className="hidden md:inline-flex px-4 py-2 text-[14px] font-normal tracking-wide transition-opacity hover:opacity-70"
-                  style={{ color: '#000000' }}
-                >
-                  Espace club
-                </Link>
-              )}
-
-              {/* Mon compte - masqué sur accueil */}
-              {!isAccueil && <AuthStatus />}
             </div>
 
           </div>

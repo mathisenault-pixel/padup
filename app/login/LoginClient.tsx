@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
+import { useLocale } from '@/state/LocaleContext'
 
 interface LoginClientProps {
   callbackUrl?: string
 }
 
 export default function LoginClient({ callbackUrl }: LoginClientProps) {
+  const { t } = useLocale()
   const [error, setError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
   const router = useRouter()
@@ -54,7 +56,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
         
         // Si l'email confirmation est requise
         if (data.user && !data.session) {
-          setError('Veuillez vérifier votre email pour confirmer votre inscription')
+          setError(t('login.verifierEmail'))
           setIsPending(false)
           return
         }
@@ -90,7 +92,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
       }
     } catch (err) {
       console.error('[LOGIN] ❌ Unexpected error:', err)
-      setError('Une erreur inattendue est survenue')
+      setError(t('login.erreurInattendue'))
       setIsPending(false)
     }
   }
@@ -114,7 +116,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
             <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Retour à l&apos;accueil
+            {t('login.retourAccueil')}
           </button>
         </div>
 
@@ -128,8 +130,8 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 className="w-full h-full object-contain"
               />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">Bienvenue</h1>
-            <p className="text-gray-600 text-lg">Connectez-vous à votre espace</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">{t('login.bienvenue')}</h1>
+            <p className="text-gray-600 text-lg">{t('login.connectezEspace')}</p>
           </div>
 
           {/* Message si redirigé depuis une page protégée */}
@@ -142,8 +144,8 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900 mb-1">Connexion requise</p>
-                  <p className="text-sm text-slate-700">Connectez-vous pour accéder à cette page</p>
+                  <p className="text-sm font-bold text-slate-900 mb-1">{t('login.connexionRequise')}</p>
+                  <p className="text-sm text-slate-700">{t('login.connectezPage')}</p>
                 </div>
               </div>
             </div>
@@ -165,7 +167,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-bold text-gray-900 mb-3">
-                Adresse email
+                {t('login.adresseEmail')}
               </label>
               <input
                 id="email"
@@ -174,13 +176,13 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 required
                 disabled={isPending}
                 className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none transition-all disabled:opacity-50 text-gray-900 font-medium placeholder:text-gray-400"
-                placeholder="vous@exemple.com"
+                placeholder={t('login.placeholderEmail')}
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-bold text-gray-900 mb-3">
-                Mot de passe
+                {t('login.motDePasse')}
               </label>
               <input
                 id="password"
@@ -192,7 +194,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 className="w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-slate-400 focus:border-slate-400 outline-none transition-all disabled:opacity-50 text-gray-900 font-medium placeholder:text-gray-400"
                 placeholder="••••••••"
               />
-              <p className="mt-2 text-xs text-gray-500">Minimum 6 caractères</p>
+              <p className="mt-2 text-xs text-gray-500">{t('login.min6car')}</p>
             </div>
 
             <div className="flex gap-4 pt-4">
@@ -207,10 +209,10 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                     <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    Connexion...
+                    {t('login.connexionEnCours')}
                   </span>
                 ) : (
-                  'Connexion'
+                  t('login.connexion')
                 )}
               </button>
               <button
@@ -219,7 +221,7 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
                 disabled={isPending}
                 className="flex-1 px-6 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 hover:scale-105"
               >
-                Inscription
+                {t('login.inscription')}
               </button>
             </div>
           </form>
@@ -230,14 +232,14 @@ export default function LoginClient({ callbackUrl }: LoginClientProps) {
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">Nouveau sur Pad&apos;Up ?</span>
+              <span className="px-4 bg-white text-gray-500 font-medium">{t('login.nouveauSurPadup')}</span>
             </div>
           </div>
 
           {/* Info premium */}
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Créez un compte pour réserver vos terrains<br />et accéder aux tournois exclusifs
+              {t('login.creezCompte')}
             </p>
           </div>
         </div>

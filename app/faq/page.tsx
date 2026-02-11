@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/state/LocaleContext";
 
 export default function FAQPage() {
   const router = useRouter();
+  const { t } = useLocale();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -13,114 +15,81 @@ export default function FAQPage() {
           onClick={() => router.back()}
           className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-8"
         >
-          ← Retour
+          ← {t("public.retour")}
         </button>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Foire aux questions</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-8">{t("faqPage.title")}</h1>
 
         <div className="space-y-8">
           {/* Intro */}
           <p className="text-lg text-gray-700 leading-relaxed">
-            Retrouvez ici les réponses aux questions les plus fréquentes concernant l&apos;utilisation de Pad&apos;Up.
-            Si vous ne trouvez pas votre réponse, vous pouvez nous contacter.
+            {t("faqPage.intro")}
           </p>
 
           {/* Réservations */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Réservations</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("faqPage.reservations")}</h2>
             
             <div className="space-y-6">
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Comment réserver un terrain sur Pad&apos;Up ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  Il suffit de sélectionner un club, de choisir un créneau disponible et de confirmer la réservation. Le processus est rapide et se fait en quelques clics.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q1")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a1")}</p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Dois-je créer un compte pour réserver ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  Oui, la création d&apos;un compte est nécessaire pour réserver un terrain et gérer vos réservations.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q2")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a2")}</p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Les disponibilités sont-elles en temps réel ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  Oui, les disponibilités affichées sur Pad&apos;Up sont mises à jour en temps réel afin d&apos;éviter les doubles réservations.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q3")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a3")}</p>
               </div>
             </div>
           </section>
 
           {/* Paiement et frais */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Paiement et frais</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("faqPage.paiementFrais")}</h2>
             
             <div className="space-y-6">
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  La réservation est-elle payante ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  La réservation via Pad&apos;Up est sans frais pour les joueurs. Les éventuels paiements dépendent des conditions du club.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q4")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a4")}</p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Puis-je annuler une réservation ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  Les conditions d&apos;annulation dépendent du club auprès duquel la réservation a été effectuée.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q5")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a5")}</p>
               </div>
             </div>
           </section>
 
           {/* Clubs */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Clubs</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("faqPage.clubs")}</h2>
             
             <div className="space-y-6">
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Comment un club peut-il rejoindre Pad&apos;Up ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  Les clubs peuvent nous contacter via la page Contact afin d&apos;étudier une intégration à la plateforme.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q6")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a6")}</p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Pad&apos;Up est-il réservé aux clubs indépendants ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  Pad&apos;Up s&apos;adresse en priorité aux clubs indépendants, mais reste ouvert à toute structure partageant la même vision.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q7")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a7")}</p>
               </div>
             </div>
           </section>
 
           {/* Support */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Support</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t("faqPage.support")}</h2>
             
             <div className="space-y-6">
               <div>
-                <p className="font-semibold text-gray-900 mb-2">
-                  Que faire en cas de problème ?
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  En cas de souci, vous pouvez contacter l&apos;équipe Pad&apos;Up via la page Contact. Nous ferons notre possible pour vous aider rapidement.
-                </p>
+                <p className="font-semibold text-gray-900 mb-2">{t("faqPage.q8")}</p>
+                <p className="text-gray-700 leading-relaxed">{t("faqPage.a8")}</p>
               </div>
             </div>
           </section>
@@ -128,7 +97,7 @@ export default function FAQPage() {
           {/* Phrase de fin */}
           <div className="pt-8 border-t border-gray-200">
             <p className="text-xl font-semibold text-gray-900 text-center">
-              Pad&apos;Up, une réservation simple, sans complication.
+              {t("faqPage.phraseFin")}
             </p>
           </div>
         </div>

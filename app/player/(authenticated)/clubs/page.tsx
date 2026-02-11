@@ -13,6 +13,7 @@ import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime, getDrivingMetrics } from '@/lib/geoUtils'
 import { getCitySuggestions, getCityCoordinates } from '@/lib/cities'
 import { CLUBS_DATA, getClubById } from '@/lib/data/clubs'
+import { useLocale } from '@/state/LocaleContext'
 
 // ✅ Force dynamic rendering (pas de pre-render statique)
 // Nécessaire car supabaseBrowser accède à document.cookie
@@ -48,6 +49,7 @@ const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
 }
 
 export default function ClubsPage() {
+  const { t } = useLocale()
   const [searchTerm, setSearchTerm] = useState('')
   const [cityClubFilter, setCityClubFilter] = useState<string>('')
   const [radiusKm, setRadiusKm] = useState<number>(50)
@@ -326,23 +328,23 @@ export default function ClubsPage() {
         
         {/* Header */}
         <PageHeader
-          title="Clubs"
-          subtitle="Trouvez les meilleurs clubs de padel près de chez vous"
+          title={t('clubs.title')}
+          subtitle={t('clubs.subtitle')}
           leftField={{
-            label: "Que cherchez-vous ?",
-            placeholder: "Nom du club",
+            label: t('clubs.queCherchezVous'),
+            placeholder: t('clubs.nomDuClub'),
             value: headerSearchTerm,
             onChange: setHeaderSearchTerm,
             suggestions: clubNameSuggestions
           }}
           rightField={{
-            label: "Où",
-            placeholder: "Ville",
+            label: t('clubs.ou'),
+            placeholder: t('clubs.ville'),
             value: headerCitySearch,
             onChange: setHeaderCitySearch,
             suggestions: citySuggestions
           }}
-          buttonLabel="Rechercher"
+          buttonLabel={t('clubs.rechercher')}
           onSearch={() => {
             setSearchTerm(headerSearchTerm)
             setCityClubFilter(headerCitySearch)
@@ -355,7 +357,7 @@ export default function ClubsPage() {
         <FiltersDrawer
           isOpen={isFiltersDrawerOpen}
           onClose={() => setIsFiltersDrawerOpen(false)}
-          title="Filtrer les clubs"
+          title={t('clubs.filtrerClubs')}
           onReset={() => {
             setSearchTerm('')
             setSortBy('note')
@@ -367,24 +369,24 @@ export default function ClubsPage() {
         >
           {/* Filtre Tri */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Trier par</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('clubs.trierPar')}</h3>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
               className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
             >
-              <option value="note">Mieux notés</option>
-              <option value="prix-asc">Prix croissant</option>
-              <option value="prix-desc">Prix décroissant</option>
+              <option value="note">{t('clubs.mieuxNotes')}</option>
+              <option value="prix-asc">{t('clubs.prixCroissant')}</option>
+              <option value="prix-desc">{t('clubs.prixDecroissant')}</option>
             </select>
           </div>
 
           {/* Filtre Autour de */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Autour de</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('clubs.autourDe')}</h3>
             <div className="space-y-2">
               <SmartSearchBar
-                placeholder="Sélectionner une ville..."
+                placeholder={t('clubs.selectionnerVille')}
                 onSearch={(query) => setCityClubFilter(query)}
                 suggestions={[
                   ...getCitySuggestions(),
@@ -401,18 +403,16 @@ export default function ClubsPage() {
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
                 className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
               >
-                <option value={10}>Rayon : 10 km</option>
-                <option value={20}>Rayon : 20 km</option>
-                <option value={30}>Rayon : 30 km</option>
-                <option value={50}>Rayon : 50 km</option>
-                <option value={100}>Rayon : 100 km</option>
+                {[10, 20, 30, 50, 100].map((km) => (
+                  <option key={km} value={km}>{t('clubs.rayonKm', { km })}</option>
+                ))}
               </select>
             </div>
           </div>
 
           {/* Filtres Équipements */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Équipements</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('clubs.equipements')}</h3>
             <div className="flex flex-col gap-2">
               {['Restaurant', 'Parking', 'Bar', 'Fitness', 'Coaching'].map((equipement) => (
                 <button
@@ -432,7 +432,7 @@ export default function ClubsPage() {
 
           {/* Filtres Gamme de prix */}
           <div className="mb-0">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Gamme de prix</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('clubs.gammePrix')}</h3>
             <div className="flex flex-col gap-2">
               {[
                 { label: '≤ 8€', value: '0-8' },
@@ -459,7 +459,7 @@ export default function ClubsPage() {
         {isLoading && (
           <div className="text-center py-16">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent mb-4"></div>
-            <p className="text-gray-600 font-semibold">Chargement des clubs...</p>
+            <p className="text-gray-600 font-semibold">{t('clubs.chargement')}</p>
           </div>
         )}
 
@@ -490,8 +490,8 @@ export default function ClubsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucun club trouvé</h3>
-            <p className="text-gray-600 mb-6">Essayez de modifier votre recherche</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('clubs.aucunClub')}</h3>
+            <p className="text-gray-600 mb-6">{t('clubs.modifierRecherche')}</p>
             <button
               onClick={() => {
                 setSearchTerm('')
@@ -499,7 +499,7 @@ export default function ClubsPage() {
               }}
               className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
             >
-              Réinitialiser
+              {t('clubs.reinitialiser')}
             </button>
           </div>
         )}

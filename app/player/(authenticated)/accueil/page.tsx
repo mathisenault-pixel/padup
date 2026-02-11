@@ -215,8 +215,8 @@ export default function AccueilPage() {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Clubs - mobile: +1.5cm pour dégager le titre sous la navbar */}
-      <section className="pt-[calc(5rem+1.5cm)] md:pt-24 pb-0 px-6 bg-white">
+      {/* Clubs - mobile: +1.5cm + 2.8cm pour dégager le titre sous la navbar ; desktop: +2.8cm sous les onglets */}
+      <section className="pt-[calc(5rem+1.5cm+2.8cm)] md:pt-[calc(6rem+2.8cm)] pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">

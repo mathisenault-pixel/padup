@@ -11,6 +11,7 @@ import { debug } from '@/lib/debug'
 import { useUserLocation } from '@/hooks/useUserLocation'
 import { haversineKm, formatDistance, estimateMinutes, formatTravelTime, getDrivingMetrics } from '@/lib/geoUtils'
 import { getCitySuggestions, getCityCoordinates } from '@/lib/cities'
+import { useLocale } from '@/state/LocaleContext'
 
 type Tournoi = {
   id: number
@@ -50,6 +51,7 @@ const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
 }
 
 export default function TournoisPage() {
+  const { t } = useLocale()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState<'tous' | 'ouverts' | 'inscrits'>('ouverts')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -392,23 +394,23 @@ export default function TournoisPage() {
         
         {/* Header */}
         <PageHeader
-          title="Tournois"
-          subtitle="Découvrez et participez aux tournois de padel"
+          title={t('tournois.title')}
+          subtitle={t('tournois.subtitle')}
           leftField={{
-            label: "Que cherchez-vous ?",
-            placeholder: "Nom du tournoi",
+            label: t('tournois.queCherchezVous'),
+            placeholder: t('tournois.nomTournoi'),
             value: headerSearchTerm,
             onChange: setHeaderSearchTerm,
             suggestions: tournoiNameSuggestions
           }}
           rightField={{
-            label: "Où",
-            placeholder: "Ville",
+            label: t('tournois.ou'),
+            placeholder: t('tournois.ville'),
             value: headerCitySearch,
             onChange: setHeaderCitySearch,
             suggestions: citySuggestions
           }}
-          buttonLabel="Rechercher"
+          buttonLabel={t('tournois.rechercher')}
           onSearch={() => {
             setSearchTerm(headerSearchTerm)
             setCityClubFilter(headerCitySearch)
@@ -421,7 +423,7 @@ export default function TournoisPage() {
         <FiltersDrawer
           isOpen={isFiltersDrawerOpen}
           onClose={() => setIsFiltersDrawerOpen(false)}
-          title="Filtrer les tournois"
+          title={t('tournois.filtrerTournois')}
           onReset={() => {
             setSearchTerm('')
             setSelectedFilter('ouverts')
@@ -434,7 +436,7 @@ export default function TournoisPage() {
         >
           {/* Filtre Statut */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Statut</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('tournois.statut')}</h3>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => setSelectedFilter('ouverts')}
@@ -444,7 +446,7 @@ export default function TournoisPage() {
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Ouverts
+                {t('tournois.ouverts')}
               </button>
               <button
                 onClick={() => setSelectedFilter('inscrits')}
@@ -454,7 +456,7 @@ export default function TournoisPage() {
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Mes inscriptions
+                {t('tournois.mesInscriptions')}
               </button>
               <button
                 onClick={() => setSelectedFilter('tous')}
@@ -464,14 +466,14 @@ export default function TournoisPage() {
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Tous
+                {t('tournois.tous')}
               </button>
             </div>
           </div>
 
           {/* Filtre Tri */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Trier par</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('clubs.trierPar')}</h3>
             <button
               onClick={() => setSortBy('date')}
               className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium text-left transition-all ${
@@ -480,16 +482,16 @@ export default function TournoisPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              📅 Date
+              📅 {t('tournois.trierParDate')}
             </button>
           </div>
 
           {/* Filtre Autour de */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Autour de</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('tournois.autourDe')}</h3>
             <div className="space-y-2">
               <SmartSearchBar
-                placeholder="Sélectionner une ville..."
+                placeholder={t('tournois.selectionnerVille')}
                 onSearch={(query) => setCityClubFilter(query)}
                 suggestions={[
                   ...getCitySuggestions(),
@@ -506,18 +508,16 @@ export default function TournoisPage() {
                 onChange={(e) => setRadiusKm(Number(e.target.value))}
                 className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900 bg-white"
               >
-                <option value={10}>Rayon : 10 km</option>
-                <option value={20}>Rayon : 20 km</option>
-                <option value={30}>Rayon : 30 km</option>
-                <option value={50}>Rayon : 50 km</option>
-                <option value={100}>Rayon : 100 km</option>
+                {[10, 20, 30, 50, 100].map((km) => (
+                  <option key={km} value={km}>{t('tournois.rayonKm', { km })}</option>
+                ))}
               </select>
             </div>
           </div>
 
           {/* Filtre Niveau */}
           <div className="mb-6">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Niveau</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('tournois.niveau')}</h3>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => setSelectedCategories([])}
@@ -527,7 +527,7 @@ export default function TournoisPage() {
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Tous les niveaux
+                {t('tournois.tousNiveaux')}
               </button>
               {['P100', 'P250', 'P500', 'P1000', 'P2000'].map((cat) => (
                 <button
@@ -547,7 +547,7 @@ export default function TournoisPage() {
 
           {/* Filtre Genre */}
           <div className="mb-0">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Genre</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-3">{t('tournois.genre')}</h3>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => setSelectedGenres([])}
@@ -557,7 +557,7 @@ export default function TournoisPage() {
                     : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                Tous les genres
+                {t('tournois.tousGenres')}
               </button>
               {['Hommes', 'Femmes', 'Mixte'].map((genre) => (
                 <button
@@ -611,8 +611,8 @@ export default function TournoisPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucun tournoi trouvé</h3>
-            <p className="text-gray-600 mb-6">Essayez de modifier votre recherche ou vos filtres</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('tournois.aucunTournoi')}</h3>
+            <p className="text-gray-600 mb-6">{t('tournois.modifierRecherche')}</p>
             <button
               onClick={() => {
                 setSearchTerm('')
@@ -622,7 +622,7 @@ export default function TournoisPage() {
               }}
               className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
             >
-              Réinitialiser
+              {t('tournois.reinitialiser')}
             </button>
           </div>
         )}

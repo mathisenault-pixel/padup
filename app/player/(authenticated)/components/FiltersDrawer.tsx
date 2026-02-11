@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useEffect } from 'react'
+import { useLocale } from '@/state/LocaleContext'
 
 type FiltersDrawerProps = {
   isOpen: boolean
@@ -19,6 +20,7 @@ export default function FiltersDrawer({
   title = 'Filtres',
   children,
 }: FiltersDrawerProps) {
+  const { t } = useLocale()
   // Empêcher le scroll du body quand le drawer est ouvert
   useEffect(() => {
     if (isOpen) {
@@ -49,7 +51,7 @@ export default function FiltersDrawer({
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-            aria-label="Fermer"
+            aria-label={t('common.fermer')}
           >
             <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -69,7 +71,7 @@ export default function FiltersDrawer({
               onClick={onReset}
               className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
             >
-              Réinitialiser
+              {t('common.reinitialiser')}
             </button>
           )}
           <button
@@ -79,7 +81,7 @@ export default function FiltersDrawer({
             }}
             className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
           >
-            Appliquer
+            {t('common.appliquer')}
           </button>
         </div>
       </div>

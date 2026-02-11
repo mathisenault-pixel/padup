@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useLocale } from '@/state/LocaleContext'
 
 type MessageBubble = {
   id: number
@@ -21,6 +22,7 @@ type Conversation = {
 }
 
 export default function MessagesPage() {
+  const { t } = useLocale()
   const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: 1,
@@ -230,8 +232,8 @@ export default function MessagesPage() {
         <div className="container mx-auto px-3 md:px-6 py-4 md:py-6 pb-1 md:pb-3 max-w-[1400px]">
           {/* En-tête */}
           <div className="mb-4 md:mb-5">
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">Messages</h1>
-            <p className="text-sm md:text-base text-gray-600">Discutez avec les clubs et consultez vos notifications</p>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-2">{t('messages.title')}</h1>
+            <p className="text-sm md:text-base text-gray-600">{t('messages.subtitle')}</p>
           </div>
 
           {/* Interface de messagerie */}
@@ -244,7 +246,7 @@ export default function MessagesPage() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Rechercher..."
+                    placeholder={t('messages.rechercher')}
                     className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400"
                   />
                   <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,8 +305,8 @@ export default function MessagesPage() {
                   <div className="flex-1 min-w-0">
                     <h2 className="font-bold text-gray-900 truncate">{selectedConversation.contact}</h2>
                     <p className="text-xs text-gray-500 truncate">
-                      {selectedConversation.type === 'club' ? 'Club de padel' : 
-                       selectedConversation.type === 'system' ? 'Notifications Pad\'Up' : 'Joueur'}
+                      {selectedConversation.type === 'club' ? t('messages.clubPadel') : 
+                       selectedConversation.type === 'system' ? t('messages.notificationsPadup') : t('messages.joueur')}
                     </p>
                   </div>
                 </div>
@@ -343,7 +345,7 @@ export default function MessagesPage() {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                      placeholder="Écrivez votre message..."
+                      placeholder={t('messages.ecrireMessage')}
                       className="flex-1 px-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400"
                     />
                     <button
@@ -364,7 +366,7 @@ export default function MessagesPage() {
                   <svg className="w-20 h-20 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
-                  <p className="text-gray-500 font-semibold">Sélectionnez une conversation</p>
+                  <p className="text-gray-500 font-semibold">{t('messages.selectionnerConversation')}</p>
                 </div>
               </div>
             )}
@@ -400,8 +402,8 @@ export default function MessagesPage() {
             <div className="flex-1 min-w-0">
               <h2 className="font-bold text-gray-900 truncate text-base">{selectedConversation.contact}</h2>
               <p className="text-xs text-gray-500 truncate">
-                {selectedConversation.type === 'club' ? 'Club de padel' : 
-                 selectedConversation.type === 'system' ? 'Notifications Pad\'Up' : 'Joueur'}
+                {selectedConversation.type === 'club' ? t('messages.clubPadel') : 
+                 selectedConversation.type === 'system' ? t('messages.notificationsPadup') : t('messages.joueur')}
               </p>
             </div>
           </div>
@@ -465,7 +467,7 @@ export default function MessagesPage() {
                 onFocus={() => {
                   setTimeout(scrollToBottom, 300)
                 }}
-                placeholder="Écrivez votre message..."
+                placeholder={t('messages.ecrireMessage')}
                 className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-400 text-[16px]"
                 style={{ fontSize: '16px' }} // Évite le zoom sur iOS
               />

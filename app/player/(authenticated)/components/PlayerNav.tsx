@@ -2,23 +2,22 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { useLocale } from '@/state/LocaleContext'
 
 type NavItem = {
   href: string
-  label: string
-  desktopOnly?: boolean
-  mobileOnly?: boolean
+  labelKey: string
 }
 
 export default function PlayerNav() {
   const pathname = usePathname()
+  const { t } = useLocale()
 
-  // Navigation style Planity (texte simple, pas de boutons)
   const navItems: NavItem[] = [
-    { href: '/player/accueil', label: 'Accueil' },
-    { href: '/player/reservations', label: 'Mes réservations' },
-    { href: '/player/clubs', label: 'Clubs' },
-    { href: '/player/tournois', label: 'Tournois' },
+    { href: '/player/accueil', labelKey: 'nav.accueil' },
+    { href: '/player/reservations', labelKey: 'nav.mesReservations' },
+    { href: '/player/clubs', labelKey: 'nav.clubs' },
+    { href: '/player/tournois', labelKey: 'nav.tournois' },
   ]
 
   const isActive = (href: string) => pathname === href
@@ -27,7 +26,7 @@ export default function PlayerNav() {
     <>
       {/* Navigation mobile */}
       <nav className="lg:hidden flex items-center gap-1">
-        {navItems.filter(item => !item.desktopOnly).map((item) => (
+        {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
@@ -36,7 +35,7 @@ export default function PlayerNav() {
             }`}
             style={{ color: '#000000' }}
           >
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         ))}
       </nav>
@@ -58,7 +57,7 @@ export default function PlayerNav() {
               `}
               style={{ color: '#000000' }}
             >
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           )
         })}

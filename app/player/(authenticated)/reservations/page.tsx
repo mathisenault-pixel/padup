@@ -9,6 +9,7 @@ import ActiveFiltersChips from '../components/ActiveFiltersChips'
 import PageHeader from '../components/PageHeader'
 import ReservationCard from '../components/ReservationCard'
 import TournoiCard from '../components/TournoiCard'
+import { useLocale } from '@/state/LocaleContext'
 
 // ✅ Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -57,6 +58,7 @@ type MixedEvent = (EnrichedBooking | TournamentRegistration) & {
 }
 
 export default function ReservationsPage() {
+  const { t } = useLocale()
   const [bookings, setBookings] = useState<EnrichedBooking[]>([])
   const [tournaments, setTournaments] = useState<TournamentRegistration[]>([])
   const [loading, setLoading] = useState(true)
@@ -308,28 +310,28 @@ export default function ReservationsPage() {
         
         {/* Header */}
         <PageHeader
-          title="Mes réservations"
-          subtitle="Retrouvez et gérez toutes vos réservations de padel"
+          title={t('reservations.title')}
+          subtitle={t('reservations.subtitle')}
           leftField={{
-            label: "Rechercher",
-            placeholder: "Club, ville…",
+            label: t('reservations.rechercher'),
+            placeholder: t('reservations.clubVille'),
             value: headerSearchTerm,
             onChange: setHeaderSearchTerm
           }}
           rightField={{
-            label: "Statut",
+            label: t('reservations.statut'),
             placeholder: "",
             value: headerStatusFilter,
             onChange: setHeaderStatusFilter,
             type: "select",
             options: [
-              { value: 'tous', label: 'Toutes' },
-              { value: 'a-venir', label: 'À venir' },
-              { value: 'passees', label: 'Passées' },
-              { value: 'annulees', label: 'Annulées' }
+              { value: 'tous', label: t('reservations.toutes') },
+              { value: 'a-venir', label: t('reservations.aVenir') },
+              { value: 'passees', label: t('reservations.passees') },
+              { value: 'annulees', label: t('reservations.annulees') }
             ]
           }}
-          buttonLabel="Appliquer"
+          buttonLabel={t('reservations.appliquer')}
           onSearch={handleHeaderSearch}
         />
 
@@ -357,28 +359,28 @@ export default function ReservationsPage() {
         
         {/* Header */}
         <PageHeader
-          title="Mes réservations"
-          subtitle="Retrouvez et gérez toutes vos réservations de padel"
+          title={t('reservations.title')}
+          subtitle={t('reservations.subtitle')}
           leftField={{
-            label: "Rechercher",
-            placeholder: "Club, ville…",
+            label: t('reservations.rechercher'),
+            placeholder: t('reservations.clubVille'),
             value: headerSearchTerm,
             onChange: setHeaderSearchTerm
           }}
           rightField={{
-            label: "Statut",
+            label: t('reservations.statut'),
             placeholder: "",
             value: headerStatusFilter,
             onChange: setHeaderStatusFilter,
             type: "select",
             options: [
-              { value: 'tous', label: 'Toutes' },
-              { value: 'a-venir', label: 'À venir' },
-              { value: 'passees', label: 'Passées' },
-              { value: 'annulees', label: 'Annulées' }
+              { value: 'tous', label: t('reservations.toutes') },
+              { value: 'a-venir', label: t('reservations.aVenir') },
+              { value: 'passees', label: t('reservations.passees') },
+              { value: 'annulees', label: t('reservations.annulees') }
             ]
           }}
-          buttonLabel="Appliquer"
+          buttonLabel={t('reservations.appliquer')}
           onSearch={handleHeaderSearch}
         />
 
@@ -394,28 +396,28 @@ export default function ReservationsPage() {
       
       {/* Header */}
       <PageHeader
-        title="Mes réservations"
-        subtitle="Retrouvez et gérez toutes vos réservations de padel"
+        title={t('reservations.title')}
+        subtitle={t('reservations.subtitle')}
         leftField={{
-          label: "Rechercher",
-          placeholder: "Club, ville…",
+          label: t('reservations.rechercher'),
+          placeholder: t('reservations.clubVille'),
           value: headerSearchTerm,
           onChange: setHeaderSearchTerm
         }}
         rightField={{
-          label: "Statut",
+          label: t('reservations.statut'),
           placeholder: "",
           value: headerStatusFilter,
           onChange: setHeaderStatusFilter,
           type: "select",
           options: [
-            { value: 'tous', label: 'Toutes' },
-            { value: 'a-venir', label: 'À venir' },
-            { value: 'passees', label: 'Passées' },
-            { value: 'annulees', label: 'Annulées' }
+            { value: 'tous', label: t('reservations.toutes') },
+            { value: 'a-venir', label: t('reservations.aVenir') },
+            { value: 'passees', label: t('reservations.passees') },
+            { value: 'annulees', label: t('reservations.annulees') }
           ]
         }}
-        buttonLabel="Appliquer"
+        buttonLabel={t('reservations.appliquer')}
         onSearch={handleHeaderSearch}
         onFiltersClick={() => setIsFiltersDrawerOpen(true)}
         activeFiltersCount={activeFiltersCount}
@@ -425,7 +427,7 @@ export default function ReservationsPage() {
       <FiltersDrawer
         isOpen={isFiltersDrawerOpen}
         onClose={() => setIsFiltersDrawerOpen(false)}
-        title="Filtrer mes réservations"
+        title={t('reservations.filtrerReservations')}
         onReset={() => {
           setSelectedType('tous')
           setSelectedFilter('tous')
@@ -433,7 +435,7 @@ export default function ReservationsPage() {
       >
         {/* Filtre par type */}
         <div className="mb-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-3">Type d'événement</h3>
+          <h3 className="text-sm font-bold text-slate-900 mb-3">{t('reservations.typeEvent')}</h3>
           <div className="flex flex-col gap-2">
             <button
               onClick={() => setSelectedType('tous')}
@@ -443,7 +445,7 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Tout ({validBookings.length + tournaments.length})
+              {t('reservations.tout')} ({validBookings.length + tournaments.length})
             </button>
             <button
               onClick={() => setSelectedType('parties')}
@@ -453,7 +455,7 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Parties ({validBookings.length})
+              {t('reservations.parties')} ({validBookings.length})
             </button>
             <button
               onClick={() => setSelectedType('tournois')}
@@ -463,14 +465,14 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Tournois ({tournaments.length})
+              {t('reservations.tournois')} ({tournaments.length})
             </button>
           </div>
         </div>
 
         {/* Filtre par statut */}
         <div className="mb-0">
-          <h3 className="text-sm font-bold text-slate-900 mb-3">Filtrer par statut</h3>
+          <h3 className="text-sm font-bold text-slate-900 mb-3">{t('reservations.filtrerParStatut')}</h3>
           <div className="flex flex-col gap-2">
             <button
               onClick={() => setSelectedFilter('tous')}
@@ -480,7 +482,7 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Toutes ({validBookings.length})
+              {t('reservations.toutes')} ({validBookings.length})
             </button>
             <button
               onClick={() => setSelectedFilter('a-venir')}
@@ -490,7 +492,7 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              À venir ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})
+              {t('reservations.aVenir')} ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) > new Date()).length})
             </button>
             <button
               onClick={() => setSelectedFilter('passees')}
@@ -500,7 +502,7 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Passées ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})
+              {t('reservations.passees')} ({validBookings.filter(b => b.status === 'confirmed' && new Date(b.slot_start) < new Date()).length})
             </button>
             <button
               onClick={() => setSelectedFilter('annulees')}
@@ -510,7 +512,7 @@ export default function ReservationsPage() {
                   : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Annulées ({validBookings.filter(b => b.status === 'cancelled').length})
+              {t('reservations.annulees')} ({validBookings.filter(b => b.status === 'cancelled').length})
             </button>
           </div>
         </div>
@@ -525,16 +527,16 @@ export default function ReservationsPage() {
             </svg>
           </div>
           <h3 className="text-2xl font-black text-gray-900 mb-3">
-            Aucune réservation
+            {t('reservations.aucuneReservation')}
           </h3>
           <p className="text-gray-600 mb-6">
             {selectedFilter === 'tous' 
-              ? "Vous n'avez pas encore de réservation" 
-              : `Aucune réservation ${selectedFilter === 'a-venir' ? 'à venir' : selectedFilter === 'passees' ? 'passée' : 'annulée'}`}
+              ? t('reservations.aucuneReservationEncore') 
+              : `${t('reservations.aucuneReservation')} ${selectedFilter === 'a-venir' ? t('reservations.aucuneVenir') : selectedFilter === 'passees' ? t('reservations.aucunePassee') : t('reservations.aucuneAnnulee')}`}
           </p>
           <Link href="/player/clubs">
             <button className="px-8 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-all">
-              Réserver un terrain
+              {t('reservations.reserverTerrain')}
             </button>
           </Link>
         </div>
