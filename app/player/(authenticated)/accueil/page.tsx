@@ -34,15 +34,15 @@ type Club = {
  * Coordonnées GPS des clubs (hardcodé pour MVP)
  * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
  */
-// Photo de fond Hero : utilisez '/images/accueil/hero-padel.jpg' pour votre propre image
-const HERO_BG_IMAGE = 'https://images.unsplash.com/photo-1622163642998-1ce230a6c914?auto=format&fit=crop&w=1920'
+// Photo de fond Hero : déposez hero-padel.jpg dans public/images/accueil/ pour utiliser la vôtre
+const HERO_BG_IMAGE = 'https://images.pexels.com/photos/1553783/pexels-photo-1553783.jpeg'
 
-/** 4 clubs "bientôt disponibles" (cartes non cliquables) */
+/** 4 clubs "bientôt disponibles" (cartes non cliquables) - pas de photo existante */
 const COMING_SOON_CLUBS = [
-  { name: 'Padel Club Nord', city: 'Ouverture bientôt', imageUrl: getClubImage('a1b2c3d4-e5f6-4789-a012-3456789abcde') },
-  { name: 'Arena Padel Sud', city: 'Ouverture bientôt', imageUrl: getClubImage('b2c3d4e5-f6a7-4890-b123-456789abcdef') },
-  { name: 'Swing Padel Center', city: 'Ouverture bientôt', imageUrl: getClubImage('c3d4e5f6-a7b8-4901-c234-56789abcdef0') },
-  { name: 'Urban Padel Pro', city: 'Ouverture bientôt', imageUrl: getClubImage('d4e5f6a7-b8c9-4012-d345-6789abcdef01') },
+  { name: 'Club de padel', city: 'Ouverture bientôt' },
+  { name: 'Club de padel', city: 'Ouverture bientôt' },
+  { name: 'Club de padel', city: 'Ouverture bientôt' },
+  { name: 'Club de padel', city: 'Ouverture bientôt' },
 ]
 
 const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -237,11 +237,11 @@ export default function AccueilPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero - Photo de fond padel plein écran */}
+      {/* Hero - Photo de fond padel plein écran, visible jusqu'au-dessus de "Clubs" */}
       <section
         className="relative min-h-screen bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.9) 100%), url('${HERO_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
         }}
       >
         <div className="pt-2 pb-16 px-4 md:pt-0 md:pb-0 md:relative md:min-h-screen flex md:items-center md:justify-center">
@@ -343,19 +343,15 @@ export default function AccueilPage() {
               </Link>
             ))}
 
-            {/* Cartes bientôt disponibles (non cliquables) */}
+            {/* Cartes bientôt disponibles (non cliquables) - pas de photo */}
             {COMING_SOON_CLUBS.map((club, index) => (
               <div
                 key={`bientot-${index}`}
                 className="opacity-85 border border-black/10 rounded-lg overflow-hidden cursor-not-allowed select-none"
                 role="presentation"
               >
-                <div className="relative h-48 overflow-hidden bg-gray-100">
-                  <img
-                    src={club.imageUrl}
-                    alt={club.name}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="relative h-48 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm font-medium">—</span>
                   <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium bg-black/70 text-white rounded-full">
                     Bientôt
                   </span>
