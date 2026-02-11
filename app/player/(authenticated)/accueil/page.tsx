@@ -236,20 +236,20 @@ export default function AccueilPage() {
     <div>
       {/* Hero - w-screen left-0 right-0 : bord-à-bord */}
       <section className="relative min-h-screen w-screen left-0 right-0 overflow-hidden flex items-center justify-center bg-white">
-        <div className="w-full py-16">
+        <div className="w-full py-20 md:py-28">
           <div className="w-full max-w-6xl mx-auto text-center px-4">
-            <div className="inline-block mb-6">
+            <div className="inline-block mb-8 md:mb-10">
               <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
                 Réserver un terrain n'a jamais été aussi simple
               </span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-4 leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-6 md:mb-8 leading-tight tracking-tight">
               Votre terrain de padel.<br />En quelques secondes
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-black/60 mb-8 max-w-2xl mx-auto font-light">
+            <p className="text-base sm:text-lg md:text-xl text-black/60 mb-10 md:mb-12 max-w-2xl mx-auto font-light">
               Disponibilités en temps réel, réservation sans appel ni attente.
             </p>
-            <div className="max-w-2xl mx-auto mb-6">
+            <div className="max-w-2xl mx-auto mb-10 md:mb-12">
               <SmartSearchBar
                 placeholder="Où souhaitez-vous jouer ?"
                 onSearch={(query) => router.push(`/player/clubs?q=${encodeURIComponent(query)}`)}
@@ -269,7 +269,7 @@ export default function AccueilPage() {
                 </p>
               )}
             </div>
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto mt-2 md:mt-4">
               <button
                 type="button"
                 onClick={handleCTAClick}
@@ -285,7 +285,7 @@ export default function AccueilPage() {
       {/* Contenu sous le hero : overflow-x pour éviter scroll horizontal */}
       <div className="overflow-x-hidden">
       {/* Clubs */}
-      <section className="pt-12 md:pt-16 pb-16 md:pb-20 px-6 bg-white">
+      <section className="pt-12 md:pt-16 pb-6 md:pb-8 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
@@ -378,8 +378,8 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-white mt-16 md:mt-20 py-16 md:py-20 border-t border-black/5">
+      {/* CTA - mt+pb clubs = pt clubs (même espace qu'entre hero et "Les meilleurs clubs") */}
+      <section className="bg-white mt-6 md:mt-8 py-16 md:py-20 border-t border-black/5">
         <div className="mx-auto max-w-6xl px-6 md:px-8">
           {/* Contenu centré */}
           <div className="max-w-2xl mx-auto text-center mb-12">

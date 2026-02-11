@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import PlayerNav from './components/PlayerNav'
 import AuthStatus from './components/AuthStatus'
+import LanguageSwitcher from './components/LanguageSwitcher'
+import HeaderUserMenu from './components/HeaderUserMenu'
 
 export default function PlayerAuthLayout({
   children,
@@ -38,7 +40,10 @@ export default function PlayerAuthLayout({
             </div>
 
             {/* Actions à droite (style Planity) */}
-            <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex items-center gap-1 md:gap-2">
+              {/* Langue + Menu utilisateur (S'inscrire / Se connecter) - toujours visibles */}
+              <LanguageSwitcher />
+              <HeaderUserMenu />
               {/* Messages - Visible uniquement sur mobile (icône seulement) */}
               <Link
                 href="/player/messages"
