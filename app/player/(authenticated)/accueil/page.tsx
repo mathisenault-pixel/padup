@@ -285,7 +285,7 @@ export default function AccueilPage() {
       {/* Contenu sous le hero : overflow-x pour éviter scroll horizontal */}
       <div className="overflow-x-hidden">
       {/* Clubs */}
-      <section className="pt-12 md:pt-16 pb-6 md:pb-8 px-6 bg-white">
+      <section className="pt-12 md:pt-16 pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
@@ -378,8 +378,8 @@ export default function AccueilPage() {
         </div>
       </section>
 
-      {/* CTA - mt+pb clubs = pt clubs (même espace qu'entre hero et "Les meilleurs clubs") */}
-      <section className="bg-white mt-6 md:mt-8 py-16 md:py-20 border-t border-black/5">
+      {/* CTA - pt-12/16 = même espace qu'entre hero et "Les meilleurs clubs" */}
+      <section className="bg-white pt-12 md:pt-16 pb-16 md:pb-20 border-t border-black/5">
         <div className="mx-auto max-w-6xl px-6 md:px-8">
           {/* Contenu centré */}
           <div className="max-w-2xl mx-auto text-center mb-12">
