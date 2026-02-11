@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ReservationProvider } from "@/state/ReservationContext";
 import Footer from "@/components/Footer";
+import { DebugOverflow } from "@/components/DebugOverflow";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
