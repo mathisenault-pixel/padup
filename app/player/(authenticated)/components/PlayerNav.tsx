@@ -9,14 +9,17 @@ type NavItem = {
   labelKey: string
 }
 
+/** Onglets masqués - à réintégrer ailleurs si besoin */
+const NAV_ITEMS_HIDDEN: NavItem[] = [
+  { href: '/player/reservations', labelKey: 'nav.mesReservations' },
+]
+
 export default function PlayerNav() {
   const pathname = usePathname()
   const { t } = useLocale()
 
   const navItems: NavItem[] = [
-    { href: '/player/accueil', labelKey: 'nav.accueil' },
-    { href: '/player/reservations', labelKey: 'nav.mesReservations' },
-    { href: '/player/clubs', labelKey: 'nav.clubs' },
+    { href: '/player/accueil', labelKey: 'nav.clubs' }, // Accueil renommé "Clubs"
     { href: '/player/tournois', labelKey: 'nav.tournois' },
   ]
 

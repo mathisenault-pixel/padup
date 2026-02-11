@@ -227,12 +227,12 @@ export default function AccueilPage() {
       {/* Clubs - mobile: +1.5cm + 2.8cm pour dégager le titre sous la navbar ; desktop: +2.8cm sous les onglets */}
       <section className="pt-[calc(5rem+1.5cm+2.8cm)] md:pt-[calc(6rem+2.8cm)] pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
-          {/* Barre de recherche */}
+          {/* Barre de recherche - style pill/capsule type Airbnb (ombre, séparateurs légers, bouton rose) */}
           <div className="mb-6 md:mb-8">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-0 sm:gap-0 bg-white border-2 border-black/10 rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.75rem] sm:rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.08)] min-h-[4rem] sm:min-h-0">
               {/* Partie gauche : Où */}
-              <div className="flex-1 min-w-0 p-3 sm:p-4">
-                <label className="block text-xs font-semibold text-black/70 mb-1.5 uppercase tracking-wide">
+              <div className="flex-1 min-w-0 px-4 py-3 sm:px-5 sm:py-3.5">
+                <label className="block text-xs font-bold text-gray-600 mb-0.5">
                   {t('accueil.searchOu')}
                 </label>
                 <input
@@ -241,17 +241,17 @@ export default function AccueilPage() {
                   onChange={(e) => setSearchOu(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder={t('accueil.searchPlaceholder')}
-                  className="w-full text-sm sm:text-base text-black placeholder:text-black/40 bg-transparent focus:outline-none"
+                  className="w-full text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
                 />
               </div>
 
               {/* Trait vertical */}
-              <div className="hidden sm:block w-px bg-black/15 self-stretch min-h-[3rem]" aria-hidden />
-              <div className="sm:hidden h-px bg-black/15 mx-3" aria-hidden />
+              <div className="hidden sm:block w-px bg-gray-200/80 flex-shrink-0 self-stretch min-h-[2rem]" aria-hidden />
+              <div className="sm:hidden h-px bg-gray-200/80 mx-4 flex-shrink-0" aria-hidden />
 
               {/* Partie droite : Dates */}
-              <div className="flex-1 min-w-0 p-3 sm:p-4">
-                <label className="block text-xs font-semibold text-black/70 mb-1.5 uppercase tracking-wide">
+              <div className="flex-1 min-w-0 px-4 py-3 sm:px-5 sm:py-3.5">
+                <label className="block text-xs font-bold text-gray-600 mb-0.5">
                   {t('accueil.searchDates')}
                 </label>
                 <input
@@ -260,18 +260,18 @@ export default function AccueilPage() {
                   onChange={(e) => setSearchQuand(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder={t('accueil.searchQuand')}
-                  className="w-full text-sm sm:text-base text-black placeholder:text-black/40 bg-transparent focus:outline-none"
+                  className="w-full text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
                 />
               </div>
 
-              {/* Bouton loupe */}
+              {/* Bouton loupe circulaire rose/rouge */}
               <button
                 type="button"
                 onClick={handleSearch}
-                className="flex items-center justify-center p-4 bg-black text-white hover:bg-black/90 transition-colors shrink-0"
+                className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-full bg-[#FF4567] text-white hover:bg-[#e63950] active:scale-95 transition-all m-2"
                 aria-label="Rechercher"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </button>
