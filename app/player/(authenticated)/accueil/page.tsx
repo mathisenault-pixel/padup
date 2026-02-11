@@ -8,9 +8,7 @@ import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 // ✅ Force dynamic rendering (pas de pre-render statique)
 // Nécessaire car supabaseBrowser accède à document.cookie
 export const dynamic = 'force-dynamic'
-import SmartSearchBar from '../components/SmartSearchBar'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
-import { getCitySuggestions } from '@/lib/cities'
 import { haversineKm, formatTravelTime, estimateMinutes, formatDistance } from '@/lib/geoUtils'
 import { getClubById } from '@/lib/data/clubs'
 
@@ -76,7 +74,6 @@ export default function AccueilPage() {
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [locationError, setLocationError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [showSearchError, setShowSearchError] = useState(false)
 
   const [clubs, setClubs] = useState<Club[]>([])
 
@@ -216,76 +213,10 @@ export default function AccueilPage() {
     setShowReservationModal(true)
   }
 
-  const handleCTAClick = () => {
-    // Lire la valeur actuelle du champ de recherche
-    const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement
-    const currentQuery = searchInput?.value || ''
-    
-    if (!currentQuery.trim()) {
-      setShowSearchError(true)
-      searchInput?.focus()
-      // Masquer le message après 3 secondes
-      setTimeout(() => setShowSearchError(false), 3000)
-      return
-    }
-    // Naviguer vers la page clubs avec le filtre
-    router.push(`/player/clubs?q=${encodeURIComponent(currentQuery)}`)
-  }
-
   return (
-    <div>
-      {/* Hero - w-screen left-0 right-0 : bord-à-bord */}
-      <section className="relative min-h-screen w-screen left-0 right-0 overflow-hidden flex items-center justify-center bg-white">
-        <div className="w-full py-20 md:py-28">
-          <div className="w-full max-w-6xl mx-auto text-center px-4">
-            <div className="inline-block mb-8 md:mb-10">
-              <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
-                Réserver un terrain n'a jamais été aussi simple
-              </span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-black mb-6 md:mb-8 leading-tight tracking-tight">
-              Votre terrain de padel.<br />En quelques secondes
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-black/60 mb-10 md:mb-12 max-w-2xl mx-auto font-light">
-              Disponibilités en temps réel, réservation sans appel ni attente.
-            </p>
-            <div className="max-w-2xl mx-auto mb-10 md:mb-12">
-              <SmartSearchBar
-                placeholder="Où souhaitez-vous jouer ?"
-                onSearch={(query) => router.push(`/player/clubs?q=${encodeURIComponent(query)}`)}
-                suggestions={[
-                  'Le Hangar Sport & Co',
-                  'Paul & Louis Sport',
-                  'ZE Padel',
-                  'QG Padel Club',
-                  ...getCitySuggestions()
-                ]}
-                storageKey="search-history-accueil"
-                compact={false}
-              />
-              {showSearchError && (
-                <p className="text-sm text-black/50 mt-2 font-light animate-fade-in">
-                  Entrez une ville ou un club
-                </p>
-              )}
-            </div>
-            <div className="max-w-2xl mx-auto mt-2 md:mt-4">
-              <button
-                type="button"
-                onClick={handleCTAClick}
-                className="w-full sm:w-auto px-10 py-4 bg-black text-white font-medium rounded-lg tracking-wide text-base hover:bg-black/90 shadow-lg hover:shadow-xl transition-all"
-              >
-                Voir les terrains disponibles
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contenu sous le hero : overflow-x pour éviter scroll horizontal */}
-      <div className="overflow-x-hidden">
-      {/* Clubs */}
-      <section className="pt-12 md:pt-16 pb-0 px-6 bg-white">
+    <div className="overflow-x-hidden">
+      {/* Clubs - première section visible */}
+      <section className="pt-14 md:pt-16 pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
@@ -498,7 +429,6 @@ export default function AccueilPage() {
           </div>
         </div>
       </section>
-      </div>
 
       {/* Modal */}
       {showReservationModal && selectedClub && (
