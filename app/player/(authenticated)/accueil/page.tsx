@@ -236,16 +236,16 @@ export default function AccueilPage() {
 
   return (
     <div className="overflow-x-hidden">
-      {/* Hero - full width edge-to-edge, aucun container sur le hero */}
+      {/* Hero - full-bleed bord-à-bord (sort du layout contraint) */}
       <section
-        className="relative w-screen min-h-screen overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen min-h-screen overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
           backgroundAttachment: 'scroll',
         }}
       >
-        <div className="w-full px-4 py-16">
-          <div className="max-w-6xl mx-auto text-center w-full">
+        <div className="w-full py-16">
+          <div className="w-full max-w-6xl mx-auto text-center px-4">
             <div className="inline-block mb-6">
               <span className="px-6 py-2.5 bg-black text-white text-xs font-medium rounded-full tracking-wide">
                 Réserver un terrain n'a jamais été aussi simple
