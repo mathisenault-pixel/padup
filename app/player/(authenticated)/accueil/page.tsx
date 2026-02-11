@@ -236,9 +236,9 @@ export default function AccueilPage() {
 
   return (
     <div>
-      {/* Hero - cadrage image OK, contenu centré */}
+      {/* Hero - w-screen left-0 right-0 : bord-à-bord, sans hack */}
       <section
-        className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
+        className="relative min-h-screen w-screen left-0 right-0 overflow-hidden flex items-center justify-center bg-cover bg-no-repeat hero-bg-position"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.5) 100%), url('${HERO_BG_IMAGE}')`,
           backgroundAttachment: 'scroll',
