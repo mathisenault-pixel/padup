@@ -54,11 +54,10 @@
 
 html,
 body {
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden; /* fallback anciens navigateurs */
-  overflow-x: clip;
 }
 
 body {
