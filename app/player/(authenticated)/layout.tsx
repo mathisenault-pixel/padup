@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import PlayerNav from './components/PlayerNav'
 import AuthStatus from './components/AuthStatus'
 
@@ -10,7 +10,8 @@ export default function PlayerAuthLayout({
 }: {
   children: React.ReactNode
 }) {
-  const router = useRouter()
+  const pathname = usePathname()
+  const isAccueil = pathname === '/player/accueil'
 
   return (
     <div className="min-h-screen bg-white">
@@ -44,16 +45,19 @@ export default function PlayerAuthLayout({
                 </svg>
               </Link>
 
-              {/* Espace club */}
-              <Link
-                href="/club-access"
-                className="hidden md:inline-flex px-4 py-2 text-[14px] font-normal tracking-wide transition-opacity hover:opacity-70"
-                style={{ color: '#000000' }}
-              >
-                Espace club
-              </Link>
+              {/* Espace club - masqué sur accueil */}
+              {!isAccueil && (
+                <Link
+                  href="/club-access"
+                  className="hidden md:inline-flex px-4 py-2 text-[14px] font-normal tracking-wide transition-opacity hover:opacity-70"
+                  style={{ color: '#000000' }}
+                >
+                  Espace club
+                </Link>
+              )}
 
-              <AuthStatus />
+              {/* Mon compte - masqué sur accueil */}
+              {!isAccueil && <AuthStatus />}
             </div>
 
           </div>
