@@ -43,14 +43,14 @@ export default function PlayerAuthLayout({
             showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
           } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
         >
-          <div className="flex items-center justify-between h-12 md:h-14">
-            <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6cm]">
+          <div className="relative flex items-center justify-between h-12 md:h-14">
+            <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6.8cm]">
               <span className="text-[1.35rem] md:text-[1.5rem] font-bold text-black">Pad&apos;Up</span>
             </Link>
-            <div className="hidden lg:flex flex-1 justify-center max-w-3xl mx-12">
+            <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
               <PlayerNav />
             </div>
-            <div className="flex items-center gap-1 md:gap-2 ml-[10cm]">
+            <div className="flex items-center gap-1 md:gap-2 ml-[17cm]">
               <Link
                 href="/club/signup"
                 className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
@@ -78,7 +78,7 @@ export default function PlayerAuthLayout({
       </header>
 
       {/* Main - padding bottom pour barre fixe mobile */}
-      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.3cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? '' : 'pt-14 md:pt-16 min-h-screen'}`}>
+      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.3cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[0.6cm]' : 'pt-14 md:pt-16 min-h-screen'}`}>
         {children}
       </main>
 
