@@ -215,7 +215,7 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-6 py-12 max-w-[1400px]">
+      <div className="container mx-auto px-6 py-12 pb-20 lg:pb-12 max-w-[1400px]">
         
         {/* Message de succès global */}
         {showSuccessMessage && (

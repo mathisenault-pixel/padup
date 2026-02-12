@@ -35,10 +35,10 @@ type Club = {
  */
 /** 4 clubs "bientôt disponibles" (cartes non cliquables) - pas de photo existante */
 const COMING_SOON_CLUBS = [
-  { name: 'Club de padel', city: 'Ouverture bientôt' },
-  { name: 'Club de padel', city: 'Ouverture bientôt' },
-  { name: 'Club de padel', city: 'Ouverture bientôt' },
-  { name: 'Club de padel', city: 'Ouverture bientôt' },
+  { name: 'Club de padel', days: 32 },
+  { name: 'Club de padel', days: 58 },
+  { name: 'Club de padel', days: 45 },
+  { name: 'Club de padel', days: 71 },
 ]
 
 const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -275,8 +275,8 @@ export default function AccueilPage() {
                 className="opacity-85 border border-black/10 rounded-lg overflow-hidden cursor-not-allowed select-none"
                 role="presentation"
               >
-                <div className="relative h-48 overflow-hidden bg-slate-200 flex items-center justify-center">
-                  <span className="text-slate-400 text-sm font-medium">—</span>
+                <div className="relative h-48 overflow-hidden bg-slate-100 flex items-center justify-center p-8">
+                  <img src="/icon.png" alt="Pad'Up" className="h-24 w-auto object-contain" />
                   <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium bg-black/70 text-white rounded-full">
                     {t('accueil.bientot')}
                   </span>
@@ -285,12 +285,8 @@ export default function AccueilPage() {
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-black mb-2">{club.name}</h3>
                   
-                  <p className="text-sm text-black/60 mb-3">
-                    {club.city}
-                  </p>
-                  
-                  <p className="text-sm text-black/50 italic">
-                    {t('accueil.ouvertureProchainement')}
+                  <p className="text-sm text-black/60 italic">
+                    {club.days}J
                   </p>
                 </div>
               </div>
@@ -365,7 +361,7 @@ export default function AccueilPage() {
       </section>
 
       {/* FAQ - COMPACT */}
-      <section className="bg-white mt-12 md:mt-16 mb-12 md:mb-16 border-t border-black/5">
+      <section className="bg-white mt-12 md:mt-16 mb-12 md:mb-20 pb-8 md:pb-12 border-t border-black/5">
         <div className="mx-auto max-w-5xl px-6 md:px-8 py-10 md:py-12">
           {/* Header */}
           <div className="text-center mb-8 max-w-2xl mx-auto">

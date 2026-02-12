@@ -26,7 +26,8 @@
     "commencerMaRecherche": "Empezar mi búsqueda",
     "searchPlaceholder": "Buscar un club o ciudad",
     "searchDates": "Fechas",
-    "searchQuand": "¿Cuándo?"
+    "searchQuand": "¿Cuándo?",
+    "searchMobilePlaceholder": "Buscar tu pista"
   },
   "nav": {
     "sInscrire": "Registrarse",

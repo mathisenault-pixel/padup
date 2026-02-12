@@ -26,7 +26,8 @@
     "commencerMaRecherche": "Start my search",
     "searchPlaceholder": "Search a club or city",
     "searchDates": "Dates",
-    "searchQuand": "When?"
+    "searchQuand": "When?",
+    "searchMobilePlaceholder": "Search for your court"
   },
   "nav": {
     "sInscrire": "Sign up",

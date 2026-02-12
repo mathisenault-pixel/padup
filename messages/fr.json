@@ -26,7 +26,8 @@
     "commencerMaRecherche": "Commencer ma recherche",
     "searchPlaceholder": "Rechercher un club ou une ville",
     "searchDates": "Dates",
-    "searchQuand": "Quand ?"
+    "searchQuand": "Quand ?",
+    "searchMobilePlaceholder": "Rechercher votre terrain"
   },
   "nav": {
     "sInscrire": "S'inscrire",

@@ -41,18 +41,41 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
       }
     : undefined
 
+  /* Mobile : barre simple cliquable → /player/clubs (recherche + filtres) */
+  if (!isDesktop) {
+    return (
+      <div className={`px-3 md:px-6 lg:px-8 mt-[0.7cm] pt-[1.1cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
+        <div className="w-full flex justify-center">
+          <button
+            type="button"
+            onClick={() => router.push('/player/clubs')}
+            data-testid="home-search-mobile"
+            className="w-full flex items-center gap-3 rounded-full border border-gray-300 bg-white px-4 py-3 font-sans text-left min-h-[2.75rem]"
+          >
+            <span className="flex-1 text-[14px] font-normal text-gray-600">
+              {t('accueil.searchMobilePlaceholder')}
+            </span>
+            <span className="flex-shrink-0 w-9 h-9 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  /* Desktop : barre complète Où | Dates | loupe */
   return (
     <div className={`px-3 md:px-6 lg:px-8 mt-[0.7cm] pt-[1.1cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
       <div className="w-full flex justify-center">
         <div
           data-testid="home-search"
           style={barStyle}
-          className={`
-            flex items-center rounded-full border border-gray-300 bg-white overflow-hidden font-sans
-            ${isDesktop ? '' : 'w-full min-h-[2rem]'}
-          `}
+          className="flex items-center rounded-full border border-gray-300 bg-white overflow-hidden font-sans"
         >
-          {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
+          {/* Partie gauche : Où */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
             <label className="block text-[12px] font-semibold text-black mb-1.5 leading-none">
               {t('accueil.searchOu')}
@@ -67,16 +90,12 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             />
           </div>
 
-          {/* Trait vertical - centré, ne touche pas le haut ni le bas */}
+          {/* Trait vertical */}
           <div className="hidden sm:flex flex-shrink-0 items-center self-stretch py-2" aria-hidden>
             <div className="w-px h-6 bg-gray-200/80" />
           </div>
-          {/* Trait horizontal mobile - centré */}
-          <div className="sm:hidden flex justify-center flex-shrink-0 py-1" aria-hidden>
-            <div className="w-12 h-px bg-gray-200/80" />
-          </div>
 
-          {/* Partie droite : Dates - texte décalé 0,4cm à droite */}
+          {/* Partie droite : Dates */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
             <label className="block text-[12px] font-semibold text-black mb-1.5 leading-none">
               {t('accueil.searchDates')}
