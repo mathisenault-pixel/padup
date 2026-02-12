@@ -50,7 +50,7 @@ export default function PlayerAuthLayout({
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
               <PlayerNav />
             </div>
-            <div className="flex items-center gap-1 md:gap-2 ml-[17cm]">
+            <div className="flex items-center gap-1 md:gap-2 ml-[17cm] lg:mr-[6cm]">
               <Link
                 href="/club/signup"
                 className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
