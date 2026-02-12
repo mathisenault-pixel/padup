@@ -34,7 +34,7 @@ export default function HeaderUserMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 py-2 w-44 bg-white rounded-xl shadow-lg border border-black/10 z-50">
+        <div className="absolute right-0 top-full mt-1 py-2 w-44 bg-white rounded-xl shadow-lg border border-black/10 z-[100]">
           <Link
             href="/login"
             onClick={() => setIsOpen(false)}

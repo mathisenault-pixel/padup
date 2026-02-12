@@ -39,8 +39,8 @@ export default function PlayerAuthLayout({
       >
         {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
         <div
-          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 overflow-hidden transition-all duration-300 ${
-            showCompactSearch ? 'max-h-0 opacity-0' : 'max-h-[6rem] md:max-h-[4rem] opacity-100'
+          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 transition-all duration-300 ${
+            showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
           } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
         >
           <div className="flex items-center justify-between h-12 md:h-14">

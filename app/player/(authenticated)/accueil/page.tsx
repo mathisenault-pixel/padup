@@ -298,7 +298,7 @@ export default function AccueilPage() {
           </div>
 
           {/* Lien Voir tout */}
-          <div className="text-center mt-10">
+          <div className="text-center mt-10 mb-[1.5cm]">
             <Link
               href="/player/clubs"
               className="text-sm text-black/60 hover:text-black underline transition-colors"
