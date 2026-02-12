@@ -4,12 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale } from '@/state/LocaleContext'
 
-const IconClubs = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-  </svg>
-)
-
 const IconTournois = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
     <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
@@ -26,7 +20,6 @@ const IconConnexion = () => (
 export default function MobileBottomBar() {
   const pathname = usePathname()
   const { t } = useLocale()
-  const isClubs = pathname === '/player/clubs' || pathname?.startsWith('/player/clubs/')
   const isTournois = pathname === '/player/tournois' || pathname?.startsWith('/player/tournois/')
   const isCompte = pathname === '/player/compte'
 
@@ -36,14 +29,6 @@ export default function MobileBottomBar() {
       style={{ height: 'calc(2.3cm + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="flex items-center justify-around h-[2.3cm] px-6">
-        <Link
-          href="/player/clubs"
-          className={`flex flex-col items-center gap-1 ${isClubs ? 'text-black' : 'text-black/50'}`}
-          style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-        >
-          <IconClubs />
-          <span className="text-xs font-light">{t('nav.clubs')}</span>
-        </Link>
         <Link
           href="/player/tournois"
           className={`flex flex-col items-center gap-1 ${isTournois ? 'text-black' : 'text-black/50'}`}
