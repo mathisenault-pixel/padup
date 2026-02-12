@@ -41,14 +41,14 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
       }
     : undefined
 
-  /* Mobile : barre simple cliquable → /player/recherche (page de recherche dédiée) */
+  /* Mobile : barre simple cliquable → /player/clubs (recherche + filtres) */
   if (!isDesktop) {
     return (
-      <div className={`px-3 md:px-6 lg:px-8 mt-0 pt-[0.2cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
+      <div className={`px-3 md:px-6 lg:px-8 mt-[0.7cm] pt-[1.1cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
         <div className="w-full flex justify-center">
           <button
             type="button"
-            onClick={() => router.push('/player/recherche')}
+            onClick={() => router.push('/player/clubs')}
             data-testid="home-search-mobile"
             className="w-full flex items-center gap-3 rounded-full border border-gray-300 bg-white px-4 py-3 font-sans text-left min-h-[2.75rem]"
           >
