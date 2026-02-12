@@ -285,6 +285,10 @@ export default function AccueilPage() {
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-black mb-2">{club.name}</h3>
                   
+                  <p className="text-sm text-black/60 mb-1">
+                    {t('accueil.ouvertureProchainement')}
+                  </p>
+                  
                   <p className="text-sm text-black/60 italic">
                     {club.days}J
                   </p>
