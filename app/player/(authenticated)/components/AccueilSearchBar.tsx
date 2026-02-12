@@ -19,7 +19,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
   return (
     <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
-      <div className="max-w-[1400px] mx-auto">
+      <div className="max-w-[778px] mx-auto">
         <div className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-all duration-300 ${compact ? 'min-h-[1.85rem] sm:min-h-0' : 'min-h-[2.75rem] sm:min-h-0'}`}>
           {/* Partie gauche : Où */}
           <div className={`flex-1 min-w-0 ${compact ? 'px-2 py-1 sm:px-2.5 sm:py-1.5' : 'px-2.5 py-2 sm:px-3.5 sm:py-2.5'}`}>
