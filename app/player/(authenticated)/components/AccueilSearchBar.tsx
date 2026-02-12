@@ -22,7 +22,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
       <div className="homeSearchOuter">
         <div
           data-testid="home-search"
-          className="homeSearchInner flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 overflow-hidden transition-all duration-300 max-lg:w-full max-lg:min-h-[2rem]"
+          className="homeSearchInner flex items-center rounded-full border border-gray-300 bg-white overflow-hidden max-lg:flex-col max-lg:items-stretch max-lg:rounded-[1.2rem] max-lg:w-full max-lg:min-h-[2rem]"
         >
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>

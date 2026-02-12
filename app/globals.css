@@ -169,19 +169,22 @@ h6 {
     justify-content: center !important;
   }
 
-  /* Taille imposée sur le conteneur visible (cm + fallback px) */
+  /* Taille imposée sur le conteneur visible .homeSearchInner */
   .homeSearchInner {
     width: 19.7cm !important;
     height: 1.5cm !important;
-    width: 744px !important; /* fallback fiable (19.7cm ≈ 744px) */
-    height: 57px !important; /* fallback fiable (1.5cm ≈ 57px) */
-    display: flex !important;
-    align-items: center !important;
+    min-width: 19.7cm !important;
+    max-width: 19.7cm !important;
+    min-height: 1.5cm !important;
+    max-height: 1.5cm !important;
+    padding: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
   }
 
-  /* Taille imposée sur l'input réel */
   .homeSearchInner input {
-    width: 100% !important;
     height: 100% !important;
+    width: 100% !important;
   }
 }
