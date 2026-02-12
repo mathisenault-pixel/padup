@@ -20,7 +20,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   return (
     <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
       <div className="w-[19.7cm] max-w-full mx-auto">
-        <div className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 transition-all duration-300 min-h-[1.5cm] sm:h-[1.5cm]`}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 w-full max-w-[19.7cm] h-[1.5cm] overflow-hidden transition-all duration-300">
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
             <label className="block font-bold text-gray-600 text-[12px] mb-1.5 leading-none">
