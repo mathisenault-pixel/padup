@@ -39,7 +39,7 @@ export default function PlayerAuthLayout({
       >
         {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
         <div
-          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-[0.3cm] transition-all duration-300 ${
+          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-[0.7cm] transition-all duration-300 ${
             showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
           } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
         >
@@ -50,7 +50,7 @@ export default function PlayerAuthLayout({
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
               <PlayerNav />
             </div>
-            <div className="flex items-center gap-1 md:gap-2 ml-[17cm] lg:translate-x-[10cm]">
+            <div className="flex items-center gap-1 md:gap-2 ml-[17cm] lg:translate-x-[8cm]">
               <Link
                 href="/club/signup"
                 className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
