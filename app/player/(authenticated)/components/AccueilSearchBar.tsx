@@ -95,7 +95,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
           <button
             type="button"
             onClick={handleSearch}
-            className={`flex items-center justify-center shrink-0 rounded-full bg-[#FF4567] text-white hover:bg-[#e63950] active:scale-95 transition-all ${compact ? 'w-5 h-5 sm:w-6 sm:h-6 m-1' : 'w-7 h-7 sm:w-8 sm:h-8 m-1.5'}`}
+            className={`flex items-center justify-center shrink-0 rounded-full bg-[#1e3a5f] text-white hover:bg-[#152a47] active:scale-95 transition-all -ml-[0.7cm] ${compact ? 'w-5 h-5 sm:w-6 sm:h-6 m-1' : 'w-7 h-7 sm:w-8 sm:h-8 m-1.5'}`}
             aria-label="Rechercher"
           >
             <svg className={compact ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
