@@ -50,13 +50,15 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             type="button"
             onClick={() => router.push('/player/clubs')}
             data-testid="home-search-mobile"
-            className="w-full flex items-center justify-center gap-2 bg-transparent font-sans min-h-[2.75rem]"
+            className="w-full flex items-center gap-3 rounded-full border border-gray-300 bg-white px-4 py-3 font-sans text-left min-h-[2.75rem]"
           >
-            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className="text-[14px] font-normal text-gray-600">
+            <span className="flex-1 text-[14px] font-normal text-gray-600">
               {t('accueil.searchMobilePlaceholder')}
+            </span>
+            <span className="flex-shrink-0 w-9 h-9 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </span>
           </button>
         </div>
