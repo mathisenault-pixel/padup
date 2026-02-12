@@ -275,8 +275,8 @@ export default function AccueilPage() {
                 className="opacity-85 border border-black/10 rounded-lg overflow-hidden cursor-not-allowed select-none"
                 role="presentation"
               >
-                <div className="relative h-48 overflow-hidden bg-slate-100 flex items-center justify-center p-8">
-                  <img src="/icon.png" alt="Pad'Up" className="h-24 w-auto object-contain" />
+                <div className="relative h-48 overflow-hidden bg-slate-200 flex items-center justify-center">
+                  <span className="text-slate-400 text-sm font-medium">—</span>
                   <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium bg-black/70 text-white rounded-full">
                     {t('accueil.bientot')}
                   </span>
