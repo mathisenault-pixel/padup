@@ -163,12 +163,21 @@ export default function SmartSearchBar({
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <div className={`relative bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border ${
-        isFocused ? 'border-slate-300' : 'border-slate-200'
-      }`}>
-        <div className={`flex items-center gap-3 ${compact ? 'px-4' : 'px-6'}`}>
-          <svg className={`${compact ? 'w-5 h-5' : 'w-6 h-6'} text-gray-400 flex-shrink-0`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <div className={`relative bg-white border transition-all ${
+        isFocused ? 'border-black shadow-lg' : 'border-black/10 shadow-md'
+      }`}
+      style={{ 
+        borderRadius: '12px',
+        transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)'
+      }}>
+        <div className={`flex items-center gap-3 ${compact ? 'px-5' : 'px-6'}`}>
+          <svg className={`${compact ? 'w-5 h-5' : 'w-5 h-5'} flex-shrink-0 ${isFocused ? 'text-black' : 'text-black/40'}`} 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24"
+               strokeWidth="1.5"
+               style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             ref={inputRef}
@@ -178,16 +187,15 @@ export default function SmartSearchBar({
             onChange={(e) => {
               setQuery(e.target.value)
               setSelectedIndex(-1)
-              setShowDropdown(true) // Toujours afficher le dropdown quand on tape
+              setShowDropdown(true)
             }}
             onFocus={() => {
               setIsFocused(true)
-              if (history.length > 0 || suggestions.length > 0) {
-                setShowDropdown(true)
-              }
+              setShowDropdown(true) // Toujours afficher au focus
             }}
             onKeyDown={handleKeyDown}
-            className={`flex-1 ${compact ? 'py-3 text-base' : 'py-4 text-lg'} focus:outline-none focus:ring-0 focus:ring-offset-0 bg-transparent placeholder:text-gray-400`}
+            className={`flex-1 ${compact ? 'py-3.5 text-base' : 'py-4 text-base'} focus:outline-none bg-transparent placeholder:text-black/40 text-black font-light`}
+            style={{ fontSize: '16px' }}
           />
           {query && (
             <button
@@ -196,21 +204,28 @@ export default function SmartSearchBar({
                 setSelectedIndex(-1)
                 inputRef.current?.focus()
               }}
-              className={`flex-shrink-0 ${compact ? 'w-7 h-7' : 'w-8 h-8'} bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-all`}
+              className={`flex-shrink-0 ${compact ? 'w-7 h-7' : 'w-8 h-8'} bg-black/5 hover:bg-black/10 rounded-full flex items-center justify-center`}
+              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
             >
-              <svg className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-gray-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg className={`${compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-black/60`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           )}
         </div>
       </div>
 
-      {/* Dropdown compact avec historique et suggestions */}
+      {/* Dropdown élégant avec suggestions */}
       {showDropdown && allSuggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-fade-in">
-          {/* Liste des suggestions - Affiche 4 suggestions à la fois */}
-          <div className="max-h-[220px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div 
+          className="absolute top-full left-0 right-0 mt-3 bg-white border border-black/10 overflow-hidden z-50 animate-fade-in"
+          style={{ 
+            borderRadius: '12px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+          }}
+        >
+          {/* Liste des suggestions */}
+          <div className="max-h-[280px] overflow-y-auto">
             {allSuggestions.map((suggestion, index) => (
               <button
                 key={`${suggestion.type}-${index}`}
@@ -221,44 +236,56 @@ export default function SmartSearchBar({
                   handleSearch(suggestion.text)
                 }}
                 onMouseEnter={() => setSelectedIndex(index)}
-                className={`w-full flex items-center gap-3 px-4 py-3 transition-all group text-left ${
+                className={`w-full flex items-center gap-4 px-5 py-3.5 text-left group ${
                   selectedIndex === index 
-                    ? 'bg-slate-50' 
-                    : 'hover:bg-slate-50'
+                    ? 'bg-black/5' 
+                    : 'hover:bg-black/5'
                 }`}
+                style={{ transition: 'all 800ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
-                <span className="text-lg flex-shrink-0">{suggestion.icon}</span>
+                <div className="w-2 h-2 rounded-full bg-black/20 flex-shrink-0"></div>
                 <div className="flex-1 min-w-0">
-                  <p className={`font-semibold transition-colors truncate text-sm ${
+                  <p className={`font-light truncate text-[15px] ${
                     selectedIndex === index
-                      ? 'text-slate-900'
-                      : 'text-gray-900 group-hover:text-slate-900'
-                  }`}>
+                      ? 'text-black'
+                      : 'text-black/70'
+                  }`}
+                  style={{ transition: 'all 800ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
                     {suggestion.text}
                   </p>
+                  {suggestion.type === 'history' && (
+                    <p className="text-xs text-black/40 font-light mt-0.5">Recherche récente</p>
+                  )}
                 </div>
-                <svg className={`w-4 h-4 transition-colors flex-shrink-0 ${
-                  selectedIndex === index
-                    ? 'text-slate-900'
-                    : 'text-gray-400 group-hover:text-slate-900'
-                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg 
+                  className={`w-4 h-4 flex-shrink-0 ${
+                    selectedIndex === index
+                      ? 'text-black'
+                      : 'text-black/20'
+                  }`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  style={{ transition: 'all 800ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             ))}
           </div>
 
-          {/* Footer minimaliste */}
+          {/* Footer pour effacer l'historique */}
           {history.length > 0 && (
-            <div className="px-4 py-2 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-xs text-gray-500">Historique de recherche</span>
+            <div className="px-5 py-3 bg-black/[0.02] border-t border-black/5 flex items-center justify-between">
+              <span className="text-xs text-black/40 font-light">Historique</span>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   setHistory([])
                   localStorage.removeItem(storageKey)
                 }}
-                className="text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+                className="text-xs font-light text-black/60 hover:text-black"
+                style={{ transition: 'all 800ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
                 Effacer
               </button>
