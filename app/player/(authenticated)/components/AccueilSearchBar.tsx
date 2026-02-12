@@ -21,8 +21,8 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
     <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
       <div className="max-w-[778px] mx-auto">
         <div className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-all duration-300 ${compact ? 'min-h-[1.85rem] sm:min-h-0' : 'min-h-[2.75rem] sm:min-h-0'}`}>
-          {/* Partie gauche : Où */}
-          <div className={`flex-1 min-w-0 ${compact ? 'px-2 py-1 sm:px-2.5 sm:py-1.5' : 'px-2.5 py-2 sm:px-3.5 sm:py-2.5'}`}>
+          {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
+          <div className={`flex-1 min-w-0 pl-[0.8cm] ${compact ? 'pr-2 py-1 sm:pr-2.5 sm:py-1.5' : 'pr-2.5 py-2 sm:pr-3.5 sm:py-2.5'}`}>
             <label className={`block font-bold text-gray-600 ${compact ? 'text-[8px] mb-0' : 'text-[10px] mb-0.5'}`}>
               {t('accueil.searchOu')}
             </label>
@@ -36,9 +36,14 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             />
           </div>
 
-          {/* Trait vertical */}
-          <div className="hidden sm:block w-px bg-gray-200/80 flex-shrink-0 self-stretch min-h-[1.25rem]" aria-hidden />
-          <div className="sm:hidden h-px bg-gray-200/80 mx-2.5 flex-shrink-0" aria-hidden />
+          {/* Trait vertical - centré, ne touche pas le haut ni le bas */}
+          <div className="hidden sm:flex flex-shrink-0 items-center self-stretch py-2" aria-hidden>
+            <div className="w-px h-6 bg-gray-200/80" />
+          </div>
+          {/* Trait horizontal mobile - centré */}
+          <div className="sm:hidden flex justify-center flex-shrink-0 py-1" aria-hidden>
+            <div className="w-12 h-px bg-gray-200/80" />
+          </div>
 
           {/* Partie droite : Dates */}
           <div className={`flex-1 min-w-0 ${compact ? 'px-2 py-1 sm:px-2.5 sm:py-1.5' : 'px-2.5 py-2 sm:px-3.5 sm:py-2.5'}`}>
