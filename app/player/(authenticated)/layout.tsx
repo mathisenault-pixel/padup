@@ -35,7 +35,7 @@ export default function PlayerAuthLayout({
     <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fond gris ; au scroll : onglets masqués, barre de recherche réduite ÷1,5 */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-[0.8cm]' : ''}`}
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-[1.3cm]' : ''}`}
       >
         {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
         <div
@@ -44,13 +44,13 @@ export default function PlayerAuthLayout({
           } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
         >
           <div className="flex items-center justify-between h-12 md:h-14">
-            <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[5cm]">
+            <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6cm]">
               <span className="text-[1.35rem] md:text-[1.5rem] font-bold text-black">Pad&apos;Up</span>
             </Link>
             <div className="hidden lg:flex flex-1 justify-center max-w-3xl mx-12">
               <PlayerNav />
             </div>
-            <div className="flex items-center gap-1 md:gap-2 ml-[6cm]">
+            <div className="flex items-center gap-1 md:gap-2 ml-[10cm]">
               <Link
                 href="/club/signup"
                 className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
