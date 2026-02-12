@@ -35,7 +35,7 @@ export default function PlayerAuthLayout({
     <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fond gris ; au scroll : onglets masqués, barre de recherche réduite ÷1,5 */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-[1.3cm]' : ''}`}
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-[0.5cm]' : ''}`}
       >
         {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
         <div
