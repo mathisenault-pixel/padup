@@ -33,9 +33,9 @@ export default function MobileBottomBar() {
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white border-t border-black/10"
-      style={{ height: 'calc(2.3cm + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom)' }}
+      style={{ height: 'calc(1.9cm + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <div className="flex items-center justify-around h-[2.3cm] px-6">
+      <div className="flex items-center justify-around h-[1.9cm] px-6">
         <Link
           href="/player/accueil"
           className={`flex flex-col items-center gap-1 ${isClubs ? 'text-black' : 'text-black/50'}`}
