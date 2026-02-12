@@ -35,10 +35,10 @@ type Club = {
  */
 /** 4 clubs "bientôt disponibles" (cartes non cliquables) - pas de photo existante */
 const COMING_SOON_CLUBS = [
-  { name: 'Club de padel', days: 32 },
-  { name: 'Club de padel', days: 58 },
-  { name: 'Club de padel', days: 45 },
-  { name: 'Club de padel', days: 71 },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
 ]
 
 const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -216,7 +216,7 @@ export default function AccueilPage() {
   return (
     <div className="overflow-x-hidden">
       {/* Clubs - header accueil = logo + onglets + barre de recherche ; puis 1.5cm + 2.8cm ou 2.8cm */}
-      <section className="pt-[calc(10rem+1.5cm+2.8cm)] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-6 bg-white">
+      <section className="pt-[calc(10rem+1.5cm+2.8cm-3cm)] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
@@ -285,12 +285,8 @@ export default function AccueilPage() {
                 <div className="p-4">
                   <h3 className="text-base font-semibold text-black mb-2">{club.name}</h3>
                   
-                  <p className="text-sm text-black/60 mb-1">
-                    {t('accueil.ouvertureProchainement')}
-                  </p>
-                  
                   <p className="text-sm text-black/60 italic">
-                    {club.days}J
+                    {t('accueil.ouvertureProchainement')}
                   </p>
                 </div>
               </div>
