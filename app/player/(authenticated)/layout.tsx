@@ -35,11 +35,11 @@ export default function PlayerAuthLayout({
     <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fond gris ; au scroll : onglets masqués, barre de recherche réduite ÷1,5 */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-[0.5cm]' : ''}`}
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-0' : ''}`}
       >
         {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
         <div
-          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-[0.7cm] transition-all duration-300 ${
+          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-0 md:pt-[0.7cm] transition-all duration-300 ${
             showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
           } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
         >
