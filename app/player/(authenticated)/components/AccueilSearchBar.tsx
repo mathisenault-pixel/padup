@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from '@/state/LocaleContext'
 
@@ -9,6 +9,15 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   const { t } = useLocale()
   const [searchOu, setSearchOu] = useState('')
   const [searchQuand, setSearchQuand] = useState('')
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const handler = () => setIsDesktop(mq.matches)
+    handler()
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -17,22 +26,31 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
     router.push(`/player/clubs${params.toString() ? `?${params.toString()}` : ''}`)
   }
 
+  /* 19.7cm ≈ 744px, 1.5cm ≈ 57px à 96dpi - inline styles = priorité max, impossible à écraser */
+  const barStyle = isDesktop
+    ? {
+        width: 744,
+        minWidth: 744,
+        maxWidth: 744,
+        height: 57,
+        minHeight: 57,
+        maxHeight: 57,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        boxSizing: 'border-box',
+      }
+    : undefined
+
   return (
     <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
-      <div className="homeSearchOuter">
+      <div className="w-full flex justify-center">
         <div
           data-testid="home-search"
-          className="
-            homeSearchInner
-            mx-auto
-            flex items-center
-            rounded-full border border-gray-300 bg-white
-            w-full
-            lg:w-[19.7cm] lg:h-[1.5cm] lg:min-w-[19.7cm] lg:max-w-[19.7cm]
-            lg:min-h-[1.5cm] lg:max-h-[1.5cm]
-            lg:p-0
-            overflow-hidden
-          "
+          style={barStyle}
+          className={`
+            flex items-center rounded-full border border-gray-300 bg-white overflow-hidden
+            ${isDesktop ? '' : 'w-full min-h-[2rem]'}
+          `}
         >
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
