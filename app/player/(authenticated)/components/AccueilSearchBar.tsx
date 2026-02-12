@@ -90,8 +90,8 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             <span className="flex-1 text-[15px] font-light text-black/50">
               {t('accueil.searchMobilePlaceholder')}
             </span>
-            <span className="flex-shrink-0 w-9 h-9 rounded-full bg-black text-white flex items-center justify-center">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <span className="flex-shrink-0 w-9 h-9 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </span>
@@ -168,11 +168,10 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             <button
               type="button"
               onClick={handleSearch}
-              className={`flex items-center justify-center shrink-0 rounded-full bg-black text-white hover:bg-black/80 active:scale-95 origin-center ${compact ? 'w-5 h-5 sm:w-6 sm:h-6 m-1' : 'w-7 h-7 sm:w-8 sm:h-8 m-1.5'} lg:-translate-x-[0.7cm] lg:scale-[1.385]`}
-              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+              className={`flex items-center justify-center shrink-0 rounded-full bg-[#1e3a5f] text-white hover:bg-[#152a47] active:scale-95 transition-all origin-center ${compact ? 'w-5 h-5 sm:w-6 sm:h-6 m-1' : 'w-7 h-7 sm:w-8 sm:h-8 m-1.5'} lg:-translate-x-[0.7cm] lg:scale-[1.385]`}
               aria-label="Rechercher"
             >
-              <svg className={compact ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <svg className={compact ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
