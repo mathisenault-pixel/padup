@@ -59,7 +59,7 @@ export default function PlayerAuthLayout({
               </Link>
               <Link 
                 href="/player/messages" 
-                className="lg:hidden px-2.5 py-2.5 text-black/60 hover:text-black bg-black/5 rounded-lg hover:bg-black/10"
+                className="lg:hidden px-2.5 py-2.5 text-black/60 hover:text-black bg-black/5 rounded-full hover:bg-black/10"
                 style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
