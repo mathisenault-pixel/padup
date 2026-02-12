@@ -54,7 +54,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
         >
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-            <label className="block text-[12px] font-semibold text-gray-600 mb-1.5 leading-none">
+            <label className="block text-[12px] font-semibold text-black mb-1.5 leading-none">
               {t('accueil.searchOu')}
             </label>
             <input
@@ -63,7 +63,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchOu(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchPlaceholder')}
-              className="w-full h-full text-[14px] font-normal text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full h-full text-[14px] font-normal text-gray-700 placeholder:text-gray-600 bg-transparent focus:outline-none"
             />
           </div>
 
@@ -78,7 +78,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
           {/* Partie droite : Dates - texte décalé 0,4cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-            <label className="block text-[12px] font-semibold text-gray-600 mb-1.5 leading-none">
+            <label className="block text-[12px] font-semibold text-black mb-1.5 leading-none">
               {t('accueil.searchDates')}
             </label>
             <input
@@ -87,7 +87,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchQuand(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchQuand')}
-              className="w-full h-full text-[14px] font-normal text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full h-full text-[14px] font-normal text-gray-700 placeholder:text-gray-600 bg-transparent focus:outline-none"
             />
           </div>
 
