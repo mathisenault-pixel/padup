@@ -23,6 +23,7 @@
     "annuler": "Annuler",
     "confirmer": "Confirmer",
     "searchOu": "Où",
+    "commencerMaRecherche": "Commencer ma recherche",
     "searchPlaceholder": "Rechercher un club ou une ville",
     "searchDates": "Dates",
     "searchQuand": "Quand ?"
@@ -30,6 +31,7 @@
   "nav": {
     "sInscrire": "S'inscrire",
     "seConnecter": "Se connecter",
+    "connexion": "Connexion",
     "accueil": "Accueil",
     "mesReservations": "Mes réservations",
     "clubs": "Clubs",

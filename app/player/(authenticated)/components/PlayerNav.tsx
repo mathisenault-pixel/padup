@@ -53,7 +53,7 @@ export default function PlayerNav() {
             >
               <span className={active ? 'text-black' : 'text-black/70'}>{item.icon}</span>
               <span className="text-[11px] font-medium">{t(item.labelKey)}</span>
-              {active && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-black rounded-full" />}
+              {active && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-3 bg-black rounded-full" />}
             </Link>
           )
         })}
@@ -69,7 +69,7 @@ export default function PlayerNav() {
               href={item.href}
               className={`
                 relative px-4 py-2.5 text-[15px] font-normal whitespace-nowrap tracking-wide transition-opacity hover:opacity-70
-                after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[4.5px] 
+                after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[10px] 
                 after:bg-black after:transition-opacity
                 ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
                 hover:after:!opacity-100
