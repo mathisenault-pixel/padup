@@ -20,10 +20,10 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   return (
     <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
       <div className="max-w-[778px] mx-auto">
-        <div className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-all duration-300 ${compact ? 'min-h-[1.85rem] sm:min-h-0' : 'min-h-[2.75rem] sm:min-h-0'}`}>
+        <div className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 transition-all duration-300 ${compact ? 'min-h-[1.85rem] sm:min-h-0' : 'min-h-[2.75rem] sm:min-h-0'}`}>
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 pl-[0.8cm] ${compact ? 'pr-2 py-1 sm:pr-2.5 sm:py-1.5' : 'pr-2.5 py-2 sm:pr-3.5 sm:py-2.5'}`}>
-            <label className="block font-bold text-gray-600 text-[10px] mb-0.5">
+            <label className="block font-bold text-gray-600 text-[15px] mb-0.5">
               {t('accueil.searchOu')}
             </label>
             <input
@@ -32,7 +32,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchOu(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchPlaceholder')}
-              className="w-full text-[10px] text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full text-[15px] text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
 
@@ -47,7 +47,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
           {/* Partie droite : Dates - texte décalé 0,4cm à droite */}
           <div className={`flex-1 min-w-0 pl-[0.4cm] ${compact ? 'pr-2 py-1 sm:pr-2.5 sm:py-1.5' : 'pr-2.5 py-2 sm:pr-3.5 sm:py-2.5'}`}>
-            <label className="block font-bold text-gray-600 text-[10px] mb-0.5">
+            <label className="block font-bold text-gray-600 text-[15px] mb-0.5">
               {t('accueil.searchDates')}
             </label>
             <input
@@ -56,7 +56,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchQuand(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchQuand')}
-              className="w-full text-[10px] text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full text-[15px] text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
 
