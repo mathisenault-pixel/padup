@@ -36,13 +36,13 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             />
           </div>
 
-          {/* Trait vertical - centré, hauteur limitée */}
+          {/* Trait vertical - centré, hauteur limitée (×2 largeur) */}
           <div className="hidden sm:flex flex-shrink-0 items-center" aria-hidden>
-            <div className="w-px h-6 bg-gray-200/80" />
+            <div className="w-[2px] h-6 bg-gray-200/80" />
           </div>
-          {/* Trait horizontal mobile - centré */}
+          {/* Trait horizontal mobile - centré (×2 épaisseur) */}
           <div className="sm:hidden flex justify-center flex-shrink-0 py-1" aria-hidden>
-            <div className="w-12 h-px bg-gray-200/80" />
+            <div className="w-12 h-[2px] bg-gray-200/80" />
           </div>
 
           {/* Partie droite : Dates */}
