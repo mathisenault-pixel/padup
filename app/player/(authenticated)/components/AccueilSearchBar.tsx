@@ -29,12 +29,12 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
   const barStyle: CSSProperties | undefined = isDesktop
     ? {
-        width: '28cm',
-        height: '2cm',
-        minWidth: '28cm',
-        maxWidth: '28cm',
-        minHeight: '2cm',
-        maxHeight: '2cm',
+        width: '19.7cm',
+        height: '1.5cm',
+        minWidth: '19.7cm',
+        maxWidth: '19.7cm',
+        minHeight: '1.5cm',
+        maxHeight: '1.5cm',
         boxSizing: 'border-box',
         marginLeft: 'auto',
         marginRight: 'auto',
