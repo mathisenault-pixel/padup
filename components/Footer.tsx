@@ -2,10 +2,13 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { useLocale } from "@/state/LocaleContext"
 
 export default function Footer() {
   const { t } = useLocale()
+  const pathname = usePathname()
+  const isPlayerPage = pathname?.startsWith('/player')
 
   return (
     <footer className="bg-[#F0F0F0] text-black">

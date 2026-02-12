@@ -50,14 +50,18 @@ export default function PlayerAuthLayout({
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
               <PlayerNav />
             </div>
-            <div className="flex items-center gap-1 md:gap-2 ml-[17cm] lg:translate-x-[8cm]">
+            <div className="flex items-center gap-2 ml-[17cm] lg:translate-x-[8cm]">
               <Link
                 href="/club/signup"
                 className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
               >
                 Devenir visible
               </Link>
-              <Link href="/player/messages" className="lg:hidden px-2.5 py-2.5 text-black/60 hover:text-black transition-colors">
+              <Link 
+                href="/player/messages" 
+                className="lg:hidden px-2.5 py-2.5 text-black/60 hover:text-black bg-black/5 rounded-lg hover:bg-black/10"
+                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+              >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                 </svg>
