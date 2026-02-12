@@ -63,7 +63,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchOu(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchPlaceholder')}
-              className="w-full h-full text-[12px] font-normal text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full h-full text-[14px] font-normal text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
 
@@ -87,7 +87,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchQuand(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchQuand')}
-              className="w-full h-full text-[12px] font-normal text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full h-full text-[14px] font-normal text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
 
@@ -95,7 +95,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
           <button
             type="button"
             onClick={handleSearch}
-            className={`flex items-center justify-center shrink-0 rounded-full bg-[#1e3a5f] text-white hover:bg-[#152a47] active:scale-95 transition-all origin-center ${compact ? 'w-5 h-5 sm:w-6 sm:h-6 m-1' : 'w-7 h-7 sm:w-8 sm:h-8 m-1.5'} lg:-translate-x-[0.7cm] lg:scale-[1.8]`}
+            className={`flex items-center justify-center shrink-0 rounded-full bg-[#1e3a5f] text-white hover:bg-[#152a47] active:scale-95 transition-all origin-center ${compact ? 'w-5 h-5 sm:w-6 sm:h-6 m-1' : 'w-7 h-7 sm:w-8 sm:h-8 m-1.5'} lg:-translate-x-[0.7cm] lg:scale-[1.385]`}
             aria-label="Rechercher"
           >
             <svg className={compact ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5'} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
