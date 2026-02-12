@@ -216,7 +216,7 @@ export default function AccueilPage() {
   return (
     <div className="overflow-x-hidden">
       {/* Clubs - header accueil = logo + onglets + barre de recherche ; puis 1.5cm + 2.8cm ou 2.8cm */}
-      <section className="pt-[3cm] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-[calc(1.5rem+0.2cm)] md:px-6 bg-white">
+      <section className="pt-[2.6cm] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-[calc(1.5rem+0.2cm)] md:px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
