@@ -28,7 +28,8 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2.5 text-black/70 hover:text-black transition-colors"
+        className="p-2.5 text-black/70 hover:text-black bg-black/5 rounded-full hover:bg-black/10 focus:outline-none"
+        style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
         aria-label="Changer la langue"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
