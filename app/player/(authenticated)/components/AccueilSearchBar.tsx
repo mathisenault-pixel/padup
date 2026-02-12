@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from '@/state/LocaleContext'
 
@@ -9,6 +9,15 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   const { t } = useLocale()
   const [searchOu, setSearchOu] = useState('')
   const [searchQuand, setSearchQuand] = useState('')
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const handler = () => setIsDesktop(mq.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -19,10 +28,11 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
   return (
     <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
-      <div className="w-full max-w-full mx-auto">
+      <div className="w-full flex justify-center">
         <div
           data-testid="home-search"
-          className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 w-full min-h-[2rem] overflow-hidden transition-all duration-300"
+          style={isDesktop === true ? { width: '19.7cm', height: '1.5cm', marginLeft: 'auto', marginRight: 'auto' } : undefined}
+          className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 overflow-hidden transition-all duration-300 ${isDesktop !== true ? 'w-full min-h-[2rem]' : ''}`}
         >
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
@@ -35,6 +45,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchOu(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchPlaceholder')}
+              style={isDesktop === true ? { width: '100%', height: '100%' } : undefined}
               className="w-full text-[12px] text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
@@ -59,6 +70,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchQuand(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchQuand')}
+              style={isDesktop === true ? { width: '100%', height: '100%' } : undefined}
               className="w-full text-[12px] text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>

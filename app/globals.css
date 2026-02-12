@@ -160,21 +160,3 @@ h6 {
   background-color: #000000;
   color: #ffffff;
 }
-
-/* Barre de recherche accueil - dimensions exactes sur desktop uniquement */
-@media (min-width: 1024px) {
-  [data-testid="home-search"] {
-    width: 19.7cm !important;
-    height: 1.5cm !important;
-    min-width: 19.7cm !important;
-    max-width: 19.7cm !important;
-    min-height: 1.5cm !important;
-    max-height: 1.5cm !important;
-    display: flex !important;
-    align-items: center !important;
-  }
-  [data-testid="home-search"] input {
-    height: 100% !important;
-    width: 100% !important;
-  }
-}
