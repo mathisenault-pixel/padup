@@ -42,7 +42,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
     : undefined
 
   return (
-    <div className={`px-3 md:px-6 lg:px-8 pt-[1.1cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
+    <div className={`px-3 md:px-6 lg:px-8 pt-[1.8cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
       <div className="w-full flex justify-center">
         <div
           data-testid="home-search"
