@@ -35,7 +35,7 @@ export default function PageHeader({
   activeFiltersCount = 0
 }: PageHeaderProps) {
   return (
-    <div className="mb-8 md:mb-12">
+    <div className="hidden md:block mb-8 md:mb-12">
       {/* Titre + Sous-titre centrés */}
       <div className="text-center mb-6">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">

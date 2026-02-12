@@ -11,7 +11,9 @@ export default function Footer() {
   const isPlayerPage = pathname?.startsWith('/player')
 
   return (
-    <footer className="bg-[#F0F0F0] text-black">
+    <footer
+      className={`bg-[#F0F0F0] text-black ${isPlayerPage ? 'pb-[calc(2.8cm+env(safe-area-inset-bottom,0px))] lg:pb-0' : ''}`}
+    >
       {/* CTA band */}
       <div className="border-b border-slate-200">
         <div className="mx-auto max-w-6xl px-6 py-10">
