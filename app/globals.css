@@ -160,3 +160,28 @@ h6 {
   background-color: #000000;
   color: #ffffff;
 }
+
+/* Barre de recherche accueil - dimensions exactes desktop uniquement (≥1024px) */
+@media (min-width: 1024px) {
+  .homeSearchOuter {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  /* Taille imposée sur le conteneur visible (cm + fallback px) */
+  .homeSearchInner {
+    width: 19.7cm !important;
+    height: 1.5cm !important;
+    width: 744px !important; /* fallback fiable (19.7cm ≈ 744px) */
+    height: 57px !important; /* fallback fiable (1.5cm ≈ 57px) */
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Taille imposée sur l'input réel */
+  .homeSearchInner input {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
