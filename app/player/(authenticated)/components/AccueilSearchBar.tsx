@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { CSSProperties } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale } from '@/state/LocaleContext'
 
@@ -26,18 +27,17 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
     router.push(`/player/clubs${params.toString() ? `?${params.toString()}` : ''}`)
   }
 
-  /* 19.7cm ≈ 744px, 1.5cm ≈ 57px à 96dpi - inline styles = priorité max, impossible à écraser */
-  const barStyle = isDesktop
+  const barStyle: CSSProperties | undefined = isDesktop
     ? {
-        width: 744,
-        minWidth: 744,
-        maxWidth: 744,
-        height: 57,
-        minHeight: 57,
-        maxHeight: 57,
+        width: '19.7cm',
+        height: '1.5cm',
+        minWidth: '19.7cm',
+        maxWidth: '19.7cm',
+        minHeight: '1.5cm',
+        maxHeight: '1.5cm',
+        boxSizing: 'border-box',
         marginLeft: 'auto',
         marginRight: 'auto',
-        boxSizing: 'border-box',
       }
     : undefined
 
