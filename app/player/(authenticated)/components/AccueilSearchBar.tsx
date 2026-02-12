@@ -23,7 +23,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
         <div className={`flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-[1.2rem] sm:rounded-full border border-gray-300 transition-all duration-300 min-h-[1.5cm] sm:h-[1.5cm]`}>
           {/* Partie gauche : Où - texte décalé 0,8cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-            <label className="block font-bold text-gray-600 text-[12px] mb-0 leading-none">
+            <label className="block font-bold text-gray-600 text-[12px] mb-1.5 leading-none">
               {t('accueil.searchOu')}
             </label>
             <input
@@ -47,7 +47,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
           {/* Partie droite : Dates - texte décalé 0,4cm à droite */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-            <label className="block font-bold text-gray-600 text-[12px] mb-0 leading-none">
+            <label className="block font-bold text-gray-600 text-[12px] mb-1.5 leading-none">
               {t('accueil.searchDates')}
             </label>
             <input
