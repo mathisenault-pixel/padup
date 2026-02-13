@@ -35,57 +35,57 @@ export default function PlayerAuthLayout({
     <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fond gris ; au scroll : onglets masqués, barre de recherche réduite ÷1,5 */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] transition-all duration-300 ${isAccueil ? 'pb-0' : ''}`}
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] border-b border-black/10 transition-all duration-300`}
       >
-        {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
-        <div
-          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-0 md:pt-[0.7cm] transition-all duration-300 ${
-            showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
-          } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
-        >
-          <div className="relative flex items-center justify-between h-12 md:h-14">
-            <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6.8cm]">
-              <span className="text-[1.35rem] md:text-[1.5rem] font-bold text-black">Pad&apos;Up</span>
-            </Link>
-            <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
-              <PlayerNav />
+        {/* Zone header avec centrage vertical pour mobile accueil */}
+        <div className={`${isAccueil ? 'h-[140px] md:h-auto' : 'h-auto'} flex flex-col`}>
+          {/* Logo + nav + actions - masqués sur mobile accueil (uniquement barre de recherche) ; masqués au scroll */}
+          <div
+            className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-0 md:pt-[0.7cm] transition-all duration-300 ${
+              showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
+            } ${isAccueil ? 'lg:opacity-100 max-lg:hidden' : ''}`}
+          >
+            <div className="relative flex items-center justify-between h-12 md:h-14">
+              <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6.8cm]">
+                <span className="text-[1.35rem] md:text-[1.5rem] font-bold text-black">Pad&apos;Up</span>
+              </Link>
+              <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
+                <PlayerNav />
+              </div>
+              <div className="flex items-center gap-2 ml-[17cm] lg:translate-x-[8cm]">
+                <Link
+                  href="/club/signup"
+                  className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
+                >
+                  Devenir visible
+                </Link>
+                <Link 
+                  href="/player/messages" 
+                  className="lg:hidden px-2.5 py-2.5 text-black/60 hover:text-black bg-black/5 rounded-full hover:bg-black/10"
+                  style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                  </svg>
+                </Link>
+                <LanguageSwitcher />
+                <HeaderUserMenu />
+              </div>
             </div>
-            <div className="flex items-center gap-2 ml-[17cm] lg:translate-x-[8cm]">
-              <Link
-                href="/club/signup"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
-              >
-                Devenir visible
-              </Link>
-              <Link 
-                href="/player/messages" 
-                className="lg:hidden px-2.5 py-2.5 text-black/60 hover:text-black bg-black/5 rounded-full hover:bg-black/10"
-                style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </Link>
-              <LanguageSwitcher />
-              <HeaderUserMenu />
+            <div className="lg:hidden px-2.5 py-2.5 overflow-x-auto">
+              <div className="min-w-max">
+                <PlayerNav />
+              </div>
             </div>
           </div>
-          <div className="lg:hidden px-2.5 py-2.5 overflow-x-auto">
-            <div className="min-w-max">
-              <PlayerNav />
-            </div>
-          </div>
-        </div>
 
-        {/* Barre de recherche (accueil uniquement) */}
-        {isAccueil && (
-          <>
-            <div style={{position:'fixed',top:80,left:0,zIndex:99999,background:'green',color:'white',padding:'6px 10px',fontWeight:700}}>
-              DEBUG LAYOUT isAccueil={String(isAccueil)} - layout.tsx
+          {/* Barre de recherche (accueil uniquement) - centrée verticalement sur mobile */}
+          {isAccueil && (
+            <div className={`${isAccueil ? 'flex-1 flex items-center justify-center max-lg:block lg:flex-none' : ''}`}>
+              <AccueilSearchBar compact={showCompactSearch} />
             </div>
-            <AccueilSearchBar compact={showCompactSearch} />
-          </>
-        )}
+          )}
+        </div>
       </header>
 
       {/* Main - padding bottom pour barre fixe mobile */}

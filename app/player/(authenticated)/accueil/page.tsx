@@ -231,9 +231,6 @@ export default function AccueilPage() {
 
   return (
     <div className="overflow-x-hidden">
-      <div style={{position:'fixed',top:40,left:0,zIndex:99999,background:'blue',color:'white',padding:'6px 10px',fontWeight:700}}>
-        DEBUG PAGE ACCUEIL HERE - accueil/page.tsx
-      </div>
       {/* Clubs - header accueil = logo + onglets + barre de recherche ; puis 1.5cm + 2.8cm ou 2.8cm */}
       <section className="pt-[2.7cm] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-[calc(1.5rem+0.2cm)] md:px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
