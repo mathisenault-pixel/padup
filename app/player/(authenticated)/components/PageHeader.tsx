@@ -43,8 +43,8 @@ export default function PageHeader({
         </h1>
       </div>
 
-      {/* Header complet desktop */}
-      <div className="hidden md:block mb-8 md:mb-12">
+      {/* Header complet desktop - CACHÉ car barre de recherche dans le layout */}
+      <div className="hidden mb-8 md:mb-12">
         {/* Titre + Sous-titre centrés */}
         <div className="text-center mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">

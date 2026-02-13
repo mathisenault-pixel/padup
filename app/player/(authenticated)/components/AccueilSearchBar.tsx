@@ -2,15 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import type { CSSProperties } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useLocale } from '@/state/LocaleContext'
 
 export default function AccueilSearchBar({ compact = false }: { compact?: boolean }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { t } = useLocale()
   const [searchOu, setSearchOu] = useState('')
   const [searchQuand, setSearchQuand] = useState('')
+  const [niveau, setNiveau] = useState('')
+  const [genre, setGenre] = useState('')
   const [isDesktop, setIsDesktop] = useState(false)
+
+  const isTournois = pathname?.startsWith('/player/tournois')
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)')
@@ -24,15 +29,22 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
     const params = new URLSearchParams()
     if (searchOu.trim()) params.set('q', searchOu.trim())
     if (searchQuand.trim()) params.set('date', searchQuand.trim())
-    router.push(`/player/clubs${params.toString() ? `?${params.toString()}` : ''}`)
+    
+    if (isTournois) {
+      if (niveau) params.set('niveau', niveau)
+      if (genre) params.set('genre', genre)
+      router.push(`/player/tournois${params.toString() ? `?${params.toString()}` : ''}`)
+    } else {
+      router.push(`/player/clubs${params.toString() ? `?${params.toString()}` : ''}`)
+    }
   }
 
   const barStyle: CSSProperties | undefined = isDesktop
     ? {
-        width: '22.4cm',
+        width: isTournois ? '28cm' : '22.4cm',
         height: '1.7cm',
-        minWidth: '22.4cm',
-        maxWidth: '22.4cm',
+        minWidth: isTournois ? '28cm' : '22.4cm',
+        maxWidth: isTournois ? '28cm' : '22.4cm',
         minHeight: '1.7cm',
         maxHeight: '1.7cm',
         boxSizing: 'border-box',
@@ -66,7 +78,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
   /* Desktop : barre complète Où | Dates | loupe */
   return (
-    <div className={`px-3 md:px-6 lg:px-8 mt-[0.7cm] pt-[1.1cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
+    <div className={`px-3 md:px-6 lg:px-8 transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4 lg:py-6'}`}>
       <div className="w-full flex justify-center">
         <div
           data-testid="home-search"
@@ -108,7 +120,59 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
             />
           </div>
 
-            {/* Bouton loupe */}
+          {/* Filtres supplémentaires pour Tournois uniquement */}
+          {isTournois && (
+            <>
+              {/* Trait vertical */}
+              <div className="hidden sm:flex flex-shrink-0 items-center self-stretch py-2" aria-hidden>
+                <div className="w-px h-6 bg-gray-200/80" />
+              </div>
+
+              {/* Filtre Niveau */}
+              <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
+                <label className="block text-[12px] font-semibold text-black mb-1.5 leading-none">
+                  Niveau
+                </label>
+                <select
+                  value={niveau}
+                  onChange={(e) => setNiveau(e.target.value)}
+                  className="w-full h-full text-[14px] font-normal text-gray-700 bg-transparent focus:outline-none cursor-pointer"
+                >
+                  <option value="">Tous niveaux</option>
+                  <option value="P25">P25</option>
+                  <option value="P100">P100</option>
+                  <option value="P250">P250</option>
+                  <option value="P500">P500</option>
+                  <option value="P1000">P1000</option>
+                  <option value="P1500">P1500</option>
+                  <option value="P2000">P2000</option>
+                </select>
+              </div>
+
+              {/* Trait vertical */}
+              <div className="hidden sm:flex flex-shrink-0 items-center self-stretch py-2" aria-hidden>
+                <div className="w-px h-6 bg-gray-200/80" />
+              </div>
+
+              {/* Filtre Genre */}
+              <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
+                <label className="block text-[12px] font-semibold text-black mb-1.5 leading-none">
+                  Genre
+                </label>
+                <select
+                  value={genre}
+                  onChange={(e) => setGenre(e.target.value)}
+                  className="w-full h-full text-[14px] font-normal text-gray-700 bg-transparent focus:outline-none cursor-pointer"
+                >
+                  <option value="">Tous</option>
+                  <option value="Hommes">Hommes</option>
+                  <option value="Femmes">Femmes</option>
+                  <option value="Mixte">Mixte</option>
+                </select>
+              </div>
+            </>
+          )}
+
           {/* Bouton loupe */}
           <button
             type="button"
