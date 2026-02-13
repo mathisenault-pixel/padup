@@ -232,15 +232,15 @@ export default function AccueilPage() {
   return (
     <div className="overflow-x-hidden">
       {/* Clubs - header accueil = logo + onglets + barre de recherche ; puis 1.5cm + 2.8cm ou 2.8cm */}
-      <section className="pt-[2.7cm] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-[calc(1.5rem+0.2cm)] md:px-6 bg-white">
+      <section className="pt-0 md:pt-0 pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-black">{t('accueil.clubsTitle')}</h2>
           </div>
 
           {/* Grille : clubs disponibles + clubs bientôt */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Cartes cliquables */}
             {clubsWithDistance.map((club, index) => (
               <Link
