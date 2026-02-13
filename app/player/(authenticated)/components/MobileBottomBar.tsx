@@ -35,27 +35,45 @@ export default function MobileBottomBar() {
       className="fixed left-0 right-0 z-50 lg:hidden bg-white border-t border-black/10"
       style={{ bottom: '-0.4cm', height: 'calc(1.9cm + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      <div className="flex items-center justify-around h-[1.9cm] px-6">
+      <div className="relative flex items-center h-[1.9cm]">
+        {/* Clubs - gauche avec espacement symétrique */}
         <Link
           href="/player/accueil"
           className={`flex flex-col items-center gap-1 ${isClubs ? 'text-black' : 'text-black/50'}`}
-          style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+          style={{ 
+            transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
+            position: 'absolute',
+            left: '2cm'
+          }}
         >
           <IconClubs />
           <span className="text-xs font-light">{t('nav.clubs')}</span>
         </Link>
+        
+        {/* Tournois - centre parfait */}
         <Link
           href="/player/tournois"
           className={`flex flex-col items-center gap-1 ${isTournois ? 'text-black' : 'text-black/50'}`}
-          style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+          style={{ 
+            transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)'
+          }}
         >
           <IconTournois />
           <span className="text-xs font-light">{t('nav.tournois')}</span>
         </Link>
+        
+        {/* Connexion - droite avec espacement symétrique */}
         <Link
           href="/player/compte"
           className={`flex flex-col items-center gap-1 ${isCompte ? 'text-black' : 'text-black/50'}`}
-          style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+          style={{ 
+            transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
+            position: 'absolute',
+            right: '2cm'
+          }}
         >
           <IconConnexion />
           <span className="text-xs font-light">{t('nav.connexion')}</span>
