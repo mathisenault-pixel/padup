@@ -44,13 +44,13 @@ export default function PlayerAuthLayout({
           }`}
         >
           <div className="relative flex items-center justify-between h-12 md:h-14">
-            <Link href="/player/accueil" className={`flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6.8cm] ${isAccueil ? 'max-lg:hidden' : ''}`}>
+            <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80 -ml-[6.8cm] lg:-ml-[6.8cm]">
               <span className="text-[1.35rem] md:text-[1.5rem] font-bold text-black">Pad&apos;Up</span>
             </Link>
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
               <PlayerNav />
             </div>
-            <div className="flex items-center gap-2 ml-auto lg:ml-[17cm] lg:translate-x-[8cm]">
+            <div className="flex items-center gap-2 ml-[17cm] lg:translate-x-[8cm]">
               <Link
                 href="/club/signup"
                 className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
