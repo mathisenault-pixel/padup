@@ -33,8 +33,12 @@ type Club = {
  * Coordonnées GPS des clubs (hardcodé pour MVP)
  * TODO: Déplacer dans Supabase (colonnes latitude, longitude dans table clubs)
  */
-/** 4 clubs "bientôt disponibles" (cartes non cliquables) - pas de photo existante */
+/** 8 clubs "bientôt disponibles" (cartes non cliquables) - pas de photo existante */
 const COMING_SOON_CLUBS = [
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
+  { name: 'Club de padel', city: 'Ouverture prochainement' },
   { name: 'Club de padel', city: 'Ouverture prochainement' },
   { name: 'Club de padel', city: 'Ouverture prochainement' },
   { name: 'Club de padel', city: 'Ouverture prochainement' },
