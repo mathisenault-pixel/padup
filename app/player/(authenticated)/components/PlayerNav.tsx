@@ -68,13 +68,12 @@ export default function PlayerNav() {
               key={item.href}
               href={item.href}
               className={`
-                relative px-4 py-2.5 text-[15px] font-normal whitespace-nowrap tracking-wide transition-opacity hover:opacity-70
-                after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[3.33px] 
-                after:bg-black after:transition-opacity
-                ${active ? 'after:opacity-100 group-hover:after:opacity-0' : 'after:opacity-0'}
+                relative px-4 py-2 text-[14px] font-normal whitespace-nowrap transition-all
+                after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] 
+                after:bg-gray-900 after:transition-opacity
+                ${active ? 'after:opacity-100 text-gray-900 group-hover:after:opacity-0' : 'after:opacity-0 text-gray-600 hover:text-gray-900'}
                 hover:after:!opacity-100
               `}
-              style={{ color: '#000000' }}
             >
               {t(item.labelKey)}
             </Link>

@@ -35,17 +35,17 @@ export default function PlayerAuthLayout({
     <div className={`min-h-screen w-full overflow-x-hidden ${isAccueil ? '' : 'bg-white'}`}>
       {/* Navbar - fond gris ; au scroll : onglets masqués, barre de recherche réduite ÷1,5 */}
       <header
-        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#F0F0F0] border-b border-slate-200 transition-all duration-300 ${isAccueil ? 'pb-0' : ''}`}
+        className={`fixed top-0 left-0 w-full z-50 pt-[env(safe-area-inset-top)] bg-[#FAFAFA] border-b border-slate-200/50 transition-all duration-300 ${isAccueil ? 'pb-0' : ''}`}
       >
         {/* Logo + nav + actions - masqués au scroll, onglets cachés sur mobile accueil */}
         <div
-          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-0 md:pt-[0.7cm] transition-all duration-300 ${
+          className={`max-w-[1400px] mx-auto px-3 md:px-6 lg:px-8 pt-0 md:pt-4 transition-all duration-300 ${
             showCompactSearch ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[6rem] md:max-h-[4rem] opacity-100 overflow-visible'
           }`}
         >
-          <div className="relative flex items-center justify-between h-14 py-3">
+          <div className="relative flex items-center justify-between h-14 py-2">
             <Link href="/player/accueil" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-              <span className="text-xl md:text-[1.5rem] font-bold text-black">Pad&apos;Up</span>
+              <span className="text-lg md:text-xl font-semibold text-gray-900">Pad&apos;Up</span>
             </Link>
             <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
               <PlayerNav />
@@ -53,7 +53,7 @@ export default function PlayerAuthLayout({
             <div className="flex items-center gap-2">
               <Link
                 href="/club/signup"
-                className="hidden sm:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-200/60"
+                className="hidden sm:inline-flex px-3 py-1.5 text-sm font-normal text-gray-600 hover:text-gray-900 transition-colors"
               >
                 Devenir visible
               </Link>
@@ -73,13 +73,13 @@ export default function PlayerAuthLayout({
         </div>
 
         {/* Barre de recherche - visible sur PC partout, mobile uniquement accueil */}
-        <div className={`${isAccueil ? '' : 'hidden lg:block'} lg:pt-6 lg:pb-8`}>
+        <div className={`${isAccueil ? '' : 'hidden lg:block'} lg:pt-4 lg:pb-6`}>
           <AccueilSearchBar compact={showCompactSearch} />
         </div>
       </header>
 
       {/* Main - padding bottom pour barre fixe mobile */}
-      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.4cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[150px] lg:pt-[280px]' : 'pt-14 lg:pt-[280px]'} min-h-screen`}>
+      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.4cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[150px] lg:pt-[240px]' : 'pt-14 lg:pt-[240px]'} min-h-screen`}>
         {children}
       </main>
 
