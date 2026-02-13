@@ -234,9 +234,9 @@ export default function AccueilPage() {
       {/* Clubs - header accueil = logo + onglets + barre de recherche ; puis 1.5cm + 2.8cm ou 2.8cm */}
       <section className="pt-0 md:pt-0 pb-0 px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
-          {/* Header */}
-          <div className="mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-black">{t('accueil.clubsTitle')}</h2>
+          {/* Header - visible uniquement sur mobile */}
+          <div className="mb-6 lg:hidden">
+            <h2 className="text-xl font-bold text-black">{t('accueil.clubsTitle')}</h2>
           </div>
 
           {/* Grille : clubs disponibles + clubs bientôt */}
