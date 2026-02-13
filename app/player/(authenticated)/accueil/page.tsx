@@ -11,7 +11,7 @@ import { useLocale } from '@/state/LocaleContext'
 export const dynamic = 'force-dynamic'
 import { getClubImage, filterOutDemoClub } from '@/lib/clubImages'
 import { haversineKm, formatTravelTime, estimateMinutes, formatDistance } from '@/lib/geoUtils'
-import { getClubById } from '@/lib/data/clubs'
+import { getClubById, getActiveClubs } from '@/lib/data/clubs'
 
 type Club = {
   id: string // ✅ UUID depuis public.clubs
@@ -53,6 +53,28 @@ const CLUB_COORDINATES: Record<string, { lat: number; lng: number }> = {
 }
 
 /**
+ * Initialiser les clubs depuis les données statiques pour un affichage instantané
+ */
+function getInitialClubs(): Club[] {
+  const activeClubs = getActiveClubs()
+  const clubsWithUI = activeClubs.map((clubData, index) => ({
+    id: clubData.id,
+    name: clubData.name,
+    city: clubData.city,
+    lat: clubData.lat,
+    lng: clubData.lng,
+    distance: `${5 + index * 5} min`,
+    nombreTerrains: clubData.courts.length,
+    note: clubData.note,
+    avis: clubData.avis,
+    photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
+    imageUrl: clubData.imageUrl,
+    prixMin: clubData.prixMin,
+  }))
+  return filterOutDemoClub(clubsWithUI)
+}
+
+/**
  * Génère une prochaine disponibilité mock réaliste
  * TODO: Remplacer par les vraies données depuis l'API
  */
@@ -77,18 +99,15 @@ export default function AccueilPage() {
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [locationStatus, setLocationStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [locationError, setLocationError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
 
-  const [clubs, setClubs] = useState<Club[]>([])
+  const [clubs, setClubs] = useState<Club[]>(getInitialClubs())
 
   // ============================================
-  // CHARGEMENT DES CLUBS DEPUIS SUPABASE
+  // CHARGEMENT DES CLUBS DEPUIS SUPABASE (optionnel, données déjà affichées)
   // ============================================
-  // ✅ Identique connecté ou non (pas de filtre user/owner_id/memberships)
   useEffect(() => {
     const loadClubs = async () => {
       console.log('[ACCUEIL] Loading clubs from Supabase...')
-      console.log('[ACCUEIL] Query: from("clubs").select("id,name,city").order("created_at",{ascending:false})')
       
       const { data, error } = await supabase
         .from('clubs')
@@ -97,40 +116,33 @@ export default function AccueilPage() {
       
       if (error) {
         console.error('[ACCUEIL] Error loading clubs:', error)
-        console.error('[ACCUEIL] Error details:', JSON.stringify(error, null, 2))
-        setIsLoading(false)
         return
       }
       
       console.log('[ACCUEIL] ✅ Clubs loaded:', data?.length || 0, 'clubs')
-      console.log('[ACCUEIL] Data:', data)
       
       // Transformer les données Supabase en format UI
       const clubsWithUI = (data || []).map((club, index) => {
-        const coords = CLUB_COORDINATES[club.id] || { lat: 43.9, lng: 4.8 } // Fallback Avignon
-        const clubData = getClubById(club.id) // Récupérer les vraies données
+        const coords = CLUB_COORDINATES[club.id] || { lat: 43.9, lng: 4.8 }
+        const clubData = getClubById(club.id)
         return {
           id: club.id,
           name: club.name || 'Club sans nom',
           city: club.city || 'Ville non spécifiée',
           lat: coords.lat,
           lng: coords.lng,
-          distance: `${5 + index * 5} min`, // Sera recalculé avec géoloc
-          nombreTerrains: 6 + index * 2, // TODO: Compter depuis public.courts
-          note: 4.6 + (index * 0.1),
-          avis: 100 + index * 50,
+          distance: `${5 + index * 5} min`,
+          nombreTerrains: clubData?.courts.length || 6,
+          note: clubData?.note || 4.6,
+          avis: clubData?.avis || 100,
           photo: ['🏗️', '🎾', '⚡', '🏟️'][index % 4],
-          imageUrl: getClubImage(club.id), // ✅ Image par clubId
-          prixMin: clubData?.prixMin || 11 + index, // Utiliser le vrai prix depuis CLUBS_DATA
+          imageUrl: getClubImage(club.id),
+          prixMin: clubData?.prixMin || 11,
         }
       })
       
-      // ✅ Filtrer pour exclure le Club Démo
       const filteredClubs = filterOutDemoClub(clubsWithUI)
-      console.log('[ACCUEIL] ✅ Filtered clubs (without demo):', filteredClubs.length, 'clubs')
-      
       setClubs(filteredClubs)
-      setIsLoading(false)
     }
     
     loadClubs()
@@ -220,7 +232,7 @@ export default function AccueilPage() {
   return (
     <div className="overflow-x-hidden">
       {/* Clubs - header accueil = logo + onglets + barre de recherche ; puis 1.5cm + 2.8cm ou 2.8cm */}
-      <section className="pt-[2.6cm] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-[calc(1.5rem+0.2cm)] md:px-6 bg-white">
+      <section className="pt-[3cm] md:pt-[calc(8.5rem+2.8cm)] pb-0 px-[calc(1.5rem+0.2cm)] md:px-6 bg-white">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">

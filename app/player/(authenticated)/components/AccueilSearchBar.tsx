@@ -44,7 +44,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   /* Mobile : barre simple cliquable → /player/clubs (recherche + filtres) */
   if (!isDesktop) {
     return (
-      <div className={`px-[calc(0.75rem+0.2cm)] md:px-6 lg:px-8 mt-0 pt-[0.5cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : 'py-3 md:py-4'}`}>
+      <div className={`px-[calc(0.75rem+0.2cm)] md:px-6 lg:px-8 mt-0 py-[0.4cm] transition-all duration-300 ${compact ? 'py-1.5 md:py-2' : ''}`}>
         <div className="w-full flex justify-center">
           <button
             type="button"
