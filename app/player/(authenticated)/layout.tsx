@@ -70,7 +70,7 @@ export default function PlayerAuthLayout({
               <HeaderUserMenu />
             </div>
           </div>
-          <div className={`lg:hidden px-2.5 py-2.5 overflow-x-auto ${isAccueil ? 'max-lg:block' : ''}`}>
+          <div className={`lg:hidden px-2.5 py-2.5 overflow-x-auto ${isAccueil ? 'hidden' : ''}`}>
             <div className="min-w-max">
               <PlayerNav />
             </div>
