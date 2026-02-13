@@ -79,7 +79,7 @@ export default function PlayerAuthLayout({
       </header>
 
       {/* Main - padding bottom pour barre fixe mobile */}
-      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.4cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[150px] lg:pt-[calc(16rem+2cm)]' : 'pt-14 lg:pt-[200px]'} min-h-screen`}>
+      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.4cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[150px] lg:pt-[240px]' : 'pt-14 lg:pt-[200px]'} min-h-screen`}>
         {children}
       </main>
 
