@@ -36,14 +36,15 @@ export default function MobileBottomBar() {
       style={{ bottom: '-0.4cm', height: 'calc(1.9cm + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="relative flex items-center h-[1.9cm]">
-        {/* Clubs - gauche avec espacement symétrique */}
+        {/* Clubs - gauche, distance symétrique du centre */}
         <Link
           href="/player/accueil"
           className={`flex flex-col items-center gap-1 ${isClubs ? 'text-black' : 'text-black/50'}`}
           style={{ 
             transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
             position: 'absolute',
-            left: '2cm'
+            left: 'calc(50% - 3.5cm)',
+            transform: 'translateX(-50%)'
           }}
         >
           <IconClubs />
@@ -65,14 +66,15 @@ export default function MobileBottomBar() {
           <span className="text-xs font-light">{t('nav.tournois')}</span>
         </Link>
         
-        {/* Connexion - droite avec espacement symétrique */}
+        {/* Connexion - droite, distance symétrique du centre */}
         <Link
           href="/player/compte"
           className={`flex flex-col items-center gap-1 ${isCompte ? 'text-black' : 'text-black/50'}`}
           style={{ 
             transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)',
             position: 'absolute',
-            right: '2cm'
+            left: 'calc(50% + 3.5cm)',
+            transform: 'translateX(-50%)'
           }}
         >
           <IconConnexion />
