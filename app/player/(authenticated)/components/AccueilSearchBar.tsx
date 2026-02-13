@@ -45,6 +45,9 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   if (!isDesktop) {
     return (
       <div className={`px-[calc(0.75rem+0.2cm)] md:px-6 lg:px-8 transition-all duration-300`} style={{ paddingTop: '0.5rem', paddingBottom: '0.5rem' }}>
+        <div style={{position:'fixed',top:0,left:0,zIndex:99999,background:'red',color:'white',padding:'6px 10px',fontWeight:700}}>
+          DEBUG SEARCHBAR HERE - AccueilSearchBar.tsx
+        </div>
         <div className="w-full flex justify-center" style={{ transform: 'translateY(-8px)' }}>
           <button
             type="button"

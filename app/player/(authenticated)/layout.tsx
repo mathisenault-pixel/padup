@@ -78,7 +78,14 @@ export default function PlayerAuthLayout({
         </div>
 
         {/* Barre de recherche (accueil uniquement) */}
-        {isAccueil && <AccueilSearchBar compact={showCompactSearch} />}
+        {isAccueil && (
+          <>
+            <div style={{position:'fixed',top:80,left:0,zIndex:99999,background:'green',color:'white',padding:'6px 10px',fontWeight:700}}>
+              DEBUG LAYOUT isAccueil={String(isAccueil)} - layout.tsx
+            </div>
+            <AccueilSearchBar compact={showCompactSearch} />
+          </>
+        )}
       </header>
 
       {/* Main - padding bottom pour barre fixe mobile */}
