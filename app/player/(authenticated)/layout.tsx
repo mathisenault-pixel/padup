@@ -70,11 +70,6 @@ export default function PlayerAuthLayout({
               <HeaderUserMenu />
             </div>
           </div>
-          <div className="hidden lg:block px-2.5 py-2.5 overflow-x-auto">
-            <div className="min-w-max">
-              <PlayerNav />
-            </div>
-          </div>
         </div>
 
         {/* Barre de recherche (accueil uniquement) */}
