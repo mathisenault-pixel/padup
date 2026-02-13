@@ -73,13 +73,13 @@ export default function PlayerAuthLayout({
         </div>
 
         {/* Barre de recherche - visible sur PC partout, mobile uniquement accueil */}
-        <div className={`${isAccueil ? '' : 'hidden lg:block'}`}>
+        <div className={`${isAccueil ? '' : 'hidden lg:block'} lg:pt-6 lg:pb-8`}>
           <AccueilSearchBar compact={showCompactSearch} />
         </div>
       </header>
 
       {/* Main - padding bottom pour barre fixe mobile */}
-      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.4cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[150px] lg:pt-[240px]' : 'pt-14 lg:pt-[200px]'} min-h-screen`}>
+      <main className={`w-full overflow-x-hidden lg:pb-0 pb-[calc(2.4cm+env(safe-area-inset-bottom,0px))] ${isAccueil ? 'pt-[150px] lg:pt-[280px]' : 'pt-14 lg:pt-[280px]'} min-h-screen`}>
         {children}
       </main>
 
