@@ -45,7 +45,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
   if (!isDesktop) {
     return (
       <div className={`px-[calc(0.75rem+0.2cm)] md:px-6 lg:px-8 transition-all duration-300`}>
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center" style={{ transform: 'translateY(-20px)' }}>
           <button
             type="button"
             onClick={() => router.push('/player/clubs')}
