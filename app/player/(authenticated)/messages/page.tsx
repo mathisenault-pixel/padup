@@ -462,7 +462,7 @@ export default function MessagesPage() {
               touchAction: 'pan-y',
               overscrollBehavior: 'contain',
               paddingTop: '16px',
-              paddingBottom: '180px',
+              paddingBottom: 'calc(180px + 4cm)',
               marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
               minHeight: '100%',
             }}
