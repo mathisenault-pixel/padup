@@ -37,19 +37,22 @@ export default function HeaderUserMenu() {
       {isOpen && (
         <div className="absolute right-0 top-full mt-1 py-2 w-44 bg-white rounded-xl shadow-lg border border-black/10 z-[100]">
           <Link
-            href="/login"
+            href="/player/compte"
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2.5 text-sm font-medium text-black hover:bg-black/5 transition-colors"
           >
-            {t('nav.sInscrire')}
+            {t('nav.monProfil') || 'Mon profil'}
           </Link>
-          <Link
-            href="/login"
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2.5 text-sm font-medium text-black hover:bg-black/5 transition-colors"
+          <button
+            onClick={() => {
+              setIsOpen(false)
+              // Déconnexion
+              window.location.href = '/login'
+            }}
+            className="w-full text-left block px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
           >
-            {t('nav.seConnecter')}
-          </Link>
+            {t('nav.seDeconnecter') || 'Se déconnecter'}
+          </button>
         </div>
       )}
     </div>
