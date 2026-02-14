@@ -449,10 +449,10 @@ export default function MessagesPage() {
             className="flex-shrink-0 p-3 border-t border-gray-200 bg-white"
             style={{
               position: 'fixed',
-              bottom: 0,
+              bottom: 'calc(1.5cm + env(safe-area-inset-bottom, 0px))',
               left: 0,
               right: 0,
-              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+              paddingBottom: '12px',
               transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'translateY(0)',
               transition: 'transform 0.2s ease-out',
             }}
