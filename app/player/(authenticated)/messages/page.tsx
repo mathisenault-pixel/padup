@@ -461,8 +461,11 @@ export default function MessagesPage() {
               WebkitOverflowScrolling: 'touch',
               touchAction: 'pan-y',
               overscrollBehavior: 'contain',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
               paddingTop: '16px',
-              paddingBottom: 'calc(50vh + 100px)',
+              paddingBottom: '100px',
               marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
               minHeight: '100%',
             }}
