@@ -136,7 +136,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
                 <select
                   value={niveau}
                   onChange={(e) => setNiveau(e.target.value)}
-                  className="w-full text-[15px] font-normal text-gray-800 bg-transparent focus:outline-none cursor-pointer appearance-none"
+                  className={`w-full text-[15px] font-normal bg-transparent focus:outline-none cursor-pointer appearance-none ${niveau ? 'text-gray-800' : 'text-gray-400'}`}
                   style={{ 
                     height: 'auto',
                     lineHeight: '1.5',
@@ -144,7 +144,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
                     margin: 0
                   }}
                 >
-                  <option value="" className="text-gray-400">Tous niveaux</option>
+                  <option value="">Tous niveaux</option>
                   <option value="P25">P25</option>
                   <option value="P100">P100</option>
                   <option value="P250">P250</option>
@@ -168,7 +168,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
                 <select
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
-                  className="w-full text-[15px] font-normal text-gray-800 bg-transparent focus:outline-none cursor-pointer appearance-none"
+                  className={`w-full text-[15px] font-normal bg-transparent focus:outline-none cursor-pointer appearance-none ${genre ? 'text-gray-800' : 'text-gray-400'}`}
                   style={{ 
                     height: 'auto',
                     lineHeight: '1.5',
@@ -176,7 +176,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
                     margin: 0
                   }}
                 >
-                  <option value="" className="text-gray-400">Tous</option>
+                  <option value="">Tous</option>
                   <option value="Hommes">Hommes</option>
                   <option value="Femmes">Femmes</option>
                   <option value="Mixte">Mixte</option>
