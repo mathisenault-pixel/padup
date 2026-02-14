@@ -41,7 +41,7 @@ export default function HeaderUserMenu() {
             onClick={() => setIsOpen(false)}
             className="block px-4 py-2.5 text-sm font-medium text-black hover:bg-black/5 transition-colors"
           >
-            {t('nav.monProfil') || 'Mon profil'}
+            Mon profil
           </Link>
           <button
             onClick={() => {
@@ -51,7 +51,7 @@ export default function HeaderUserMenu() {
             }}
             className="w-full text-left block px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
           >
-            {t('nav.seDeconnecter') || 'Se déconnecter'}
+            Se déconnecter
           </button>
         </div>
       )}
