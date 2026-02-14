@@ -392,30 +392,8 @@ export default function TournoisPage() {
     <div className="min-h-screen bg-white">
       <div className="px-3 md:px-6 lg:px-8 pt-6 pb-4 md:py-8">
         
-        {/* Titre mobile simple + Bouton filtres */}
+        {/* Filtres rapides mobile + Bouton filtres */}
         <div className="md:hidden mb-6">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-black tracking-tight">{t('tournois.title')}</h1>
-              <p className="text-base text-black/60 font-light mt-2">{t('tournois.subtitle')}</p>
-            </div>
-            <button
-              onClick={() => setIsFiltersDrawerOpen(true)}
-              className="relative flex-shrink-0 p-3 bg-black/5 rounded-full hover:bg-black/10 mt-1"
-              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-            >
-              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-              {activeFiltersCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
-          </div>
-          
-          {/* Filtres rapides mobile */}
           <div className="flex gap-2 overflow-x-auto pb-2">
             <button
               onClick={() => setSelectedFilter('ouverts')}
@@ -449,6 +427,20 @@ export default function TournoisPage() {
               style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
             >
               {t('tournois.tous')}
+            </button>
+            <button
+              onClick={() => setIsFiltersDrawerOpen(true)}
+              className="relative flex-shrink-0 p-2 bg-black/5 rounded-full hover:bg-black/10"
+              style={{ transition: 'all 1000ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              {activeFiltersCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

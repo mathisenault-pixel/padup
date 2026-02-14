@@ -206,12 +206,6 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                       Sans engagement · Résiliable à tout moment
                     </p>
                   </div>
-                  
-                  {/* Badge -20% */}
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-slate-900">-20%</div>
-                    <div className="text-xs font-medium text-slate-500">Resto</div>
-                  </div>
                 </div>
                 
                 {/* Séparateur */}

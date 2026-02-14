@@ -65,7 +65,7 @@ export default function FiltersDrawer({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 flex gap-3">
+        <div className="p-4 border-t border-slate-200 flex gap-3" style={{ paddingBottom: 'calc(1rem + 1.5cm + env(safe-area-inset-bottom, 0px))' }}>
           {onReset && (
             <button
               onClick={onReset}

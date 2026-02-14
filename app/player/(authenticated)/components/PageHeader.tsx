@@ -36,8 +36,8 @@ export default function PageHeader({
 }: PageHeaderProps) {
   return (
     <>
-      {/* Titre mobile simple */}
-      <div className="md:hidden pt-6 pb-4 px-6">
+      {/* Titre mobile simple - masqué car géré directement dans la page */}
+      <div className="hidden">
         <h1 className="text-2xl font-bold text-black">
           {title}
         </h1>
