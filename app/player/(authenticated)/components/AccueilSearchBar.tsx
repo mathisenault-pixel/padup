@@ -87,7 +87,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
         >
           {/* Partie gauche : Où */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.8cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-            <label className="block text-[11px] font-medium text-black mb-1.5 leading-none">
+            <label className="block text-[12px] font-medium text-black mb-1.5 leading-none">
               {t('accueil.searchOu')}
             </label>
             <input
@@ -96,7 +96,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchOu(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchPlaceholder')}
-              className="w-full h-full text-[14px] font-normal text-gray-800 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full h-full text-[15px] font-normal text-gray-800 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
 
@@ -107,7 +107,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
           {/* Partie droite : Dates */}
           <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-            <label className="block text-[11px] font-medium text-black mb-1.5 leading-none">
+            <label className="block text-[12px] font-medium text-black mb-1.5 leading-none">
               {t('accueil.searchDates')}
             </label>
             <input
@@ -116,7 +116,7 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
               onChange={(e) => setSearchQuand(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('accueil.searchQuand')}
-              className="w-full h-full text-[14px] font-normal text-gray-800 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="w-full h-full text-[15px] font-normal text-gray-800 placeholder:text-gray-400 bg-transparent focus:outline-none"
             />
           </div>
 
@@ -130,13 +130,13 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
               {/* Filtre Niveau */}
               <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-                <label className="block text-[11px] font-medium text-black mb-1.5 leading-none">
+                <label className="block text-[12px] font-medium text-black mb-1.5 leading-none">
                   Niveau
                 </label>
                 <select
                   value={niveau}
                   onChange={(e) => setNiveau(e.target.value)}
-                  className="w-full text-[14px] font-normal text-gray-800 bg-transparent focus:outline-none cursor-pointer appearance-none"
+                  className="w-full text-[15px] font-normal text-gray-800 bg-transparent focus:outline-none cursor-pointer appearance-none"
                   style={{ 
                     height: 'auto',
                     lineHeight: '1.5',
@@ -162,13 +162,13 @@ export default function AccueilSearchBar({ compact = false }: { compact?: boolea
 
               {/* Filtre Genre */}
               <div className={`flex-1 min-w-0 flex flex-col justify-center pl-[0.4cm] overflow-hidden ${compact ? 'pr-2 py-0.5 sm:pr-2.5' : 'pr-2.5 py-1 sm:pr-3.5'}`}>
-                <label className="block text-[11px] font-medium text-black mb-1.5 leading-none">
+                <label className="block text-[12px] font-medium text-black mb-1.5 leading-none">
                   Genre
                 </label>
                 <select
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
-                  className="w-full text-[14px] font-normal text-gray-800 bg-transparent focus:outline-none cursor-pointer appearance-none"
+                  className="w-full text-[15px] font-normal text-gray-800 bg-transparent focus:outline-none cursor-pointer appearance-none"
                   style={{ 
                     height: 'auto',
                     lineHeight: '1.5',
