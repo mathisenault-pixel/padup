@@ -407,10 +407,11 @@ export default function MessagesPage() {
             minHeight: '100vh',
             height: '100dvh',
             overscrollBehavior: 'none',
+            overflow: 'hidden',
           }}
         >
           {/* En-tête de la conversation */}
-          <div className="flex-shrink-0 p-3 border-b border-gray-200 flex items-center gap-3 bg-white">
+          <div className="flex-shrink-0 p-3 border-b border-gray-200 flex items-center gap-3 bg-white" style={{ touchAction: 'none' }}>
             {/* Bouton retour */}
             <button
               onClick={() => setSelectedConversation(null)}
@@ -436,39 +437,39 @@ export default function MessagesPage() {
           {/* Messages - Zone scrollable avec hauteur dynamique */}
           <div 
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 bg-gray-50"
+            className="flex-1 overflow-y-auto overflow-x-hidden px-3 bg-gray-50"
             style={{
               WebkitOverflowScrolling: 'touch',
               touchAction: 'pan-y',
               overscrollBehavior: 'contain',
-              paddingBottom: isInputFocused ? '120px' : 'calc(1.5cm + 100px)',
+              paddingTop: '16px',
+              paddingBottom: isInputFocused ? '280px' : 'calc(1.5cm + 100px)',
               marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
+              minHeight: '100%',
             }}
           >
-            <div className="space-y-3">
-              {selectedConversation.messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.isFromMe ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[80%] ${msg.isFromMe ? 'order-2' : 'order-1'}`}>
-                    <div
-                      className={`rounded-2xl px-4 py-2.5 ${
-                        msg.isFromMe
-                          ? 'bg-slate-900 text-white rounded-br-md'
-                          : 'bg-white text-gray-900 shadow-sm rounded-bl-md'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">{msg.text}</p>
-                    </div>
-                    <p className={`text-[11px] text-gray-500 mt-1 px-2 ${msg.isFromMe ? 'text-right' : 'text-left'}`}>
-                      {msg.timestamp}
-                    </p>
+            {selectedConversation.messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex mb-3 ${msg.isFromMe ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`max-w-[80%] ${msg.isFromMe ? 'order-2' : 'order-1'}`}>
+                  <div
+                    className={`rounded-2xl px-4 py-2.5 ${
+                      msg.isFromMe
+                        ? 'bg-slate-900 text-white rounded-br-md'
+                        : 'bg-white text-gray-900 shadow-sm rounded-bl-md'
+                    }`}
+                  >
+                    <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">{msg.text}</p>
                   </div>
+                  <p className={`text-[11px] text-gray-500 mt-1 px-2 ${msg.isFromMe ? 'text-right' : 'text-left'}`}>
+                    {msg.timestamp}
+                  </p>
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Zone de saisie - Fixe en bas, s'ajuste au clavier */}
@@ -482,6 +483,8 @@ export default function MessagesPage() {
               paddingBottom: isInputFocused ? 'max(12px, env(safe-area-inset-bottom))' : '12px',
               transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'translateY(0)',
               transition: 'all 0.2s ease-out',
+              zIndex: 10,
+              touchAction: 'none',
             }}
           >
             <div className="flex items-end gap-2">
