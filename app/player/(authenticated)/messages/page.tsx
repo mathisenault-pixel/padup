@@ -405,7 +405,8 @@ export default function MessagesPage() {
           className="md:hidden fixed inset-0 bg-white z-50 flex flex-col"
           style={{
             minHeight: '100vh',
-            height: '100dvh', // Dynamic viewport height avec fallback
+            height: '100dvh',
+            overscrollBehavior: 'none',
           }}
         >
           {/* En-tête de la conversation */}
@@ -435,11 +436,12 @@ export default function MessagesPage() {
           {/* Messages - Zone scrollable avec hauteur dynamique */}
           <div 
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 bg-gray-50 overscroll-contain"
+            className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 bg-gray-50"
             style={{
               WebkitOverflowScrolling: 'touch',
               touchAction: 'pan-y',
-              paddingBottom: isInputFocused ? '80px' : 'calc(1.5cm + 80px)',
+              overscrollBehavior: 'contain',
+              paddingBottom: isInputFocused ? '120px' : 'calc(1.5cm + 100px)',
               marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
             }}
           >
@@ -496,7 +498,12 @@ export default function MessagesPage() {
                 }}
                 onFocus={() => {
                   setIsInputFocused(true)
-                  setTimeout(scrollToBottom, 300)
+                  setTimeout(() => {
+                    if (messagesContainerRef.current) {
+                      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+                    }
+                  }, 300)
+                  setTimeout(scrollToBottom, 400)
                 }}
                 onBlur={() => {
                   setTimeout(() => setIsInputFocused(false), 150)
