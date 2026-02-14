@@ -32,6 +32,7 @@ export default function MobileBottomBar() {
 
   return (
     <div
+      data-mobile-bottom-bar
       className="fixed left-0 right-0 z-50 lg:hidden bg-white border-t border-black/10"
       style={{ bottom: '-0.4cm', height: 'calc(1.9cm + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >

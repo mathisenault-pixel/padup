@@ -116,6 +116,7 @@ export default function MessagesPage() {
   const inputRef = useRef<HTMLInputElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [keyboardHeight, setKeyboardHeight] = useState(0)
+  const [isInputFocused, setIsInputFocused] = useState(false)
 
   // Bloquer le scroll du body quand une conversation est ouverte sur mobile
   useEffect(() => {
@@ -138,6 +139,24 @@ export default function MessagesPage() {
       document.body.style.height = ''
     }
   }, [selectedConversation])
+
+  // Cacher la barre de navigation mobile quand l'input est focus
+  useEffect(() => {
+    const mobileBottomBar = document.querySelector('[data-mobile-bottom-bar]') as HTMLElement
+    if (mobileBottomBar) {
+      if (isInputFocused) {
+        mobileBottomBar.style.display = 'none'
+      } else {
+        mobileBottomBar.style.display = ''
+      }
+    }
+
+    return () => {
+      if (mobileBottomBar) {
+        mobileBottomBar.style.display = ''
+      }
+    }
+  }, [isInputFocused])
 
   // Gérer le clavier mobile et ajuster la vue
   useEffect(() => {
@@ -197,6 +216,11 @@ export default function MessagesPage() {
 
     setSelectedConversation(prev => prev ? { ...prev, messages: [...prev.messages, newMsg] } : null)
     setNewMessage('')
+    
+    // Garder le focus sur l'input après l'envoi
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
     
     // Scroll vers le bas après l'envoi
     setTimeout(scrollToBottom, 100)
@@ -415,6 +439,7 @@ export default function MessagesPage() {
             style={{
               WebkitOverflowScrolling: 'touch',
               touchAction: 'pan-y',
+              paddingBottom: isInputFocused ? '80px' : 'calc(1.5cm + 80px)',
               marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
             }}
           >
@@ -449,12 +474,12 @@ export default function MessagesPage() {
             className="flex-shrink-0 p-3 border-t border-gray-200 bg-white"
             style={{
               position: 'fixed',
-              bottom: 'calc(1.5cm + env(safe-area-inset-bottom, 0px))',
+              bottom: isInputFocused ? 0 : 'calc(1.5cm + env(safe-area-inset-bottom, 0px))',
               left: 0,
               right: 0,
-              paddingBottom: '12px',
+              paddingBottom: isInputFocused ? 'max(12px, env(safe-area-inset-bottom))' : '12px',
               transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'translateY(0)',
-              transition: 'transform 0.2s ease-out',
+              transition: 'all 0.2s ease-out',
             }}
           >
             <div className="flex items-end gap-2">
@@ -463,16 +488,29 @@ export default function MessagesPage() {
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleSendMessage()
+                  }
+                }}
                 onFocus={() => {
+                  setIsInputFocused(true)
                   setTimeout(scrollToBottom, 300)
+                }}
+                onBlur={() => {
+                  setTimeout(() => setIsInputFocused(false), 150)
                 }}
                 placeholder={t('messages.ecrireMessage')}
                 className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-400 text-[16px]"
                 style={{ fontSize: '16px' }} // Évite le zoom sur iOS
               />
               <button
-                onClick={handleSendMessage}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleSendMessage()
+                }}
+                onMouseDown={(e) => e.preventDefault()}
                 disabled={!newMessage.trim()}
                 className="flex-shrink-0 w-12 h-12 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-all flex items-center justify-center touch-manipulation"
               >
