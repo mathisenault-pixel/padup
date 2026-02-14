@@ -140,11 +140,11 @@ export default function MessagesPage() {
     }
   }, [selectedConversation])
 
-  // Cacher la barre de navigation mobile quand l'input est focus
+  // Cacher la barre de navigation mobile quand on est dans une conversation
   useEffect(() => {
     const mobileBottomBar = document.querySelector('[data-mobile-bottom-bar]') as HTMLElement
     if (mobileBottomBar) {
-      if (isInputFocused) {
+      if (selectedConversation && window.innerWidth < 768) {
         mobileBottomBar.style.display = 'none'
       } else {
         mobileBottomBar.style.display = ''
@@ -156,7 +156,7 @@ export default function MessagesPage() {
         mobileBottomBar.style.display = ''
       }
     }
-  }, [isInputFocused])
+  }, [selectedConversation])
 
   // Gérer le clavier mobile et ajuster la vue
   useEffect(() => {
@@ -232,8 +232,24 @@ export default function MessagesPage() {
     setConversations(prev => prev.map(c => 
       c.id === conv.id ? { ...c, unreadCount: 0 } : c
     ))
-    // Scroll vers le bas après ouverture
-    setTimeout(scrollToBottom, 100)
+    
+    // Sur mobile, activer automatiquement le mode écriture (comme Instagram)
+    if (window.innerWidth < 768) {
+      setIsInputFocused(true)
+      // Focus l'input après un court délai pour laisser l'animation se terminer
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+          // Forcer l'ouverture du clavier sur iOS
+          inputRef.current.click()
+        }
+        // Scroll vers le bas après le focus
+        setTimeout(scrollToBottom, 300)
+      }, 500)
+    } else {
+      // Scroll vers le bas pour desktop
+      setTimeout(scrollToBottom, 100)
+    }
   }
 
   const getAvatarInitials = (name: string) => {
@@ -414,7 +430,10 @@ export default function MessagesPage() {
           <div className="flex-shrink-0 p-3 border-b border-gray-200 flex items-center gap-3 bg-white" style={{ touchAction: 'none' }}>
             {/* Bouton retour */}
             <button
-              onClick={() => setSelectedConversation(null)}
+              onClick={() => {
+                setSelectedConversation(null)
+                setIsInputFocused(false)
+              }}
               className="flex-shrink-0 w-10 h-10 flex items-center justify-center hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors touch-manipulation"
             >
               <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -443,7 +462,7 @@ export default function MessagesPage() {
               touchAction: 'pan-y',
               overscrollBehavior: 'contain',
               paddingTop: '16px',
-              paddingBottom: isInputFocused ? '280px' : 'calc(1.5cm + 100px)',
+              paddingBottom: '180px',
               marginBottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
               minHeight: '100%',
             }}
@@ -477,12 +496,12 @@ export default function MessagesPage() {
             className="flex-shrink-0 p-3 border-t border-gray-200 bg-white"
             style={{
               position: 'fixed',
-              bottom: isInputFocused ? 0 : 'calc(1.5cm + env(safe-area-inset-bottom, 0px))',
+              bottom: 0,
               left: 0,
               right: 0,
-              paddingBottom: isInputFocused ? 'max(12px, env(safe-area-inset-bottom))' : '12px',
+              paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
               transform: keyboardHeight > 0 ? `translateY(-${keyboardHeight}px)` : 'translateY(0)',
-              transition: 'all 0.2s ease-out',
+              transition: 'transform 0.2s ease-out',
               zIndex: 10,
               touchAction: 'none',
             }}
@@ -500,16 +519,15 @@ export default function MessagesPage() {
                   }
                 }}
                 onFocus={() => {
-                  setIsInputFocused(true)
+                  if (!isInputFocused) {
+                    setIsInputFocused(true)
+                  }
                   setTimeout(() => {
                     if (messagesContainerRef.current) {
                       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
                     }
                   }, 300)
                   setTimeout(scrollToBottom, 400)
-                }}
-                onBlur={() => {
-                  setTimeout(() => setIsInputFocused(false), 150)
                 }}
                 placeholder={t('messages.ecrireMessage')}
                 className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-slate-400 text-[16px]"
