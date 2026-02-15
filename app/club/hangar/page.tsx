@@ -42,12 +42,11 @@ export default async function DashboardPage() {
     .lte('slot_start', end.toISOString())
     .order('slot_start', { ascending: true })
 
-  // 3️⃣ Récupérer les terrains
+  // 3️⃣ Récupérer tous les terrains du Hangar
   const { data: courts } = await supabase
     .from('courts')
-    .select('id, name, is_active')
+    .select('id, name')
     .eq('club_id', club.id)
-    .eq('is_active', true)
 
   // 4️⃣ Récupérer les paramètres
   const { data: settings } = await supabase

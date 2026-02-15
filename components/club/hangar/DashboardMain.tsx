@@ -22,6 +22,7 @@ type Booking = {
 type Court = {
   id: string
   name: string
+  is_active?: boolean
 }
 
 type Props = {
@@ -67,7 +68,8 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
   const revenus = confirmed * priceOffpeak
 
   // Calcul du taux d'occupation basé sur les heures d'ouverture réelles
-  const nbTerrains = courts.length || 1 // Au moins 1 pour éviter division par 0
+  // Compter TOUS les terrains (pas seulement actifs pour le calcul d'occupation)
+  const nbTerrains = courts.length > 0 ? courts.length : 1 // Au moins 1 pour éviter division par 0
   const slotMinutes = settings?.slot_minutes || 90
   
   // Calculer le nombre de créneaux par jour par terrain
@@ -174,7 +176,13 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-xs">
         <div className="font-bold text-blue-900 mb-2">📊 Détail calcul taux d'occupation</div>
         <div className="space-y-1 text-blue-800">
-          <div><strong>Nombre de terrains actifs:</strong> {nbTerrains}</div>
+          <div><strong>Terrains du Hangar:</strong> {courts.length} terrain(s)</div>
+          <div className="ml-4 text-xs">
+            {courts.map((c, i) => (
+              <div key={c.id}>• {c.name}</div>
+            ))}
+          </div>
+          <div><strong>Utilisés pour calcul:</strong> {nbTerrains} terrain(s)</div>
           <div><strong>Heures d'ouverture:</strong> {firstDay.start} → {firstDay.end} ({Math.floor(totalMinutesOpen / 60)}h{totalMinutesOpen % 60}min)</div>
           <div><strong>Durée créneau:</strong> {slotMinutes} min</div>
           <div><strong>Créneaux par terrain/jour:</strong> {slotsPerCourtPerDay}</div>
