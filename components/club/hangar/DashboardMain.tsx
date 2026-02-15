@@ -8,6 +8,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+type UserProfile = {
+  id: string
+  full_name: string | null
+  email: string | null
+  phone: string | null
+}
+
 type Booking = {
   id: string
   club_id: string
@@ -16,6 +23,17 @@ type Booking = {
   slot_end: string
   status: string
   created_at: string
+  created_by: string
+  profiles: UserProfile[] | UserProfile | null
+}
+
+// Helper pour obtenir le profil utilisateur
+function getUserProfile(booking: Booking): UserProfile | null {
+  if (!booking.profiles) return null
+  if (Array.isArray(booking.profiles)) {
+    return booking.profiles[0] || null
+  }
+  return booking.profiles
 }
 
 type Court = {
@@ -82,14 +100,20 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
 
   // Export CSV
   const exportCsv = () => {
-    const headers = ["Date", "Heure début", "Heure fin", "Terrain", "Statut"]
-    const rows = bookings.map((b) => [
-      new Date(b.slot_start).toLocaleDateString("fr-FR"),
-      formatTime(b.slot_start),
-      formatTime(b.slot_end),
-      courtsMap[b.court_id] || "—",
-      b.status === "confirmed" ? "Confirmée" : "Annulée",
-    ])
+    const headers = ["Date", "Heure début", "Heure fin", "Terrain", "Client", "Email", "Téléphone", "Statut"]
+    const rows = bookings.map((b) => {
+      const profile = getUserProfile(b)
+      return [
+        new Date(b.slot_start).toLocaleDateString("fr-FR"),
+        formatTime(b.slot_start),
+        formatTime(b.slot_end),
+        courtsMap[b.court_id] || "—",
+        profile?.full_name || "—",
+        profile?.email || "—",
+        profile?.phone || "—",
+        b.status === "confirmed" ? "Confirmée" : "Annulée",
+      ]
+    })
 
     const csvContent = [
       headers.join(","),
@@ -144,15 +168,30 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       setModalError("")
       setSelectedCourt("")
       setSelectedTime("")
-      // Recharger les bookings
+      // Recharger les bookings avec infos utilisateur
       const { data } = await supabase
         .from("bookings")
-        .select("id, club_id, court_id, slot_start, slot_end, status, created_at")
+        .select(`
+          id, 
+          club_id, 
+          court_id, 
+          slot_start, 
+          slot_end, 
+          status, 
+          created_at,
+          created_by,
+          profiles:created_by (
+            id,
+            full_name,
+            email,
+            phone
+          )
+        `)
         .eq("club_id", clubId)
         .gte("slot_start", new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
         .lte("slot_start", new Date(new Date().setHours(23, 59, 59, 999)).toISOString())
         .order("slot_start", { ascending: true })
-      if (data) setBookings(data)
+      if (data) setBookings(data as any)
     }
   }
 
@@ -180,31 +219,66 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
             Aucune réservation aujourd'hui
           </div>
         ) : (
-          <div className="divide-y divide-slate-800 rounded-md overflow-hidden">
-            {bookings.map((b) => (
-              <div
-                key={b.id}
-                className="flex justify-between items-center px-4 py-3 bg-slate-950/20 hover:bg-slate-900 transition"
-              >
-                <div>
-                  <div className="text-slate-200">
-                    {formatTime(b.slot_start)} → {formatTime(b.slot_end)}
-                  </div>
-                  <div className="text-xs text-slate-400 mt-0.5">
-                    {courtsMap[b.court_id] || "Terrain inconnu"}
-                  </div>
-                </div>
-                <div
-                  className={`text-xs px-3 py-1 rounded-full ${
-                    b.status === "confirmed"
-                      ? "bg-emerald-800/80 text-emerald-100"
-                      : "bg-red-800/80 text-red-100"
-                  }`}
-                >
-                  {b.status === "confirmed" ? "Confirmée" : "Annulée"}
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="border-b border-slate-800">
+                <tr>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Heure</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Terrain</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Client</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Contact</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Statut</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {bookings.map((b) => {
+                  const profile = getUserProfile(b)
+                  return (
+                    <tr key={b.id} className="hover:bg-slate-900/40 transition">
+                      <td className="px-4 py-3">
+                        <div className="text-slate-200 font-medium">
+                          {formatTime(b.slot_start)}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          → {formatTime(b.slot_end)}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="text-slate-200">
+                          {courtsMap[b.court_id] || "—"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="text-slate-200 font-medium">
+                          {profile?.full_name || "—"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="text-slate-200 text-sm">
+                          {profile?.email || "—"}
+                        </div>
+                        {profile?.phone && (
+                          <div className="text-xs text-slate-400 mt-0.5">
+                            {profile.phone}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div
+                          className={`inline-flex text-xs px-3 py-1 rounded-full ${
+                            b.status === "confirmed"
+                              ? "bg-emerald-800/80 text-emerald-100"
+                              : "bg-red-800/80 text-red-100"
+                          }`}
+                        >
+                          {b.status === "confirmed" ? "Confirmée" : "Annulée"}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

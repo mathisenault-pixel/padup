@@ -27,7 +27,7 @@ export default async function DashboardPage() {
     )
   }
 
-  // 2️⃣ Récupérer les bookings d'aujourd'hui
+  // 2️⃣ Récupérer les bookings d'aujourd'hui avec infos utilisateur
   const now = new Date()
   const start = new Date(now)
   start.setHours(0, 0, 0, 0)
@@ -36,7 +36,22 @@ export default async function DashboardPage() {
 
   const { data: bookings } = await supabase
     .from('bookings')
-    .select('id, club_id, court_id, slot_start, slot_end, status, created_at')
+    .select(`
+      id, 
+      club_id, 
+      court_id, 
+      slot_start, 
+      slot_end, 
+      status, 
+      created_at,
+      created_by,
+      profiles:created_by (
+        id,
+        full_name,
+        email,
+        phone
+      )
+    `)
     .eq('club_id', club.id)
     .gte('slot_start', start.toISOString())
     .lte('slot_start', end.toISOString())
