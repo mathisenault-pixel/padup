@@ -36,9 +36,22 @@ export default function ClubSettingsPage() {
 
   const handleLogout = async () => {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-      await signOut()
-      // Force un rechargement complet pour effacer le cache
-      window.location.href = '/club'
+      try {
+        console.log('[Settings] 🔄 Début logout...')
+        
+        // 1. Déconnexion Supabase
+        await signOut()
+        
+        console.log('[Settings] ✅ SignOut terminé')
+        console.log('[Settings] 🚀 Redirection vers /club')
+        
+        // 2. Forcer un rechargement complet sans cache
+        window.location.replace('/club')
+      } catch (error) {
+        console.error('[Settings] ❌ Erreur logout:', error)
+        // Même en cas d'erreur, forcer la redirection
+        window.location.replace('/club')
+      }
     }
   }
 

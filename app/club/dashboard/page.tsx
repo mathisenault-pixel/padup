@@ -46,9 +46,23 @@ export default function Dashboard() {
   }
 
   const handleLogout = async () => {
-    await signOut()
-    // Force un rechargement complet pour effacer le cache
-    window.location.href = '/club'
+    try {
+      console.log('[Dashboard] 🔄 Début logout...')
+      
+      // 1. Déconnexion Supabase
+      await signOut()
+      
+      console.log('[Dashboard] ✅ SignOut terminé')
+      console.log('[Dashboard] 🚀 Redirection vers /club')
+      
+      // 2. Forcer un rechargement complet sans cache
+      // Utilise replace() pour ne pas garder de trace dans l'historique
+      window.location.replace('/club')
+    } catch (error) {
+      console.error('[Dashboard] ❌ Erreur logout:', error)
+      // Même en cas d'erreur, forcer la redirection
+      window.location.replace('/club')
+    }
   }
 
   const handleCreateInvite = async () => {

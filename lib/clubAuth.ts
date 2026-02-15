@@ -161,20 +161,30 @@ export async function getDefaultClub(): Promise<ClubWithMembership | null> {
 }
 
 /**
- * Déconnexion
+ * Déconnexion complète
  */
 export async function signOut() {
   const supabase = supabaseBrowser
+  
+  console.log('[Club Auth] 🔄 Début de la déconnexion...')
   
   // Supprimer toutes les sessions (scope: 'global' pour tout effacer)
   const { error } = await supabase.auth.signOut({ scope: 'global' })
   
   if (error) {
-    console.error('[Club Auth] Sign out error:', error)
+    console.error('[Club Auth] ❌ Sign out error:', error)
     return { error }
   }
 
-  console.log('[Club Auth] ✅ Déconnexion réussie')
+  // Vérifier que la session est bien nulle
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session) {
+    console.warn('[Club Auth] ⚠️ Session encore présente après signOut!')
+  } else {
+    console.log('[Club Auth] ✅ Session bien supprimée')
+  }
+
+  console.log('[Club Auth] ✅ Déconnexion réussie - redirection vers /club')
   return { error: null }
 }
 

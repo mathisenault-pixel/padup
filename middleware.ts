@@ -1,9 +1,29 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // TODO: Implémenter authentification avec Prisma
-  // Pour l'instant, laisser passer toutes les requêtes
+  const { pathname } = request.nextUrl
   
+  // Log pour debug
+  if (pathname.startsWith('/club')) {
+    console.log(`[Middleware] 🔍 Request: ${pathname}`)
+  }
+  
+  // Protéger UNIQUEMENT /club/dashboard et ses sous-routes
+  if (pathname.startsWith('/club/dashboard')) {
+    // Vérifier la présence du token d'auth dans les cookies
+    const token = request.cookies.get('sb-eohioutmqfqdehfxgjgv-auth-token')
+    
+    if (!token) {
+      console.log(`[Middleware] ❌ Pas de token sur ${pathname} -> redirect /club`)
+      const url = request.nextUrl.clone()
+      url.pathname = '/club'
+      return NextResponse.redirect(url)
+    }
+    
+    console.log(`[Middleware] ✅ Token OK sur ${pathname}`)
+  }
+  
+  // Toutes les autres routes : laisser passer
   return NextResponse.next()
 }
 
