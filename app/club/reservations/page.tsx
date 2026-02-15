@@ -24,13 +24,13 @@ export default function ClubReservationsPage() {
       const { club, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club')
+        router.replace('/club')
         return
       }
 
       if (!club) {
         alert('Aucun club associé')
-        router.push('/club/dashboard')
+        router.replace('/club/dashboard')
         return
       }
 

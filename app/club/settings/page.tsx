@@ -16,13 +16,13 @@ export default function ClubSettingsPage() {
       const { club: userClub, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club')
+        router.replace('/club')
         return
       }
 
       if (!userClub) {
         alert('Aucun club associé')
-        router.push('/club/dashboard')
+        router.replace('/club/dashboard')
         return
       }
 

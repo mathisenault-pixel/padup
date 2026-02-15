@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser } from '@/lib/supabaseBrowser'
+import { getCurrentClub } from '@/lib/getClub'
 import { signOut } from '@/lib/clubAuth'
 
 export default function Dashboard() {
@@ -21,31 +22,22 @@ export default function Dashboard() {
   const loadClub = async () => {
     setLoading(true)
     try {
-      // 1. Récupérer la session
-      const { data: sessionData } = await supabaseBrowser.auth.getSession()
-      const session = sessionData.session
+      const { club, session } = await getCurrentClub()
 
       if (!session) {
-        router.push('/club')
+        // Pas de session -> redirect page publique club
+        router.replace('/club')
         return
       }
 
-      // 2. Requête club_memberships
-      const { data, error } = await supabaseBrowser
-        .from('club_memberships')
-        .select('club_id, role, clubs:club_id ( id, name, city, club_code )')
-        .eq('user_id', session.user.id)
-
-      if (error) {
-        console.error('[Dashboard] Error loading memberships:', error)
+      if (!club) {
+        // Session mais pas de membership -> rester sur la page pour afficher le message
+        setLoading(false)
         return
       }
 
-      // 3. Extraire le premier club si présent
-      const first = data?.[0]
-      if (first?.clubs) {
-        setClub(first.clubs)
-      }
+      // Club trouvé
+      setClub(club)
     } catch (err) {
       console.error('[Dashboard] Error loading club:', err)
     } finally {

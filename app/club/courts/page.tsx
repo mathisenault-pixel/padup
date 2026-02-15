@@ -33,13 +33,13 @@ export default function CourtsPage() {
       const { club: userClub, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club')
+        router.replace('/club')
         return
       }
 
       if (!userClub) {
         alert('Aucun club associé à votre compte')
-        router.push('/club/dashboard')
+        router.replace('/club/dashboard')
         return
       }
       
@@ -47,7 +47,7 @@ export default function CourtsPage() {
       await fetchCourts(userClub.id)
     } catch (err) {
       console.error('Error loading data:', err)
-      router.push('/club')
+      router.replace('/club')
     } finally {
       setLoading(false)
     }
