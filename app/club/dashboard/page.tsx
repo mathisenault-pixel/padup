@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser } from '@/lib/supabaseBrowser'
 import { getCurrentClub } from '@/lib/getClub'
-import { signOut } from '@/lib/clubAuth'
+import { logout } from '@/lib/logout'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -46,23 +46,8 @@ export default function Dashboard() {
   }
 
   const handleLogout = async () => {
-    try {
-      console.log('[Dashboard] 🔄 Début logout...')
-      
-      // 1. Déconnexion Supabase
-      await signOut()
-      
-      console.log('[Dashboard] ✅ SignOut terminé')
-      console.log('[Dashboard] 🚀 Redirection vers /club')
-      
-      // 2. Forcer un rechargement complet sans cache
-      // Utilise replace() pour ne pas garder de trace dans l'historique
-      window.location.replace('/club')
-    } catch (error) {
-      console.error('[Dashboard] ❌ Erreur logout:', error)
-      // Même en cas d'erreur, forcer la redirection
-      window.location.replace('/club')
-    }
+    // Utilise la fonction unique de logout
+    await logout()
   }
 
   const handleCreateInvite = async () => {
