@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@supabase/supabase-js"
-import { formatTimeInParisTz, debugTimezone } from '@/lib/dateUtils'
+import { formatTimeInParisTz, debugTimezone, createSlotStartUTC, calculateSlotEnd } from '@/lib/dateUtils'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -264,25 +264,27 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
           const endH = Math.floor(endMinutes / 60)
           const endM = endMinutes % 60
           
-          const slotStart = new Date(currentDate)
-          slotStart.setHours(startH, startM, 0, 0)
+          // ✅ CORRECTION TIMEZONE: Utiliser createSlotStartUTC pour générer des timestamps cohérents
+          const dateStr = currentDate.toISOString().split('T')[0] // YYYY-MM-DD
+          const timeStr = `${String(startH).padStart(2, '0')}:${String(startM).padStart(2, '0')}` // HH:mm
           
-          const slotEnd = new Date(currentDate)
-          slotEnd.setHours(endH, endM, 0, 0)
+          // Créer slot_start en UTC (comme les bookings en base)
+          const slotStartUTC = createSlotStartUTC(dateStr, timeStr)
+          const slotEndUTC = calculateSlotEnd(slotStartUTC)
           
-          // Vérifier si ce créneau est réservé
+          // ✅ Vérifier si ce créneau est réservé (comparaison en ISO string pour éviter problèmes timezone)
           const isBooked = bookings.some(b => 
             b.court_id === court.id &&
             b.status === 'confirmed' &&
-            new Date(b.slot_start).getTime() === slotStart.getTime()
+            b.slot_start === slotStartUTC // Comparaison directe des ISO strings
           )
           
           slots.push({
             courtId: court.id,
             courtName: court.name,
-            date: currentDate.toISOString().split('T')[0],
-            start: slotStart.toISOString(),
-            end: slotEnd.toISOString(),
+            date: dateStr,
+            start: slotStartUTC,
+            end: slotEndUTC,
             isBooked
           })
           
