@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("[API INSERT - reservations]", {
+    console.log("[API INSERT - bookings]", {
       clubId,
       courtId,
       slotStart,
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     });
 
     // =====================================================
-    // Calculer slot_start et fin_de_slot (timestamptz)
+    // Calculer slot_start et slot_end (timestamptz)
     // =====================================================
     const slotStartDate = new Date(slotStart);
     const slotEndDate = new Date(slotStartDate.getTime() + 90 * 60 * 1000); // +90 minutes
@@ -50,29 +50,29 @@ export async function POST(req: Request) {
 
     console.log("[SLOT CALCULATION]", {
       slotStart: slotStartISO,
-      finDeSlot: slotEndISO,
+      slotEnd: slotEndISO,
     });
 
     // =====================================================
-    // INSERT direct dans reservations
-    // Colonnes: club_id, court_id, slot_start, fin_de_slot, user_id, status
+    // INSERT direct dans bookings
+    // Colonnes: club_id, court_id, slot_start, slot_end, created_by, status
     // Protection anti-double-booking via UNIQUE INDEX
     // =====================================================
     const { data, error } = await supabase
-      .from("reservations")
+      .from("bookings")
       .insert([{
         club_id: clubId,
         court_id: courtId,
         slot_start: slotStartISO,
-        fin_de_slot: slotEndISO,
-        user_id: createdBy,
-        status: status || 'reserved',
+        slot_end: slotEndISO,
+        created_by: createdBy,
+        status: status || 'confirmed',
       }])
       .select()
       .single();
 
     if (error) {
-      console.error("[INSERT ERROR - reservations]", {
+      console.error("[INSERT ERROR - bookings]", {
         code: error.code,
         message: error.message,
         details: error.details,
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("[INSERT SUCCESS - reservations]", data);
+    console.log("[INSERT SUCCESS - bookings]", data);
     console.log("[API /bookings POST] Success");
 
     return NextResponse.json({ 
@@ -118,9 +118,9 @@ export async function POST(req: Request) {
       bookingId: data.id,
       clubId: data.club_id,
       courtId: data.court_id,
-      userId: data.user_id,
+      createdBy: data.created_by,
       slotStart: data.slot_start,
-      finDeSlot: data.fin_de_slot,
+      slotEnd: data.slot_end,
       status: data.status,
       durationMinutes: 90
     });

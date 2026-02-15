@@ -377,13 +377,13 @@ export default function AvailabilityPage() {
    */
   useEffect(() => {
     const channel = supabase
-      .channel("reservations-realtime")
+      .channel("bookings-realtime")
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
-          table: "reservations",
+          table: "bookings",
           filter: `court_id=eq.${courtId}`,
         },
         () => {

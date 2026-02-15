@@ -18,13 +18,14 @@ const supabase = createClient(
 );
 
 type Booking = {
-  identifiant: string;
+  id: string;
   club_id: string;
   court_id: string;
   slot_start: string;
-  fin_de_slot: string;
-  statut: string;
-  cree_a: string;
+  slot_end: string;
+  status: string;
+  created_at: string;
+  created_by: string;
   clubs: { name: string } | null;
   courts: { name: string } | null;
 };
@@ -68,16 +69,17 @@ export default function MyBookingsPage() {
 
     try {
       let query = supabase
-        .from("reservations")
+        .from("bookings")
         .select(
           `
-          identifiant,
+          id,
           club_id,
           court_id,
           slot_start,
-          fin_de_slot,
-          statut,
-          cree_a,
+          slot_end,
+          status,
+          created_at,
+          created_by,
           clubs (
             name
           ),
@@ -86,18 +88,18 @@ export default function MyBookingsPage() {
           )
         `
         )
-        .eq("cree_par", userId)
+        .eq("created_by", userId)
         .order("slot_start", { ascending: false });
 
       // Filtrer par statut
       if (filter === "upcoming") {
         query = query
-          .eq("statut", "confirmed")
+          .eq("status", "confirmed")
           .gte("slot_start", new Date().toISOString());
       } else if (filter === "past") {
         query = query.lt("slot_start", new Date().toISOString());
       } else if (filter === "cancelled") {
-        query = query.eq("statut", "cancelled");
+        query = query.eq("status", "cancelled");
       }
 
       const { data, error } = await query;
@@ -156,11 +158,11 @@ export default function MyBookingsPage() {
     setIsCancelling(true);
 
     console.log("[CANCEL BOOKING]", {
-      bookingId: bookingToCancel.identifiant,
+      bookingId: bookingToCancel.id,
     });
 
     try {
-      const res = await fetch(`/api/bookings/${bookingToCancel.identifiant}/cancel`, {
+      const res = await fetch(`/api/bookings/${bookingToCancel.id}/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -263,7 +265,7 @@ export default function MyBookingsPage() {
    */
   function isCancellable(booking: Booking): boolean {
     // Seulement si status = confirmed et date dans le futur
-    if (booking.statut !== "confirmed") return false;
+    if (booking.status !== "confirmed") return false;
     const slotStart = new Date(booking.slot_start);
     return slotStart > new Date();
   }
@@ -429,12 +431,12 @@ export default function MyBookingsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {bookings.map((booking) => {
             const isPast = new Date(booking.slot_start) < new Date();
-            const isCancelled = booking.statut === "cancelled";
+            const isCancelled = booking.status === "cancelled";
             const canCancel = isCancellable(booking);
 
             return (
               <div
-                key={booking.identifiant}
+                key={booking.id}
                 style={{
                   border: "1px solid #ddd",
                   borderRadius: 12,
@@ -490,7 +492,7 @@ export default function MyBookingsPage() {
                     📅 {formatDate(booking.slot_start)}
                   </div>
                   <div style={{ fontSize: 15, color: "#666" }}>
-                    🕐 {formatTime(booking.slot_start)} - {formatTime(booking.fin_de_slot)}
+                    🕐 {formatTime(booking.slot_start)} - {formatTime(booking.slot_end)}
                     <span style={{ marginLeft: 8, fontSize: 13, color: "#999" }}>
                       (1h30)
                     </span>
@@ -586,7 +588,7 @@ export default function MyBookingsPage() {
               </div>
               <div style={{ fontSize: 14, color: "#666" }}>
                 🕐 {formatTime(bookingToCancel.slot_start)} -{" "}
-                {formatTime(bookingToCancel.fin_de_slot)} (1h30)
+                {formatTime(bookingToCancel.slot_end)} (1h30)
               </div>
             </div>
             <p style={{ fontSize: 13, color: "#dc3545", margin: 0, fontWeight: 500 }}>
