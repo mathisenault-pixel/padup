@@ -151,6 +151,16 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
   console.log('[DASHBOARD MAIN] Bookings today:', bookingsToday.length)
   console.log('[DASHBOARD MAIN] Courts count:', courts.length)
   
+  // Debug première réservation pour voir le format
+  if (bookingsToday.length > 0) {
+    const firstBooking = bookingsToday[0]
+    console.log('[DASHBOARD MAIN] First booking raw:', firstBooking)
+    console.log('[DASHBOARD MAIN] slot_start raw:', firstBooking.slot_start)
+    console.log('[DASHBOARD MAIN] slot_start as Date:', new Date(firstBooking.slot_start))
+    console.log('[DASHBOARD MAIN] slot_start formatted:', formatTime(firstBooking.slot_start))
+    console.log('[DASHBOARD MAIN] slot_start local time:', new Date(firstBooking.slot_start).toLocaleString('fr-FR'))
+  }
+  
   // Calcul KPI basé sur les bookings d'AUJOURD'HUI uniquement
   const confirmed = bookingsToday.filter((b) => b.status === "confirmed").length
   const cancelled = bookingsToday.filter((b) => b.status === "cancelled").length
@@ -347,9 +357,13 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
     console.log('[HANGAR DASHBOARD] Creating booking:')
     console.log('  - Selected date:', selectedDate)
     console.log('  - Selected time:', selectedTime)
+    console.log('  - Constructed date object:', slotStart)
     console.log('  - Slot start (local):', slotStart.toLocaleString('fr-FR'))
     console.log('  - Slot start (ISO):', slotStart.toISOString())
+    console.log('  - Slot start (UTC hour):', slotStart.getUTCHours())
+    console.log('  - Slot start (local hour):', slotStart.getHours())
     console.log('  - Slot end (ISO):', slotEnd.toISOString())
+    console.log('  - Timezone offset:', slotStart.getTimezoneOffset())
 
     const { data: userData } = await supabase.auth.getUser()
     if (!userData.user) {
