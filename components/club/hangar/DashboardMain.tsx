@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createClient } from "@supabase/supabase-js"
+import { formatTimeInParisTz, debugTimezone } from '@/lib/dateUtils'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -42,11 +43,13 @@ function KPI({ title, value, small }: { title: string; value: string | number; s
   )
 }
 
+/**
+ * ⚠️ FONCTION OBSOLÈTE - Remplacée par formatTimeInParisTz
+ * On garde temporairement pour compatibilité, mais elle appelle formatTimeInParisTz
+ */
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  // ✅ Utiliser la fonction timezone-aware de dateUtils
+  return formatTimeInParisTz(iso)
 }
 
 type TimeSlot = {
@@ -151,7 +154,7 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
   console.log('[DASHBOARD MAIN] Bookings today:', bookingsToday.length)
   console.log('[DASHBOARD MAIN] Courts count:', courts.length)
   
-  // Debug première réservation pour voir le format
+  // Debug première réservation pour voir le format ET diagnostiquer timezone
   if (bookingsToday.length > 0) {
     const firstBooking = bookingsToday[0]
     console.log('[DASHBOARD MAIN] First booking raw:', firstBooking)
@@ -159,6 +162,10 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
     console.log('[DASHBOARD MAIN] slot_start as Date:', new Date(firstBooking.slot_start))
     console.log('[DASHBOARD MAIN] slot_start formatted:', formatTime(firstBooking.slot_start))
     console.log('[DASHBOARD MAIN] slot_start local time:', new Date(firstBooking.slot_start).toLocaleString('fr-FR'))
+    
+    // ✅ DEBUG TIMEZONE COMPLET
+    debugTimezone('slot_start', firstBooking.slot_start)
+    debugTimezone('slot_end', firstBooking.slot_end)
   }
   
   // Calcul KPI basé sur les bookings d'AUJOURD'HUI uniquement

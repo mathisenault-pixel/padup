@@ -8,6 +8,7 @@ import PremiumModal from './PremiumModal'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 import { getClubImage } from '@/lib/clubImages'
 import { getClubById } from '@/lib/data/clubs'
+import { createSlotStartUTC, calculateSlotEnd, debugTimezone } from '@/lib/dateUtils'
 
 type Club = {
   id: string
@@ -73,15 +74,9 @@ function combineDateAndTime(dateStr: string, timeStr: string): string {
 }
 
 /**
- * Calculer slot_end en ajoutant EXACTEMENT 90 minutes à slot_start
- * ✅ Garantit la contrainte DB: slot_end - slot_start = 90 minutes EXACT
- * ✅ Utilise getTime() pour calcul en millisecondes (pas d'arrondi)
+ * ⚠️ FONCTION SUPPRIMÉE - Utiliser calculateSlotEnd de @/lib/dateUtils
+ * (Importée en haut du fichier)
  */
-function calculateSlotEnd(slotStartISO: string): string {
-  const startDate = new Date(slotStartISO)
-  const endDate = new Date(startDate.getTime() + 90 * 60 * 1000) // +90 minutes EXACT
-  return endDate.toISOString() // Format UTC avec Z
-}
 
 /**
  * Valider que la durée entre deux timestamps est exactement 90 minutes
@@ -774,30 +769,28 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
       
       // ============================================
       // ✅ CALCUL STRICT ET UNIQUE DE LA DURÉE 90 MINUTES
+      // Utilisation de la fonction timezone-aware de dateUtils
       // ============================================
-      // Ne dépend d'AUCUNE source externe (pas de time_slots.end_time, pas de slot_id, etc.)
-      // Calcul unique et strict: end = start + 90 minutes EXACTEMENT
       
-      // Étape 1: Construire slot_start depuis date + heure du slot sélectionné EN HEURE LOCALE
-      // Utiliser le constructeur Date avec year, month, day, hours, minutes pour éviter les problèmes de timezone
-      const [hours, minutes] = selectedSlot.start_time.split(':').map(Number)
-      const [year, month, day] = bookingDate.split('-').map(Number)
-      const start = new Date(year, month - 1, day, hours, minutes, 0, 0)
+      // Étape 1: Créer slot_start en UTC depuis date locale + heure locale (Paris)
+      const slot_start = createSlotStartUTC(bookingDate, selectedSlot.start_time)
       
-      // Étape 2: Calculer slot_end = start + 90 minutes EXACT
-      const end = new Date(start.getTime() + 90 * 60 * 1000)
-      
-      // Étape 3: Convertir en ISO UTC pour Supabase (la conversion UTC se fait automatiquement)
-      const slot_start = start.toISOString()
-      const slot_end = end.toISOString()
+      // Étape 2: Calculer slot_end = slot_start + 90 minutes EXACT
+      const slot_end = calculateSlotEnd(slot_start)
       
       console.log('[BOOKING TIMEZONE DEBUG]')
-      console.log('  - Selected time:', selectedSlot.start_time)
-      console.log('  - Constructed date (local):', start.toLocaleString('fr-FR'))
+      console.log('  - Selected time (local Paris):', selectedSlot.start_time)
+      console.log('  - Booking date:', bookingDate)
       console.log('  - ISO for DB (UTC):', slot_start)
-      console.log('  - Timezone offset:', start.getTimezoneOffset(), 'minutes')
+      console.log('  - ISO slot_end (UTC):', slot_end)
+      
+      // ✅ DEBUG COMPLET TIMEZONE
+      debugTimezone('slot_start (before insert)', slot_start)
+      debugTimezone('slot_end (before insert)', slot_end)
       
       // ✅ LOG DE DEBUG OBLIGATOIRE
+      const start = new Date(slot_start)
+      const end = new Date(slot_end)
       const diffMin = (end.getTime() - start.getTime()) / 60000
       console.log('BOOKING_DEBUG', {
         start: slot_start,
