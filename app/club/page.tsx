@@ -88,7 +88,7 @@ export default function ClubDashboardPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
               Accédez à votre espace
             </h2>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 mb-4">
               <Link
                 href="/club/auth/login"
                 className="flex-1 px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg transition-all text-center"
@@ -100,6 +100,14 @@ export default function ClubDashboardPage() {
                 className="flex-1 px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition-all text-center"
               >
                 Créer un compte
+              </Link>
+            </div>
+            <div className="text-center">
+              <Link
+                href="/"
+                className="inline-block px-6 py-3 text-slate-600 hover:text-slate-900 font-medium text-sm border border-slate-300 rounded-lg hover:bg-slate-50 transition-all"
+              >
+                Continuer sans connexion
               </Link>
             </div>
           </div>
