@@ -35,41 +35,42 @@ export default function ReservationsSimple({ bookings, courts }: Props) {
 
   return (
     <section className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold">Réservations du jour</h2>
-        <p className="text-sm text-slate-400">
-          {bookings.length} réservation(s) trouvée(s)
+      <div className="bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 rounded-xl p-5 shadow-sm">
+        <h2 className="text-xl font-bold text-slate-900">Réservations du jour</h2>
+        <p className="text-sm text-slate-600 mt-1">
+          <span className="font-semibold text-blue-600">{bookings.length}</span> réservation(s) trouvée(s)
         </p>
       </div>
 
       {bookings.length === 0 ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-8 text-center">
-          <div className="text-sm text-slate-400">Aucune réservation aujourd'hui.</div>
+        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+          <div className="text-5xl mb-4">📅</div>
+          <div className="text-sm text-slate-600 font-medium">Aucune réservation aujourd'hui.</div>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
-          <div className="divide-y divide-slate-800 rounded-lg overflow-hidden">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="divide-y divide-slate-100">
             {bookings.map((b) => (
               <div
                 key={b.id}
-                className="flex items-center justify-between px-4 py-3 bg-slate-950/20 hover:bg-slate-900 transition"
+                className="flex items-center justify-between px-5 py-4 hover:bg-blue-50/50 transition"
               >
                 <div>
-                  <div className="text-sm text-slate-200">
+                  <div className="text-sm font-semibold text-slate-900">
                     {formatTime(b.slot_start)} → {formatTime(b.slot_end)}
                   </div>
-                  <div className="text-xs text-slate-400 mt-0.5">
+                  <div className="text-xs text-slate-600 mt-1 font-medium">
                     {courtsMap[b.court_id] || "Terrain inconnu"}
                   </div>
                 </div>
                 <span
-                  className={`text-xs px-3 py-1 rounded-full ${
+                  className={`text-xs font-semibold px-4 py-1.5 rounded-full ${
                     b.status === "confirmed"
-                      ? "bg-emerald-800/70 text-emerald-100 border border-emerald-700/40"
-                      : "bg-red-800/70 text-red-100 border border-red-700/40"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-rose-100 text-rose-700"
                   }`}
                 >
-                  {b.status === "confirmed" ? "Confirmée" : "Annulée"}
+                  {b.status === "confirmed" ? "✓ Confirmée" : "✕ Annulée"}
                 </span>
               </div>
             ))}

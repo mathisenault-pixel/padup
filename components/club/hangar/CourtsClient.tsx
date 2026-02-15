@@ -175,36 +175,31 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
     <section className="space-y-6">
       {/* Live Badge */}
       <div className="flex items-center justify-end">
-
-          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-            <span
-              className={`h-2 w-2 rounded-full ${
-                isLive ? "bg-green-500 animate-pulse" : "bg-slate-500"
-              }`}
-            />
-            <span className="text-sm text-slate-300">{isLive ? "Live" : "Hors ligne"}</span>
-          </div>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-200">
+          <div className={`w-2 h-2 rounded-full ${isLive ? "bg-white animate-pulse" : "bg-white/50"}`} />
+          <span className="text-xs font-bold">{isLive ? "LIVE" : "HORS LIGNE"}</span>
         </div>
+      </div>
 
-        {/* Shell Card */}
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6">
+      {/* Shell Card */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
           {/* Header */}
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold">Gestion des terrains</h2>
-            <p className="text-sm text-slate-400 mt-1">
+            <h2 className="text-2xl font-bold text-slate-900">Gestion des terrains</h2>
+            <p className="text-sm text-slate-600 mt-1">
               Ajoutez, renommez et activez/désactivez vos terrains en temps réel.
             </p>
           </div>
 
           {/* Message global */}
           {message && (
-            <div className="mb-4 p-3 bg-green-400/10 border border-green-400/30 rounded-lg">
-              <p className="text-sm text-green-200">{message}</p>
+            <div className="mb-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl">
+              <p className="text-sm font-medium text-emerald-700">✓ {message}</p>
             </div>
           )}
 
           {/* Formulaire d'ajout */}
-          <div className="mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+          <div className="mb-6 p-5 bg-gradient-to-br from-blue-50 to-white border-2 border-blue-100 rounded-xl shadow-sm">
             <div className="flex gap-3">
               <div className="flex-1">
                 <input
@@ -219,16 +214,16 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                     if (e.key === "Enter") handleAddCourt()
                   }}
                   disabled={isAdding}
-                  className="w-full px-4 py-2 bg-slate-800 border border-white/10 rounded-lg text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                  className="w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 transition font-medium"
                 />
                 {addError && (
-                  <p className="text-xs text-red-400 mt-1">{addError}</p>
+                  <p className="text-xs text-rose-600 mt-2 font-medium">{addError}</p>
                 )}
               </div>
               <button
                 onClick={handleAddCourt}
                 disabled={isAdding}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold shadow-lg shadow-blue-200"
               >
                 {isAdding ? (
                   <>
@@ -251,7 +246,7 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
           {courts.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-5xl mb-4">🏟️</div>
-              <p className="text-slate-400">Aucun terrain pour le moment.</p>
+              <p className="text-slate-600 font-medium">Aucun terrain pour le moment.</p>
               <p className="text-sm text-slate-500 mt-2">
                 Ajoutez votre premier terrain ci-dessus.
               </p>
@@ -265,10 +260,10 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                 return (
                   <div
                     key={court.id}
-                    className={`p-4 rounded-xl border transition ${
+                    className={`p-5 rounded-xl border-2 transition shadow-sm ${
                       court.is_active
-                        ? "bg-white/5 border-white/10 hover:bg-white/10"
-                        : "bg-slate-800/30 border-slate-700/50 opacity-60"
+                        ? "bg-white border-slate-200 hover:border-blue-300 hover:shadow-md"
+                        : "bg-slate-50 border-slate-300 opacity-60"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-4">
@@ -286,19 +281,19 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                               }}
                               disabled={isUpdating}
                               autoFocus
-                              className="flex-1 px-3 py-1.5 bg-slate-700 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                              className="flex-1 px-4 py-2 bg-white border-2 border-blue-300 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 font-medium"
                             />
                             <button
                               onClick={() => saveEdit(court.id)}
                               disabled={isUpdating}
-                              className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 text-sm"
+                              className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition disabled:opacity-50 font-semibold shadow-md"
                             >
                               {isUpdating ? "..." : "✓"}
                             </button>
                             <button
                               onClick={cancelEdit}
                               disabled={isUpdating}
-                              className="px-3 py-1.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition disabled:opacity-50 text-sm"
+                              className="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition disabled:opacity-50 font-semibold"
                             >
                               ✕
                             </button>
@@ -306,8 +301,8 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                         ) : (
                           <>
                             <div className="flex-1">
-                              <div className="font-medium text-white">{court.name}</div>
-                              <div className="text-xs text-slate-400 mt-0.5">
+                              <div className="font-semibold text-slate-900">{court.name}</div>
+                              <div className="text-xs text-slate-500 mt-0.5">
                                 Créé le{" "}
                                 {new Date(court.created_at).toLocaleDateString("fr-FR", {
                                   day: "2-digit",
@@ -320,11 +315,11 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                             {/* Badge statut */}
                             <div>
                               {court.is_active ? (
-                                <span className="inline-flex items-center rounded-full border border-green-400/30 bg-green-400/10 text-green-200 px-3 py-1 text-xs">
-                                  Actif
+                                <span className="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 px-3 py-1.5 text-xs font-semibold">
+                                  ✓ Actif
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center rounded-full border border-slate-400/30 bg-slate-400/10 text-slate-400 px-3 py-1 text-xs">
+                                <span className="inline-flex items-center rounded-full bg-slate-200 text-slate-600 px-3 py-1.5 text-xs font-semibold">
                                   Inactif
                                 </span>
                               )}
@@ -339,10 +334,10 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                           {/* Renommer */}
                           <button
                             onClick={() => startEdit(court)}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition"
+                            className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition"
                             title="Renommer"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                             </svg>
                           </button>
@@ -351,10 +346,10 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
                           <button
                             onClick={() => toggleActive(court)}
                             disabled={isToggling}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm ${
                               court.is_active
-                                ? "bg-slate-600 text-white hover:bg-slate-700"
-                                : "bg-green-600 text-white hover:bg-green-700"
+                                ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                                : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200"
                             }`}
                           >
                             {isToggling
@@ -374,30 +369,32 @@ export default function CourtsClient({ clubId, initialCourts }: Props) {
 
           {/* Stats */}
           {courts.length > 0 && (
-            <div className="mt-6 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-400">Total:</span>
-                <span className="font-semibold text-white">{courts.length} terrain(s)</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mt-2">
-                <span className="text-slate-400">Actifs:</span>
-                <span className="font-semibold text-green-400">
-                  {courts.filter((c) => c.is_active).length}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm mt-2">
-                <span className="text-slate-400">Inactifs:</span>
-                <span className="font-semibold text-slate-400">
-                  {courts.filter((c) => !c.is_active).length}
-                </span>
+            <div className="mt-6 pt-5 border-t-2 border-slate-200">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-slate-900">{courts.length}</div>
+                  <div className="text-xs text-slate-600 mt-1 font-medium">Total</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-emerald-600">
+                    {courts.filter((c) => c.is_active).length}
+                  </div>
+                  <div className="text-xs text-slate-600 mt-1 font-medium">Actifs</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-slate-400">
+                    {courts.filter((c) => !c.is_active).length}
+                  </div>
+                  <div className="text-xs text-slate-600 mt-1 font-medium">Inactifs</div>
+                </div>
               </div>
             </div>
           )}
 
           {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <p className="text-xs text-slate-500 text-center">
-              Les données sont mises à jour en temps réel.
+          <div className="mt-6 pt-4 border-t border-slate-200">
+            <p className="text-xs text-slate-500 text-center font-medium">
+              ⚡ Les données sont mises à jour en temps réel
             </p>
           </div>
         </div>
