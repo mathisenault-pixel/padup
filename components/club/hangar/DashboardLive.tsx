@@ -323,7 +323,7 @@ export default function DashboardLive({ clubId, initialBookings, startIso, endIs
   }, [clubId, startIso, endIso])
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-slate-950 text-white">
       <div className="max-w-6xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
