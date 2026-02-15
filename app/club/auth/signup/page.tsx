@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { signUpWithEmail } from '@/lib/clubAuth'
+import { supabaseBrowser } from '@/lib/supabaseBrowser'
 
 export default function ClubAuthSignupPage() {
   const router = useRouter()
@@ -18,6 +19,24 @@ export default function ClubAuthSignupPage() {
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+
+  // Check si déjà connecté au chargement
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabaseBrowser.auth.getSession()
+      
+      if (session) {
+        console.log('[Club Auth Signup] ✅ Session déjà existante -> redirect dashboard')
+        router.replace('/club/hangar/dashboard')
+        return
+      }
+      
+      setIsCheckingSession(false)
+    }
+
+    checkSession()
+  }, [router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -76,14 +95,23 @@ export default function ClubAuthSignupPage() {
 
       console.log('[Club Auth Signup] ✅ Club créé:', club)
 
-      // Redirection vers le dashboard
-      router.push('/club/dashboard')
+      // Redirection DIRECT vers le dashboard Hangar
+      router.replace('/club/hangar/dashboard')
     } catch (err: any) {
       console.error('[Club Auth Signup] Error:', err)
       setError('Une erreur est survenue lors de la création du compte')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Afficher un loader pendant la vérification de session
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
+      </div>
+    )
   }
 
   return (

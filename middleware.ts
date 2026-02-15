@@ -6,18 +6,33 @@ export async function middleware(req: NextRequest) {
 
   console.log(`[Middleware] 📍 Request: ${path}`)
 
-  // PUBLIC: Tout sauf /club/dashboard/*
-  if (!path.startsWith("/club/dashboard")) {
-    console.log(`[Middleware] ✅ Route publique: ${path}`)
+  // EXCLURE EXPLICITEMENT les pages publiques (éviter les boucles)
+  const publicPaths = [
+    '/club',
+    '/club/login',
+    '/club/auth/login',
+    '/club/auth/signup',
+    '/club/signup',
+    '/club-access',
+  ]
+  
+  if (publicPaths.includes(path) || path.startsWith('/club/invite/')) {
+    console.log(`[Middleware] ✅ Route publique explicite: ${path}`)
     return NextResponse.next()
   }
 
-  // PROTÉGÉ: /club/dashboard/*
+  // PROTÉGÉ: /club/dashboard et /club/hangar/dashboard
+  const isProtectedRoute = path.startsWith("/club/dashboard") || path.startsWith("/club/hangar/dashboard")
+  
+  if (!isProtectedRoute) {
+    console.log(`[Middleware] ✅ Route non protégée: ${path}`)
+    return NextResponse.next()
+  }
+
   // Vérifier si l'utilisateur a un token Supabase
   const cookies = req.cookies
   let hasAuthToken = false
 
-  // Chercher un cookie Supabase auth (plusieurs formats possibles)
   cookies.getAll().forEach(cookie => {
     if (cookie.name.includes('sb-') && cookie.name.includes('auth-token')) {
       hasAuthToken = true
@@ -25,19 +40,20 @@ export async function middleware(req: NextRequest) {
   })
 
   if (!hasAuthToken) {
-    console.log(`[Middleware] ❌ Pas de token auth -> redirect /club`)
+    console.log(`[Middleware] ❌ Pas de token auth sur route protégée -> redirect /club`)
     const url = req.nextUrl.clone()
     url.pathname = "/club"
     return NextResponse.redirect(url)
   }
 
-  console.log(`[Middleware] ✅ Token trouvé -> accès dashboard autorisé`)
+  console.log(`[Middleware] ✅ Token trouvé -> accès autorisé`)
   return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    // Protéger uniquement /club/dashboard et ses sous-routes
+    // Protéger /club/dashboard et /club/hangar/dashboard (et leurs sous-routes)
     "/club/dashboard/:path*",
+    "/club/hangar/dashboard/:path*",
   ],
 }

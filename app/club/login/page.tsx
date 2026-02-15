@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
@@ -10,6 +10,24 @@ export default function ClubLoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+
+  // Check si déjà connecté au chargement
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (session) {
+        console.log('[Club Login] ✅ Session déjà existante -> redirect dashboard')
+        router.replace('/club/hangar/dashboard')
+        return
+      }
+      
+      setIsCheckingSession(false)
+    }
+
+    checkSession()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +45,8 @@ export default function ClubLoginPage() {
       if (data) {
         console.log('[Club Login] ✅ Success:', data)
         localStorage.setItem('club', JSON.stringify(data))
-        router.push('/club/dashboard')
+        // Redirection DIRECT vers le dashboard Hangar
+        router.replace('/club/hangar/dashboard')
       } else {
         setError('Identifiant ou mot de passe incorrect')
       }
@@ -37,6 +56,15 @@ export default function ClubLoginPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Afficher un loader pendant la vérification de session
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
+      </div>
+    )
   }
 
   return (
