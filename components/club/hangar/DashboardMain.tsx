@@ -94,6 +94,16 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
     courtsMap[c.id] = c.name
   })
 
+  // Grouper les réservations par terrain
+  const bookingsByCourt = courts.map(court => {
+    const courtBookings = bookings.filter(b => b.court_id === court.id && b.status === "confirmed")
+    return {
+      court,
+      bookings: courtBookings,
+      isEmpty: courtBookings.length === 0
+    }
+  })
+
   // Export CSV
   const exportCsv = () => {
     const headers = ["Date", "Heure début", "Heure fin", "Terrain", "Statut"]
@@ -185,10 +195,10 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       </div>
 
       <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">Planning du jour</h2>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-semibold text-slate-900">Planning du jour par terrain</h2>
           <span className="text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-medium">
-            {bookings.length} réservation{bookings.length > 1 ? 's' : ''}
+            {bookings.filter(b => b.status === "confirmed").length} réservation{bookings.filter(b => b.status === "confirmed").length > 1 ? 's' : ''}
           </span>
         </div>
 
@@ -197,46 +207,61 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
             Aucune réservation aujourd'hui
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b-2 border-slate-200 bg-slate-50">
-                <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Heure</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Terrain</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Statut</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {bookings.map((b) => (
-                  <tr key={b.id} className="hover:bg-blue-50/50 transition">
-                    <td className="px-4 py-4">
-                      <div className="text-slate-900 font-semibold">
-                        {formatTime(b.slot_start)}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        → {formatTime(b.slot_end)}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="text-slate-900 font-medium">
-                        {courtsMap[b.court_id] || "—"}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {bookingsByCourt.map(({ court, bookings: courtBookings, isEmpty }) => (
+              <div
+                key={court.id}
+                className={`border-2 rounded-xl p-4 transition-all ${
+                  isEmpty
+                    ? "border-slate-200 bg-slate-50/50"
+                    : "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white shadow-sm"
+                }`}
+              >
+                {/* Header terrain */}
+                <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${isEmpty ? "bg-slate-300" : "bg-emerald-500"}`}></div>
+                    <h3 className="font-bold text-slate-900">{court.name}</h3>
+                  </div>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                    isEmpty
+                      ? "bg-slate-200 text-slate-600"
+                      : "bg-emerald-100 text-emerald-700"
+                  }`}>
+                    {courtBookings.length}
+                  </span>
+                </div>
+
+                {/* Liste des réservations ou message vide */}
+                {isEmpty ? (
+                  <div className="text-center py-6">
+                    <div className="text-3xl mb-2">✓</div>
+                    <p className="text-xs text-slate-500 font-medium">Disponible toute la journée</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {courtBookings.map((b) => (
                       <div
-                        className={`inline-flex text-xs font-semibold px-3 py-1.5 rounded-full ${
-                          b.status === "confirmed"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : "bg-rose-100 text-rose-700"
-                        }`}
+                        key={b.id}
+                        className="bg-white border border-emerald-200 rounded-lg p-3 hover:shadow-sm transition"
                       >
-                        {b.status === "confirmed" ? "✓ Confirmée" : "✕ Annulée"}
+                        <div className="flex items-center gap-2 mb-1">
+                          <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="text-sm font-bold text-slate-900">
+                            {formatTime(b.slot_start)}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-500 ml-6">
+                          → {formatTime(b.slot_end)}
+                        </div>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
