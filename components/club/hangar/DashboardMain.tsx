@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
@@ -60,6 +60,7 @@ type TimeSlot = {
 
 export default function DashboardMain({ clubId, initialBookings, courts, settings }: Props) {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings)
+  const [isLive, setIsLive] = useState(false)
   
   // Onglets : "reservations" ou "disponibilites"
   const [activeTab, setActiveTab] = useState<'reservations' | 'disponibilites'>('reservations')
@@ -76,9 +77,83 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0])
   const [selectedTime, setSelectedTime] = useState("")
 
-  // Calcul KPI
-  const confirmed = bookings.filter((b) => b.status === "confirmed").length
-  const cancelled = bookings.filter((b) => b.status === "cancelled").length
+  // ============================================
+  // REALTIME SUBSCRIPTION (LIVE)
+  // ============================================
+  useEffect(() => {
+    console.log('[HANGAR DASHBOARD] Setting up Realtime subscription for club:', clubId)
+    
+    const channel = supabase
+      .channel('hangar-bookings-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bookings',
+          filter: `club_id=eq.${clubId}`,
+        },
+        (payload) => {
+          console.log('[HANGAR DASHBOARD] Realtime event received:', payload.eventType, payload)
+          
+          setBookings((prev) => {
+            if (payload.eventType === 'INSERT') {
+              // Vérifier si le booking n'existe pas déjà
+              const exists = prev.find(b => b.id === (payload.new as Booking).id)
+              if (exists) return prev
+              
+              console.log('[HANGAR DASHBOARD] Adding new booking:', payload.new)
+              return [...prev, payload.new as Booking].sort(
+                (a, b) => new Date(a.slot_start).getTime() - new Date(b.slot_start).getTime()
+              )
+            }
+            
+            if (payload.eventType === 'UPDATE') {
+              console.log('[HANGAR DASHBOARD] Updating booking:', payload.new)
+              return prev.map(b => 
+                b.id === (payload.new as Booking).id ? (payload.new as Booking) : b
+              )
+            }
+            
+            if (payload.eventType === 'DELETE') {
+              console.log('[HANGAR DASHBOARD] Deleting booking:', payload.old)
+              return prev.filter(b => b.id !== (payload.old as Booking).id)
+            }
+            
+            return prev
+          })
+        }
+      )
+      .subscribe((status) => {
+        console.log('[HANGAR DASHBOARD] Subscription status:', status)
+        setIsLive(status === 'SUBSCRIBED')
+      })
+
+    return () => {
+      console.log('[HANGAR DASHBOARD] Cleaning up Realtime subscription')
+      supabase.removeChannel(channel)
+      setIsLive(false)
+    }
+  }, [clubId])
+
+  // Filtrer les bookings pour AUJOURD'HUI uniquement (pour les KPIs et l'affichage par défaut)
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const todayEnd = new Date()
+  todayEnd.setHours(23, 59, 59, 999)
+  
+  const bookingsToday = bookings.filter(b => {
+    const slotDate = new Date(b.slot_start)
+    return slotDate >= todayStart && slotDate <= todayEnd
+  })
+  
+  console.log('[DASHBOARD MAIN] Total bookings in state:', bookings.length)
+  console.log('[DASHBOARD MAIN] Bookings today:', bookingsToday.length)
+  console.log('[DASHBOARD MAIN] Courts count:', courts.length)
+  
+  // Calcul KPI basé sur les bookings d'AUJOURD'HUI uniquement
+  const confirmed = bookingsToday.filter((b) => b.status === "confirmed").length
+  const cancelled = bookingsToday.filter((b) => b.status === "cancelled").length
   
   const priceOffpeak = (settings?.price_offpeak_cents || 4000) / 100
   const revenus = confirmed * priceOffpeak
@@ -110,9 +185,9 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
     courtsMap[c.id] = c.name
   })
 
-  // Grouper les réservations par terrain
+  // Grouper les réservations d'AUJOURD'HUI par terrain
   const bookingsByCourt = courts.map(court => {
-    const courtBookings = bookings.filter(b => b.court_id === court.id && b.status === "confirmed")
+    const courtBookings = bookingsToday.filter(b => b.court_id === court.id && b.status === "confirmed")
     return {
       court,
       bookings: courtBookings,
@@ -227,10 +302,10 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
   // Compter les créneaux disponibles
   const totalAvailableSlots = availableSlots.length
 
-  // Export CSV
+  // Export CSV (exporte les bookings d'aujourd'hui)
   const exportCsv = () => {
     const headers = ["Date", "Heure début", "Heure fin", "Terrain", "Statut"]
-    const rows = bookings.map((b) => [
+    const rows = bookingsToday.map((b) => [
       new Date(b.slot_start).toLocaleDateString("fr-FR"),
       formatTime(b.slot_start),
       formatTime(b.slot_end),
@@ -272,39 +347,63 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       return
     }
 
-    const { error } = await supabase.from("bookings").insert({
-      club_id: clubId,
-      court_id: selectedCourt,
-      slot_start: slotStart.toISOString(),
-      slot_end: slotEnd.toISOString(),
-      booking_date: selectedDate,
-      status: "confirmed",
-      created_by: userData.user.id,
-    })
+    console.log('[HANGAR DASHBOARD] Inserting booking for court:', selectedCourt)
 
-    setModalLoading(false)
+    const { data: insertedBooking, error } = await supabase
+      .from("bookings")
+      .insert({
+        club_id: clubId,
+        court_id: selectedCourt,
+        slot_start: slotStart.toISOString(),
+        slot_end: slotEnd.toISOString(),
+        booking_date: selectedDate,
+        status: "confirmed",
+        created_by: userData.user.id,
+      })
+      .select()
+      .single()
 
     if (error) {
+      console.error('[HANGAR DASHBOARD] Insert error:', error)
       setModalError(`Erreur: ${error.message}`)
+      setModalLoading(false)
     } else {
+      console.log('[HANGAR DASHBOARD] Booking inserted successfully:', insertedBooking)
+      
       setIsModalOpen(false)
       setModalError("")
       setSelectedCourt("")
       setSelectedTime("")
-      // Recharger les bookings
-      const { data } = await supabase
-        .from("bookings")
-        .select('id, club_id, court_id, slot_start, slot_end, status, created_at, created_by')
-        .eq("club_id", clubId)
-        .gte("slot_start", new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
-        .lte("slot_start", new Date(new Date().setHours(23, 59, 59, 999)).toISOString())
-        .order("slot_start", { ascending: true })
-      if (data) setBookings(data)
+      setModalLoading(false)
+      
+      // Le Realtime devrait mettre à jour automatiquement,
+      // mais on fait un refetch de secours après 500ms si pas encore mis à jour
+      setTimeout(async () => {
+        const existsInState = bookings.some(b => b.id === insertedBooking?.id)
+        if (!existsInState && insertedBooking) {
+          console.log('[HANGAR DASHBOARD] Realtime delayed, adding booking manually to state')
+          setBookings(prev => [...prev, insertedBooking as Booking].sort(
+            (a, b) => new Date(a.slot_start).getTime() - new Date(b.slot_start).getTime()
+          ))
+        }
+      }, 500)
     }
   }
 
   return (
     <section className="space-y-6">
+      {/* Live Badge */}
+      <div className="flex items-center justify-end">
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all ${
+          isLive 
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-200' 
+            : 'bg-slate-200 text-slate-600'
+        }`}>
+          <div className={`w-2 h-2 rounded-full ${isLive ? 'bg-white animate-pulse' : 'bg-slate-400'}`} />
+          <span className="text-xs font-bold">{isLive ? 'LIVE' : 'CONNEXION...'}</span>
+        </div>
+      </div>
+
       {/* KPIs */}
       <div className="flex gap-4 overflow-x-auto py-2 pb-4">
         <KPI title="Réservations (confirmées)" value={confirmed} small="Aujourd'hui" />
@@ -351,11 +450,11 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold text-slate-900">Planning du jour par terrain</h2>
             <span className="text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-medium">
-              {bookings.filter(b => b.status === "confirmed").length} réservation{bookings.filter(b => b.status === "confirmed").length > 1 ? 's' : ''}
+              {confirmed} réservation{confirmed > 1 ? 's' : ''}
             </span>
           </div>
 
-          {bookings.length === 0 ? (
+          {bookingsToday.length === 0 ? (
             <div className="text-center py-12 text-sm text-slate-500">
               Aucune réservation aujourd'hui
             </div>
