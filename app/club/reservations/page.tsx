@@ -24,7 +24,7 @@ export default function ClubReservationsPage() {
       const { club, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club/auth/login')
+        router.push('/club')
         return
       }
 

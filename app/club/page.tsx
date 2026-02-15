@@ -24,7 +24,7 @@ export default function ClubDashboardPage() {
       const { club, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club/auth/login')
+        router.push('/club')
         return
       }
 

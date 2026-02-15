@@ -56,7 +56,7 @@ export default function ClubPlanningPage() {
       const { club: userClub, session } = await getCurrentClub();
       
       if (!session) {
-        router.push('/club/auth/login');
+        router.push('/club');
         return;
       }
 

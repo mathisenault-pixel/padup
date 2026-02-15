@@ -44,7 +44,7 @@ export default function ClubBookingsPage() {
       const { club: userClub, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club/auth/login')
+        router.push('/club')
         return
       }
 
@@ -60,7 +60,7 @@ export default function ClubBookingsPage() {
       await fetchData(userClub.id)
     } catch (err) {
       console.error('Error loading data:', err)
-      router.push('/club/auth/login')
+      router.push('/club')
     } finally {
       setLoading(false)
     }

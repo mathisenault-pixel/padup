@@ -26,8 +26,8 @@ export default function Dashboard() {
       const { club, session } = await getCurrentClub()
       
       if (!session) {
-        // Pas de session -> redirect login
-        router.push('/club/auth/login')
+        // Pas de session -> redirect vers page club
+        router.push('/club')
         return
       }
 
@@ -39,7 +39,7 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.error('Error loading club:', err)
-      router.push('/club/auth/login')
+      router.push('/club')
     } finally {
       setLoading(false)
     }
@@ -47,7 +47,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await signOut()
-    router.push('/club/auth/login')
+    router.push('/club')
   }
 
   const handleCreateInvite = async () => {
