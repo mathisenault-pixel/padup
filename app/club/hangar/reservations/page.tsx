@@ -1,28 +1,59 @@
-import React from "react";
+import { createClient } from '@supabase/supabase-js'
+import ReservationsSimple from '@/components/club/hangar/ReservationsSimple'
 
-export default function HangarReservationsPage() {
-  return (
-    <section className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold">Réservations</h2>
-        <p className="text-sm text-slate-400">Consultez, filtrez et gérez les réservations du club.</p>
-      </div>
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-      <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
-        <div className="text-sm font-medium">Liste des réservations</div>
-        <div className="text-xs text-slate-400 mt-1">Écran en place. Branchage données après freeze.</div>
+export default async function HangarReservationsPage() {
+  // 1️⃣ Récupérer le club Hangar
+  const { data: club } = await supabase
+    .from('clubs')
+    .select('id')
+    .eq('club_code', 'HANGAR1')
+    .single()
 
-        <div className="mt-4 divide-y divide-slate-800 rounded-lg overflow-hidden">
-          {["10:30 → 12:00", "12:00 → 13:30", "16:00 → 17:30"].map((t, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-3 bg-slate-950/20 hover:bg-slate-900 transition">
-              <div className="text-sm text-slate-200">{t}</div>
-              <span className="text-xs px-3 py-1 rounded-full bg-emerald-800/70 text-emerald-100 border border-emerald-700/40">
-                Confirmée
-              </span>
-            </div>
-          ))}
+  if (!club) {
+    return (
+      <section className="space-y-6">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-8 text-center">
+          <div className="text-xl mb-2">⚠️ Club introuvable</div>
+          <p className="text-sm text-slate-400">
+            Le club avec le code HANGAR1 n'existe pas dans la base de données.
+          </p>
         </div>
-      </div>
-    </section>
-  );
+      </section>
+    )
+  }
+
+  // 2️⃣ Charger les terrains du club
+  const { data: courts } = await supabase
+    .from('courts')
+    .select('id, name')
+    .eq('club_id', club.id)
+    .order('name', { ascending: true })
+
+  // 3️⃣ Charger les bookings d'aujourd'hui par défaut
+  const now = new Date()
+  const start = new Date(now)
+  start.setHours(0, 0, 0, 0)
+  const end = new Date(now)
+  end.setHours(23, 59, 59, 999)
+
+  const { data: bookings } = await supabase
+    .from('bookings')
+    .select('id, club_id, court_id, slot_start, slot_end, status, created_at')
+    .eq('club_id', club.id)
+    .gte('slot_start', start.toISOString())
+    .lte('slot_start', end.toISOString())
+    .order('slot_start', { ascending: true })
+
+  // 4️⃣ Rendre le composant client
+  return (
+    <ReservationsSimple
+      bookings={bookings ?? []}
+      courts={courts ?? []}
+    />
+  )
 }

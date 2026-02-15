@@ -1,43 +1,45 @@
-import React from "react";
+import { createClient } from '@supabase/supabase-js'
+import SettingsClient from '@/components/club/hangar/SettingsClient'
 
-function Field({ label, placeholder }: { label: string; placeholder: string }) {
-  return (
-    <label className="block">
-      <div className="text-xs text-slate-400 mb-2">{label}</div>
-      <input
-        className="w-full rounded-lg bg-slate-900/60 border border-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-600"
-        placeholder={placeholder}
-      />
-    </label>
-  );
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-export default function HangarSettingsPage() {
-  return (
-    <section className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold">Paramètres</h2>
-        <p className="text-sm text-slate-400">Informations du club, préférences et options.</p>
-      </div>
+export default async function HangarSettingsPage() {
+  // 1️⃣ Récupérer le club Hangar
+  const { data: club } = await supabase
+    .from('clubs')
+    .select('id, name')
+    .eq('club_code', 'HANGAR1')
+    .single()
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-4">
-          <div className="text-sm font-medium">Informations club</div>
-          <Field label="Nom du club" placeholder="Ex: Padel Center Paris" />
-          <Field label="Adresse" placeholder="Ex: 12 rue ..." />
-          <Field label="Téléphone" placeholder="Ex: 06 ..." />
+  if (!club) {
+    return (
+      <section className="space-y-6">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-8 text-center">
+          <div className="text-xl mb-2">⚠️ Club introuvable</div>
+          <p className="text-sm text-slate-400">
+            Le club avec le code HANGAR1 n'existe pas dans la base de données.
+          </p>
         </div>
+      </section>
+    )
+  }
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-4">
-          <div className="text-sm font-medium">Préférences</div>
-          <Field label="Durée d'un créneau" placeholder="1h30 (fixe)" />
-          <Field label="Devise" placeholder="EUR" />
-          <button className="mt-2 w-full px-4 py-2 rounded-lg bg-slate-800/60 border border-slate-700 hover:bg-slate-800 transition text-sm">
-            Enregistrer (placeholder)
-          </button>
-          <div className="text-xs text-slate-500">Le save Supabase sera ajouté plus tard.</div>
-        </div>
-      </div>
-    </section>
-  );
+  // 2️⃣ Charger les paramètres du club (ou null si pas encore créés)
+  const { data: settings } = await supabase
+    .from('club_settings')
+    .select('*')
+    .eq('club_id', club.id)
+    .single()
+
+  // 3️⃣ Rendre le composant client
+  return (
+    <SettingsClient
+      clubId={club.id}
+      clubName={club.name}
+      initialSettings={settings}
+    />
+  )
 }

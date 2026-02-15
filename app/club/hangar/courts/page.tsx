@@ -1,34 +1,44 @@
-import React from "react";
-import Link from "next/link";
+import { createClient } from '@supabase/supabase-js'
+import CourtsClient from '@/components/club/hangar/CourtsClient'
 
-export default function CourtsPage() {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+export default async function CourtsPage() {
+  // 1️⃣ Récupérer le club Hangar
+  const { data: club } = await supabase
+    .from('clubs')
+    .select('id')
+    .eq('club_code', 'HANGAR1')
+    .single()
+
+  if (!club) {
+    return (
+      <section className="space-y-6">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-8 text-center">
+          <div className="text-xl mb-2">⚠️ Club introuvable</div>
+          <p className="text-sm text-slate-400">
+            Le club avec le code HANGAR1 n'existe pas dans la base de données.
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  // 2️⃣ Charger les terrains du club
+  const { data: courts } = await supabase
+    .from('courts')
+    .select('id, name, is_active, created_at')
+    .eq('club_id', club.id)
+    .order('created_at', { ascending: true })
+
+  // 3️⃣ Rendre le composant client
   return (
-    <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Terrains</h2>
-          <p className="text-sm text-slate-400">Gérez vos terrains, horaires et disponibilités.</p>
-        </div>
-        <button className="px-4 py-2 rounded-lg bg-slate-800/60 border border-slate-700 hover:bg-slate-800 transition text-sm">
-          + Ajouter un terrain
-        </button>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
-          <div className="text-sm font-medium">Aucun terrain pour le moment</div>
-          <div className="text-xs text-slate-400 mt-1">Ajoutez votre premier terrain pour activer les réservations.</div>
-        </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
-          <div className="text-sm font-medium">Prochaine étape</div>
-          <div className="text-xs text-slate-400 mt-1">
-            On branchera ces écrans à Supabase après le freeze technique.
-          </div>
-          <Link className="inline-block mt-3 text-xs text-slate-300 underline hover:text-white" href="/club/hangar">
-            Retour au dashboard
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
+    <CourtsClient
+      clubId={club.id}
+      initialCourts={courts ?? []}
+    />
+  )
 }
