@@ -26,25 +26,24 @@ export default function HangarNav() {
   const active = getActiveTab()
 
   return (
-    <nav className="w-full bg-white">
-      <div className="max-w-6xl mx-auto px-6 flex items-center gap-2 py-3">
+    <nav className="w-full bg-white/50 backdrop-blur">
+      <div className="max-w-6xl mx-auto px-6 flex items-center gap-3 py-3">
         {tabs.map((t) => (
           <Link
             key={t.id}
             href={t.href}
-            className={`relative px-4 py-2 rounded-lg text-sm font-medium transition ${
+            className={`relative px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               active === t.id
-                ? "bg-gray-100 text-gray-900 border border-gray-300 shadow-sm"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 border border-transparent"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             }`}
           >
             {t.label}
-            {active === t.id && (
-              <span className="absolute left-4 right-4 -bottom-2 h-[2px] rounded bg-blue-500" />
-            )}
           </Link>
         ))}
-        <div className="ml-auto text-xs text-gray-500 font-medium">Hangar • Club</div>
+        <div className="ml-auto text-xs text-slate-500 font-semibold px-3 py-1 bg-slate-100 rounded-full">
+          Hangar • Club
+        </div>
       </div>
     </nav>
   )
