@@ -7,7 +7,7 @@ export default function HangarNav() {
   const pathname = usePathname()
 
   const tabs = [
-    { id: "dashboard", label: "Dashboard", href: "/club/hangar" },
+    { id: "dashboard", label: "Data", href: "/club/hangar" },
     { id: "courts", label: "Terrains", href: "/club/hangar/courts" },
     { id: "reservations", label: "Réservations", href: "/club/hangar/reservations" },
     { id: "settings", label: "Paramètres", href: "/club/hangar/settings" },
