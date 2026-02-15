@@ -120,7 +120,7 @@ export default function ReservationsSimple({ clubId, bookings: initialBookings, 
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all ${
           isLive 
             ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-200' 
-            : 'bg-slate-200 text-slate-600'
+            : 'bg-slate-200 text-slate-900'
         }`}>
           <div className={`w-2 h-2 rounded-full ${isLive ? 'bg-white animate-pulse' : 'bg-slate-400'}`} />
           <span className="text-xs font-bold">{isLive ? 'LIVE' : 'CONNEXION...'}</span>
