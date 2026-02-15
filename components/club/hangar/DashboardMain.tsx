@@ -170,6 +170,20 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
 
   return (
     <section className="space-y-6">
+      {/* DEBUG - Calcul taux occupation */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-xs">
+        <div className="font-bold text-blue-900 mb-2">📊 Détail calcul taux d'occupation</div>
+        <div className="space-y-1 text-blue-800">
+          <div><strong>Nombre de terrains actifs:</strong> {nbTerrains}</div>
+          <div><strong>Heures d'ouverture:</strong> {firstDay.start} → {firstDay.end} ({Math.floor(totalMinutesOpen / 60)}h{totalMinutesOpen % 60}min)</div>
+          <div><strong>Durée créneau:</strong> {slotMinutes} min</div>
+          <div><strong>Créneaux par terrain/jour:</strong> {slotsPerCourtPerDay}</div>
+          <div><strong>Total créneaux disponibles:</strong> {totalSlots} ({nbTerrains} terrains × {slotsPerCourtPerDay} créneaux)</div>
+          <div><strong>Réservations confirmées:</strong> {confirmed}</div>
+          <div className="pt-2 border-t border-blue-300 mt-2"><strong>Taux d'occupation:</strong> {confirmed} ÷ {totalSlots} = <span className="text-lg font-bold">{tauxOccupation}%</span></div>
+        </div>
+      </div>
+
       <div className="flex gap-4 overflow-x-auto py-2 pb-4">
         <KPI title="Réservations (confirmées)" value={confirmed} small="Aujourd'hui" />
         <KPI title="Annulations" value={cancelled} small="Aujourd'hui" />
