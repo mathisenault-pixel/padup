@@ -37,7 +37,8 @@ export default function ClubSettingsPage() {
   const handleLogout = async () => {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
       await signOut()
-      router.push('/club')
+      // Force un rechargement complet pour effacer le cache
+      window.location.href = '/club'
     }
   }
 

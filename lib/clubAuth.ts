@@ -166,13 +166,15 @@ export async function getDefaultClub(): Promise<ClubWithMembership | null> {
 export async function signOut() {
   const supabase = supabaseBrowser
   
-  const { error } = await supabase.auth.signOut()
+  // Supprimer toutes les sessions (scope: 'global' pour tout effacer)
+  const { error } = await supabase.auth.signOut({ scope: 'global' })
   
   if (error) {
     console.error('[Club Auth] Sign out error:', error)
     return { error }
   }
 
+  console.log('[Club Auth] ✅ Déconnexion réussie')
   return { error: null }
 }
 
