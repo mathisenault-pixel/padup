@@ -7,7 +7,6 @@ import { signOut } from '@/lib/clubAuth'
 
 export default function Dashboard() {
   const router = useRouter()
-  const [debug, setDebug] = useState<any>(null)
   const [club, setClub] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showInviteModal, setShowInviteModal] = useState(false)
@@ -31,33 +30,24 @@ export default function Dashboard() {
         return
       }
 
-      // 2. Requête club_memberships avec debug
+      // 2. Requête club_memberships
       const { data, error } = await supabaseBrowser
         .from('club_memberships')
         .select('club_id, role, clubs:club_id ( id, name, city, club_code )')
         .eq('user_id', session.user.id)
 
-      // 3. Stocker les infos de debug
-      setDebug({
-        sessionUserId: session.user.id,
-        membershipsRaw: data,
-        membershipsError: error ? { 
-          message: error.message, 
-          details: (error as any).details, 
-          code: (error as any).code 
-        } : null,
-      })
+      if (error) {
+        console.error('[Dashboard] Error loading memberships:', error)
+        return
+      }
 
-      // 4. Extraire le premier club si présent
+      // 3. Extraire le premier club si présent
       const first = data?.[0]
       if (first?.clubs) {
         setClub(first.clubs)
       }
     } catch (err) {
-      console.error('Error loading club:', err)
-      setDebug({
-        catchError: err,
-      })
+      console.error('[Dashboard] Error loading club:', err)
     } finally {
       setLoading(false)
     }
@@ -128,9 +118,6 @@ export default function Dashboard() {
       </div>
     )
   }
-
-  // TEMP: Afficher debug même si pas de club
-  if (!debug) return null
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -248,7 +235,7 @@ export default function Dashboard() {
 
         {/* Menu de navigation */}
         {club && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <button
               onClick={() => router.push('/club/courts')}
               className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow text-left"
@@ -277,14 +264,6 @@ export default function Dashboard() {
             </button>
           </div>
         )}
-
-        {/* TEMP DEBUG BLOCK (à supprimer après) */}
-        <div className="bg-gray-900 text-white p-6 rounded-lg overflow-auto">
-          <h3 className="text-lg font-bold mb-4 text-yellow-300">🐛 DEBUG INFO</h3>
-          <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
-            {JSON.stringify(debug, null, 2)}
-          </pre>
-        </div>
       </div>
     </div>
   )
