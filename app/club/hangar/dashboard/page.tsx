@@ -34,7 +34,7 @@ export default async function HangarDashboardPage() {
   const end = new Date(now)
   end.setHours(23, 59, 59, 999)
 
-  const { data: bookings } = await supabase
+  const { data: bookingsToday } = await supabase
     .from('bookings')
     .select('id, club_id, court_id, slot_start, slot_end, status, created_at')
     .eq('club_id', club.id)
@@ -42,6 +42,20 @@ export default async function HangarDashboardPage() {
     .lte('slot_start', end.toISOString())
     .order('slot_start', { ascending: true })
 
-  // 3️⃣ Afficher le dashboard live
-  return <DashboardLive clubId={club.id} initialBookings={bookings ?? []} />
+  // 3️⃣ Récupérer les terrains du club
+  const { data: courts } = await supabase
+    .from('courts')
+    .select('id, name')
+    .eq('club_id', club.id)
+
+  // 4️⃣ Afficher le dashboard live
+  return (
+    <DashboardLive
+      clubId={club.id}
+      initialBookings={bookingsToday ?? []}
+      startIso={start.toISOString()}
+      endIso={end.toISOString()}
+      courts={courts ?? []}
+    />
+  )
 }
