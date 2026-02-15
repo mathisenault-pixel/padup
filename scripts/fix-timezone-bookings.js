@@ -9,6 +9,9 @@
  * CORRECTION: Soustraire 1 heure à tous les bookings
  */
 
+// ✅ Charger les variables d'environnement depuis .env.local
+require('dotenv').config({ path: '.env.local' })
+
 const { createClient } = require('@supabase/supabase-js')
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL

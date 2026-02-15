@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test:security": "node --test tests/security.test.js",
     "test": "npm run test:security",
-    "generate-favicons": "node scripts/generate-favicons.js && node scripts/generate-favicon-ico.js"
+    "generate-favicons": "node scripts/generate-favicons.js && node scripts/generate-favicon-ico.js",
+    "fix-timezone": "node scripts/fix-timezone-bookings.js",
+    "fix-timezone:confirm": "node scripts/fix-timezone-bookings.js --confirm"
   },
   "dependencies": {
     "@prisma/client": "^7.3.0",
