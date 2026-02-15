@@ -50,10 +50,10 @@ type Props = {
 
 function KPI({ title, value, small }: { title: string; value: string | number; small?: string }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 min-w-[180px]">
-      <div className="text-xs text-slate-400">{title}</div>
-      <div className="mt-2 text-2xl font-semibold">{value}</div>
-      {small && <div className="text-xs text-slate-500 mt-1">{small}</div>}
+    <div className="bg-white border border-gray-200 rounded-lg p-4 min-w-[180px] shadow-sm">
+      <div className="text-xs text-gray-600 font-medium">{title}</div>
+      <div className="mt-2 text-2xl font-semibold text-gray-900">{value}</div>
+      {small && <div className="text-xs text-gray-500 mt-1">{small}</div>}
     </div>
   )
 }
@@ -209,56 +209,56 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
         />
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div className="text-sm font-medium text-slate-300 mb-3">
-          Planning du jour <span className="text-slate-500 text-xs">{bookings.length} réservation(s)</span>
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <div className="text-sm font-medium text-gray-900 mb-3">
+          Planning du jour <span className="text-gray-500 text-xs">{bookings.length} réservation(s)</span>
         </div>
 
         {bookings.length === 0 ? (
-          <div className="text-center py-8 text-sm text-slate-500">
+          <div className="text-center py-8 text-sm text-gray-500">
             Aucune réservation aujourd'hui
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="border-b border-slate-800">
+              <thead className="border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Heure</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Terrain</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Client</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Contact</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-slate-400 uppercase">Statut</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-600 uppercase">Heure</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-600 uppercase">Terrain</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-600 uppercase">Client</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-600 uppercase">Contact</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-600 uppercase">Statut</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-gray-100">
                 {bookings.map((b) => {
                   const profile = getUserProfile(b)
                   return (
-                    <tr key={b.id} className="hover:bg-slate-900/40 transition">
+                    <tr key={b.id} className="hover:bg-gray-50 transition">
                       <td className="px-4 py-3">
-                        <div className="text-slate-200 font-medium">
+                        <div className="text-gray-900 font-medium">
                           {formatTime(b.slot_start)}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-gray-500">
                           → {formatTime(b.slot_end)}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-slate-200">
+                        <div className="text-gray-900">
                           {courtsMap[b.court_id] || "—"}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-slate-200 font-medium">
+                        <div className="text-gray-900 font-medium">
                           {profile?.full_name || "—"}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-slate-200 text-sm">
+                        <div className="text-gray-900 text-sm">
                           {profile?.email || "—"}
                         </div>
                         {profile?.phone && (
-                          <div className="text-xs text-slate-400 mt-0.5">
+                          <div className="text-xs text-gray-500 mt-0.5">
                             {profile.phone}
                           </div>
                         )}
@@ -267,8 +267,8 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
                         <div
                           className={`inline-flex text-xs px-3 py-1 rounded-full ${
                             b.status === "confirmed"
-                              ? "bg-emerald-800/80 text-emerald-100"
-                              : "bg-red-800/80 text-red-100"
+                              ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                              : "bg-red-100 text-red-700 border border-red-200"
                           }`}
                         >
                           {b.status === "confirmed" ? "Confirmée" : "Annulée"}
@@ -284,55 +284,55 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 min-h-[120px]">
-          <div className="text-sm font-medium text-slate-200">Alertes</div>
-          <div className="text-xs text-slate-500 mt-2">Aucune alerte pour le moment</div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[120px] shadow-sm">
+          <div className="text-sm font-medium text-gray-900">Alertes</div>
+          <div className="text-xs text-gray-500 mt-2">Aucune alerte pour le moment</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 min-h-[120px]">
-          <div className="text-sm font-medium text-slate-200 mb-3">Actions rapides</div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[120px] shadow-sm">
+          <div className="text-sm font-medium text-gray-900 mb-3">Actions rapides</div>
           <div className="space-y-2">
             <button
               onClick={() => alert("Fonctionnalité à venir : bloquer un créneau spécifique")}
-              className="w-full py-2 rounded bg-slate-800/60 text-slate-200 text-xs hover:bg-slate-800 transition"
+              className="w-full py-2 rounded bg-gray-100 text-gray-700 text-xs hover:bg-gray-200 transition font-medium"
             >
               Bloquer un créneau
             </button>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="w-full py-2 rounded border border-slate-700 text-xs hover:bg-slate-800/40 transition"
+              className="w-full py-2 rounded border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition font-medium"
             >
               + Ajouter une réservation
             </button>
             <button
               onClick={exportCsv}
-              className="w-full py-2 rounded border border-slate-700 text-xs hover:bg-slate-800/40 transition"
+              className="w-full py-2 rounded border border-gray-300 text-gray-700 text-xs hover:bg-gray-50 transition font-medium"
             >
               Exporter (CSV)
             </button>
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 min-h-[120px]">
-          <div className="text-sm font-medium text-slate-200">Activité récente</div>
-          <div className="text-xs text-slate-500 mt-2">En attente d'activité…</div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 min-h-[120px] shadow-sm">
+          <div className="text-sm font-medium text-gray-900">Activité récente</div>
+          <div className="text-xs text-gray-500 mt-2">En attente d'activité…</div>
         </div>
       </div>
 
       {/* Modal Ajouter une réservation */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Ajouter une réservation</h3>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-gray-300 rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Ajouter une réservation</h3>
 
             <div className="space-y-4">
               {/* Terrain */}
               <div>
-                <label className="block text-xs text-slate-400 mb-2">Terrain</label>
+                <label className="block text-xs text-gray-600 font-medium mb-2">Terrain</label>
                 <select
                   value={selectedCourt}
                   onChange={(e) => setSelectedCourt(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Sélectionner un terrain</option>
                   {courts.map((c) => (
@@ -345,33 +345,33 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
 
               {/* Date */}
               <div>
-                <label className="block text-xs text-slate-400 mb-2">Date</label>
+                <label className="block text-xs text-gray-600 font-medium mb-2">Date</label>
                 <input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               {/* Heure */}
               <div>
-                <label className="block text-xs text-slate-400 mb-2">Heure de début</label>
+                <label className="block text-xs text-gray-600 font-medium mb-2">Heure de début</label>
                 <input
                   type="time"
                   value={selectedTime}
                   onChange={(e) => setSelectedTime(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   Durée du créneau : {slotMinutes} min (automatique)
                 </p>
               </div>
 
               {/* Erreur */}
               {modalError && (
-                <div className="p-3 bg-red-400/10 border border-red-400/30 rounded-lg">
-                  <p className="text-sm text-red-200">{modalError}</p>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700">{modalError}</p>
                 </div>
               )}
 
@@ -383,14 +383,14 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
                     setModalError("")
                   }}
                   disabled={modalLoading}
-                  className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 text-white rounded-lg hover:bg-slate-700 transition disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-200 transition disabled:opacity-50 font-medium"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleAddBooking}
                   disabled={modalLoading}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2 font-medium"
                 >
                   {modalLoading ? (
                     <>
