@@ -9,7 +9,9 @@ import Link from 'next/link'
 
 export default function ClubDashboardPage() {
   const router = useRouter()
+  const [isConnected, setIsConnected] = useState(false)
   const [clubData, setClubData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
     todayReservations: 0,
     totalReservations: 0,
@@ -21,18 +23,25 @@ export default function ClubDashboardPage() {
 
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true)
       const { club, session } = await getCurrentClub()
       
       if (!session) {
-        router.push('/club')
+        // Pas de session -> afficher page publique
+        setIsConnected(false)
+        setLoading(false)
         return
       }
 
       if (!club) {
-        alert('Aucun club associé')
-        router.push('/club/dashboard')
+        // Session mais pas de club -> redirect dashboard
+        setIsConnected(false)
+        setLoading(false)
         return
       }
+
+      // Connecté avec un club
+      setIsConnected(true)
 
       // Charger les données du club (utilise l'ancien système local pour les stats)
       const localClubData = getClubById(club.id)
@@ -50,10 +59,114 @@ export default function ClubDashboardPage() {
         blockedSlots: blockedSlots.length,
         activeReservations: allReservations.filter(r => r.status === 'confirmed').length,
       })
+      
+      setLoading(false)
     }
 
     loadData()
   }, [router])
+
+  // Page publique pour utilisateurs non connectés
+  if (!isConnected && !loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-black text-gray-900 mb-4">Espace Club</h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Gérez votre club de padel en toute simplicité
+            </p>
+          </div>
+
+          {/* CTA */}
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8 mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+              Accédez à votre espace
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/club/auth/login"
+                className="flex-1 px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg transition-all text-center"
+              >
+                Se connecter
+              </Link>
+              <Link
+                href="/club/auth/signup"
+                className="flex-1 px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition-all text-center"
+              >
+                Créer un compte
+              </Link>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Gestion des terrains</h3>
+              <p className="text-gray-600">
+                Gérez vos terrains de padel, leurs disponibilités et leurs caractéristiques.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Réservations</h3>
+              <p className="text-gray-600">
+                Suivez et gérez toutes les réservations de vos clients en temps réel.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Statistiques</h3>
+              <p className="text-gray-600">
+                Analysez l'activité de votre club avec des statistiques détaillées.
+              </p>
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <div className="flex gap-4">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="text-lg font-bold text-blue-900 mb-2">Vous avez une invitation ?</h4>
+                <p className="text-blue-800">
+                  Si vous avez reçu un lien d'invitation d'un club, connectez-vous ou créez un compte pour l'accepter.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
+      </div>
+    )
+  }
 
   if (!clubData) {
     return (

@@ -37,7 +37,7 @@ export default function ClubSettingsPage() {
   const handleLogout = async () => {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
       await signOut()
-      router.push('/club/auth/login')
+      router.push('/club')
     }
   }
 
