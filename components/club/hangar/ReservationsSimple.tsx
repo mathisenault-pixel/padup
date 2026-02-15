@@ -1,5 +1,13 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 type Booking = {
   id: string
   club_id: string
@@ -16,6 +24,7 @@ type Court = {
 }
 
 type Props = {
+  clubId: string
   bookings: Booking[]
   courts: Court[]
 }
@@ -27,14 +36,97 @@ function formatTime(iso: string): string {
   })
 }
 
-export default function ReservationsSimple({ bookings, courts }: Props) {
+export default function ReservationsSimple({ clubId, bookings: initialBookings, courts }: Props) {
+  const [bookings, setBookings] = useState<Booking[]>(initialBookings)
+  const [isLive, setIsLive] = useState(false)
+
   const courtsMap: Record<string, string> = {}
   courts.forEach((c) => {
     courtsMap[c.id] = c.name
   })
 
+  // Realtime subscription
+  useEffect(() => {
+    console.log('[RESERVATIONS] Setting up Realtime subscription for club:', clubId)
+    
+    const channel = supabase
+      .channel('reservations-live')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bookings',
+          filter: `club_id=eq.${clubId}`,
+        },
+        (payload) => {
+          console.log('[RESERVATIONS] Realtime event:', payload.eventType, payload)
+          
+          // Filtrer uniquement les bookings d'aujourd'hui
+          const now = new Date()
+          const start = new Date(now)
+          start.setHours(0, 0, 0, 0)
+          const end = new Date(now)
+          end.setHours(23, 59, 59, 999)
+          
+          setBookings((prev) => {
+            if (payload.eventType === 'INSERT') {
+              const newBooking = payload.new as Booking
+              const slotDate = new Date(newBooking.slot_start)
+              
+              // N'ajouter que si c'est aujourd'hui
+              if (slotDate >= start && slotDate <= end) {
+                const exists = prev.find(b => b.id === newBooking.id)
+                if (!exists) {
+                  console.log('[RESERVATIONS] Adding booking:', newBooking)
+                  return [...prev, newBooking].sort(
+                    (a, b) => new Date(a.slot_start).getTime() - new Date(b.slot_start).getTime()
+                  )
+                }
+              }
+              return prev
+            }
+            
+            if (payload.eventType === 'UPDATE') {
+              return prev.map(b => 
+                b.id === (payload.new as Booking).id ? (payload.new as Booking) : b
+              )
+            }
+            
+            if (payload.eventType === 'DELETE') {
+              return prev.filter(b => b.id !== (payload.old as Booking).id)
+            }
+            
+            return prev
+          })
+        }
+      )
+      .subscribe((status) => {
+        console.log('[RESERVATIONS] Subscription status:', status)
+        setIsLive(status === 'SUBSCRIBED')
+      })
+
+    return () => {
+      console.log('[RESERVATIONS] Cleaning up subscription')
+      supabase.removeChannel(channel)
+      setIsLive(false)
+    }
+  }, [clubId])
+
   return (
     <section className="space-y-6">
+      {/* Badge LIVE */}
+      <div className="flex items-center justify-end">
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all ${
+          isLive 
+            ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-200' 
+            : 'bg-slate-200 text-slate-600'
+        }`}>
+          <div className={`w-2 h-2 rounded-full ${isLive ? 'bg-white animate-pulse' : 'bg-slate-400'}`} />
+          <span className="text-xs font-bold">{isLive ? 'LIVE' : 'CONNEXION...'}</span>
+        </div>
+      </div>
+
       <div className="bg-gradient-to-br from-white to-blue-50/30 border border-blue-100 rounded-xl p-5 shadow-sm">
         <h2 className="text-xl font-bold text-slate-900">Réservations du jour</h2>
         <p className="text-sm text-slate-600 mt-1">

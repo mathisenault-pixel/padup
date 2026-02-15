@@ -53,6 +53,7 @@ export default async function HangarReservationsPage() {
   // 4️⃣ Rendre le composant client
   return (
     <ReservationsSimple
+      clubId={club.id}
       bookings={bookings ?? []}
       courts={courts ?? []}
     />

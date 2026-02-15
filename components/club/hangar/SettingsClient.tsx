@@ -164,6 +164,14 @@ export default function SettingsClient({ clubId, clubName, initialSettings }: Pr
 
   return (
     <section className="space-y-6">
+      {/* Badge LIVE */}
+      <div className="flex items-center justify-end">
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-emerald-200">
+          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+          <span className="text-xs font-bold">LIVE</span>
+        </div>
+      </div>
+
       {/* Shell Card */}
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm p-7">
           {/* Header */}
