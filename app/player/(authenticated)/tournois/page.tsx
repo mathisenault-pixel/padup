@@ -445,7 +445,7 @@ export default function TournoisPage() {
           </div>
         </div>
 
-        {/* Header Desktop */}
+        {/* Header Desktop avec animation de scroll */}
         <PageHeader
           title={t('tournois.title')}
           subtitle={t('tournois.subtitle')}
@@ -470,6 +470,7 @@ export default function TournoisPage() {
           }}
           onFiltersClick={() => setIsFiltersDrawerOpen(true)}
           activeFiltersCount={activeFiltersCount}
+          enableScrollAnimation={true}
         />
 
         {/* Drawer avec tous les filtres */}

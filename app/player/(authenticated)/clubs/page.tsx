@@ -326,7 +326,7 @@ export default function ClubsPage() {
     <div className="min-h-screen bg-white">
       <div className="px-3 md:px-6 lg:px-8 py-4 md:py-8">
         
-        {/* Header */}
+        {/* Header avec animation de scroll */}
         <PageHeader
           title={t('clubs.title')}
           subtitle={t('clubs.subtitle')}
@@ -351,6 +351,7 @@ export default function ClubsPage() {
           }}
           onFiltersClick={() => setIsFiltersDrawerOpen(true)}
           activeFiltersCount={activeFiltersCount}
+          enableScrollAnimation={true}
         />
 
         {/* Drawer avec tous les filtres */}
