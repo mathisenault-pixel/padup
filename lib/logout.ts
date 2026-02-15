@@ -1,6 +1,8 @@
 /**
  * FONCTION UNIQUE DE DÉCONNEXION
  * Source de vérité pour tous les logouts de l'application
+ * 
+ * RÈGLE ABSOLUE: Redirect UNIQUEMENT vers /club (JAMAIS /club/login)
  */
 
 "use client"
@@ -8,7 +10,7 @@
 import { supabaseBrowser } from "@/lib/supabaseBrowser"
 
 export async function logout() {
-  console.log('[LOGOUT] 🔄 Début de la déconnexion...')
+  console.log('[LOGOUT] 🔥 DÉBUT DÉCONNEXION - BUILD 2026-02-15-01')
   
   try {
     // 1. Supabase signOut (scope: global pour tout effacer)
@@ -41,7 +43,8 @@ export async function logout() {
     console.error('[LOGOUT] ❌ Erreur inattendue:', error)
   }
   
-  // 4. Redirection HARD vers /club (force reload complet)
-  console.log('[LOGOUT] 🚀 Redirection vers /club...')
-  window.location.href = "/club"
+  // 4. Redirection HARD vers /club (window.location.assign force reload complet)
+  console.log('[LOGOUT] 🚀 REDIRECTION VERS /club (PAS /club/login)')
+  console.log('[LOGOUT] 📍 window.location.assign("/club")')
+  window.location.assign("/club")
 }

@@ -112,6 +112,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      {/* BADGE VERSION - TEMPORAIRE POUR DEBUG */}
+      <div style={{position:"fixed",bottom:8,right:8,fontSize:12,opacity:0.6,zIndex:999999,background:"#000",color:"#fff",padding:"4px 8px",borderRadius:4}}>
+        BUILD: 2026-02-15-01
+      </div>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         {club ? (

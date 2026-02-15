@@ -70,6 +70,10 @@ export default function ClubDashboardPage() {
   if (!isConnected && !loading) {
     return (
       <div className="min-h-screen bg-gray-50">
+        {/* BADGE VERSION - TEMPORAIRE POUR DEBUG */}
+        <div style={{position:"fixed",bottom:8,right:8,fontSize:12,opacity:0.6,zIndex:999999,background:"#000",color:"#fff",padding:"4px 8px",borderRadius:4}}>
+          BUILD: 2026-02-15-01
+        </div>
         <div className="max-w-7xl mx-auto px-4 py-16">
           {/* Header */}
           <div className="text-center mb-12">
@@ -178,6 +182,10 @@ export default function ClubDashboardPage() {
 
   return (
     <div className="space-y-8">
+      {/* BADGE VERSION - TEMPORAIRE POUR DEBUG */}
+      <div style={{position:"fixed",bottom:8,right:8,fontSize:12,opacity:0.6,zIndex:999999,background:"#000",color:"#fff",padding:"4px 8px",borderRadius:4}}>
+        BUILD: 2026-02-15-01
+      </div>
       {/* Welcome */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl p-8 shadow-lg">
         <h1 className="text-3xl font-bold mb-2">Bienvenue ! 👋</h1>
