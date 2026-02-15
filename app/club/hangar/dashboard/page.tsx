@@ -37,7 +37,7 @@ export default async function HangarDashboardPage() {
     return <div className="text-white p-8">Club introuvable</div>;
   }
 
-  // 2️⃣ récupérer les bookings du jour (timezone locale)
+  // 2️⃣ récupérer les bookings (SANS FILTRE DATE - DEBUG)
   const now = new Date();
   const start = new Date(now);
   start.setHours(0, 0, 0, 0);
@@ -48,8 +48,6 @@ export default async function HangarDashboardPage() {
     .from("bookings")
     .select("id, slot_start, slot_end, status, created_at, court_id, club_id")
     .eq("club_id", club.id)
-    .gte("slot_start", start.toISOString())
-    .lte("slot_start", end.toISOString())
     .order("slot_start", { ascending: true });
 
   const confirmed =
