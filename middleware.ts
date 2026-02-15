@@ -1,41 +1,43 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  
-  // Log pour debug
-  if (pathname.startsWith('/club')) {
-    console.log(`[Middleware] 🔍 Request: ${pathname}`)
+export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname
+
+  console.log(`[Middleware] 📍 Request: ${path}`)
+
+  // PUBLIC: Tout sauf /club/dashboard/*
+  if (!path.startsWith("/club/dashboard")) {
+    console.log(`[Middleware] ✅ Route publique: ${path}`)
+    return NextResponse.next()
   }
-  
-  // Protéger UNIQUEMENT /club/dashboard et ses sous-routes
-  if (pathname.startsWith('/club/dashboard')) {
-    // Vérifier la présence du token d'auth dans les cookies
-    const token = request.cookies.get('sb-eohioutmqfqdehfxgjgv-auth-token')
-    
-    if (!token) {
-      console.log(`[Middleware] ❌ Pas de token sur ${pathname} -> redirect /club`)
-      const url = request.nextUrl.clone()
-      url.pathname = '/club'
-      return NextResponse.redirect(url)
+
+  // PROTÉGÉ: /club/dashboard/*
+  // Vérifier si l'utilisateur a un token Supabase
+  const cookies = req.cookies
+  let hasAuthToken = false
+
+  // Chercher un cookie Supabase auth (plusieurs formats possibles)
+  cookies.getAll().forEach(cookie => {
+    if (cookie.name.includes('sb-') && cookie.name.includes('auth-token')) {
+      hasAuthToken = true
     }
-    
-    console.log(`[Middleware] ✅ Token OK sur ${pathname}`)
+  })
+
+  if (!hasAuthToken) {
+    console.log(`[Middleware] ❌ Pas de token auth -> redirect /club`)
+    const url = req.nextUrl.clone()
+    url.pathname = "/club"
+    return NextResponse.redirect(url)
   }
-  
-  // Toutes les autres routes : laisser passer
+
+  console.log(`[Middleware] ✅ Token trouvé -> accès dashboard autorisé`)
   return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - icon.png (favicon file)
-     * - api/ (API routes)
-     */
-    '/((?!_next/static|_next/image|icon.png|api/).*)',
+    // Protéger uniquement /club/dashboard et ses sous-routes
+    "/club/dashboard/:path*",
   ],
 }
