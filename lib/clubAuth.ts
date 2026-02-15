@@ -1,176 +1,238 @@
 /**
- * Authentification Club (front-only MVP)
- * Utilise des cookies pour la session
- * 
- * ⚠️ DEV ONLY - NE PAS DEPLOYER EN PROD TEL QUEL
- * 
- * TODO PRODUCTION:
- * 1. Migrer vers table `club_access_codes` (code, club_id, email, active, hashed_password)
- *    OU ajouter colonne `access_code` dans table `clubs` (unique)
- * 2. Utiliser Supabase Auth avec passwords hashés individuels (pas de password global)
- * 3. Implémenter rate limiting sur login
- * 4. Logs d'audit pour tentatives de connexion
+ * Authentification club avec Supabase Auth
+ * Remplace le système localStorage + password en clair
  */
 
-import { LE_HANGAR_UUID, PAUL_LOUIS_UUID, ZE_PADEL_UUID, QG_PADEL_UUID } from '@/lib/clubImages'
+import { supabaseBrowser } from './supabaseBrowser'
 
-export type ClubSession = {
-  email: string
-  clubId: string
-  clubName: string
-  ts: number
-}
-
-const COOKIE_NAME = 'club_session'
-const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 jours
-
-/**
- * ⚠️ DEV ONLY - Mapping CODE -> email/clubId
- * 
- * PROD: Remplacer par requête Supabase:
- * - Table `club_access_codes`: { code, club_id, email, active, created_at }
- * - OU colonne `access_code` dans table `clubs`
- */
-const CODE_TO_CLUB: Record<string, { email: string; clubId: string; clubName: string }> = {
-  'PADUP-1234': { email: 'admin@lehangar.fr', clubId: LE_HANGAR_UUID, clubName: 'Le Hangar Sport & Co' },
-  'PADUP-5678': { email: 'admin@pauletlouis.fr', clubId: PAUL_LOUIS_UUID, clubName: 'Paul & Louis Sport' },
-  'PADUP-9012': { email: 'admin@zepadel.fr', clubId: ZE_PADEL_UUID, clubName: 'ZE Padel' },
-  'PADUP-3456': { email: 'admin@qgpadel.fr', clubId: QG_PADEL_UUID, clubName: 'QG Padel Club' },
+export interface ClubWithMembership {
+  id: string
+  name: string
+  city: string
+  club_code: string
+  email?: string
+  phone?: string
+  address?: string
+  role: string
 }
 
 /**
- * Mapping email -> clubId (legacy, pour rétrocompatibilité)
- * En prod, ce serait dans une table users_clubs dans Supabase
+ * Connexion d'un utilisateur club via email/password
  */
-const EMAIL_TO_CLUB: Record<string, { clubId: string; clubName: string }> = {
-  'admin@lehangar.fr': { clubId: LE_HANGAR_UUID, clubName: 'Le Hangar Sport & Co' },
-  'admin@pauletlouis.fr': { clubId: PAUL_LOUIS_UUID, clubName: 'Paul & Louis Sport' },
-  'admin@zepadel.fr': { clubId: ZE_PADEL_UUID, clubName: 'ZE Padel' },
-  'admin@qgpadel.fr': { clubId: QG_PADEL_UUID, clubName: 'QG Padel Club' },
-  'club@padup.one': { clubId: LE_HANGAR_UUID, clubName: 'Le Hangar Sport & Co' }, // Fallback demo
-}
-
-/**
- * ⚠️ DEV ONLY - Mot de passe global démo
- * 
- * PROD: Chaque club doit avoir son propre password hashé
- * - Via Supabase Auth: auth.users avec metadata club_id
- * - OU table `club_users` avec bcrypt hash
- */
-const DEMO_PASSWORD = process.env.NEXT_PUBLIC_CLUB_DEMO_PASSWORD || 'club2026'
-
-/**
- * Login club avec CODE (nouveau système)
- */
-export function loginClubWithCode(code: string, password: string): { success: boolean; error?: string; session?: ClubSession } {
-  // Normaliser le code (uppercase, trim)
-  const normalizedCode = code.toUpperCase().trim()
+export async function signInWithEmail(email: string, password: string) {
+  const supabase = supabaseBrowser
   
-  // Vérifier le mot de passe
-  if (password !== DEMO_PASSWORD) {
-    return { success: false, error: 'Mot de passe incorrect' }
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (error) {
+    console.error('[Club Auth] Sign in error:', error)
+    return { user: null, error }
   }
 
-  // Vérifier le code et récupérer les infos du club
-  const clubInfo = CODE_TO_CLUB[normalizedCode]
-  if (!clubInfo) {
-    return { success: false, error: 'Identifiant club invalide' }
-  }
-
-  // Créer la session
-  const session: ClubSession = {
-    email: clubInfo.email,
-    clubId: clubInfo.clubId,
-    clubName: clubInfo.clubName,
-    ts: Date.now(),
-  }
-
-  // Sauvegarder dans un cookie
-  if (typeof document !== 'undefined') {
-    const expires = new Date(Date.now() + SESSION_DURATION).toUTCString()
-    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(session))}; path=/; expires=${expires}; SameSite=Strict`
-  }
-
-  return { success: true, session }
+  return { user: data.user, error: null }
 }
 
 /**
- * Login club (legacy avec email - pour rétrocompatibilité)
+ * Inscription d'un nouvel utilisateur club
  */
-export function loginClub(email: string, password: string): { success: boolean; error?: string; session?: ClubSession } {
-  // Vérifier le mot de passe
-  if (password !== DEMO_PASSWORD) {
-    return { success: false, error: 'Mot de passe incorrect' }
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  clubData: {
+    name: string
+    city: string
+    club_code: string
+    phone?: string
+    address?: string
   }
+) {
+  const supabase = supabaseBrowser
 
-  // Vérifier l'email et récupérer le clubId
-  const clubInfo = EMAIL_TO_CLUB[email.toLowerCase()]
-  if (!clubInfo) {
-    return { success: false, error: 'Email non autorisé' }
-  }
+  // 1. Créer l'utilisateur auth
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+  })
 
-  // Créer la session
-  const session: ClubSession = {
-    email: email.toLowerCase(),
-    clubId: clubInfo.clubId,
-    clubName: clubInfo.clubName,
-    ts: Date.now(),
-  }
-
-  // Sauvegarder dans un cookie
-  if (typeof document !== 'undefined') {
-    const expires = new Date(Date.now() + SESSION_DURATION).toUTCString()
-    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(session))}; path=/; expires=${expires}; SameSite=Strict`
-  }
-
-  return { success: true, session }
-}
-
-/**
- * Logout club
- */
-export function logoutClub(): void {
-  if (typeof document !== 'undefined') {
-    // Supprimer le cookie
-    document.cookie = `${COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Strict`
-  }
-}
-
-/**
- * Récupérer la session club (côté client)
- */
-export function getClubSession(): ClubSession | null {
-  if (typeof document === 'undefined') {
-    return null
+  if (authError || !authData.user) {
+    console.error('[Club Auth] Sign up error:', authError)
+    return { club: null, error: authError }
   }
 
   try {
-    const cookies = document.cookie.split(';')
-    const sessionCookie = cookies.find(c => c.trim().startsWith(`${COOKIE_NAME}=`))
-    
-    if (!sessionCookie) {
-      return null
+    // 2. Créer le club
+    const { data: club, error: clubError } = await supabase
+      .from('clubs')
+      .insert({
+        name: clubData.name,
+        city: clubData.city,
+        club_code: clubData.club_code,
+        email: email,
+        phone: clubData.phone,
+        address: clubData.address,
+      })
+      .select()
+      .single()
+
+    if (clubError || !club) {
+      console.error('[Club Auth] Club creation error:', clubError)
+      // TODO: Rollback user creation
+      return { club: null, error: clubError }
     }
 
-    const sessionValue = sessionCookie.split('=')[1]
-    const session: ClubSession = JSON.parse(decodeURIComponent(sessionValue))
+    // 3. Créer le membership (admin)
+    const { error: membershipError } = await supabase
+      .from('club_memberships')
+      .insert({
+        user_id: authData.user.id,
+        club_id: club.id,
+        role: 'admin',
+      })
 
-    // Vérifier que la session n'est pas expirée
-    if (Date.now() - session.ts > SESSION_DURATION) {
-      logoutClub()
-      return null
+    if (membershipError) {
+      console.error('[Club Auth] Membership creation error:', membershipError)
+      return { club: null, error: membershipError }
     }
 
-    return session
-  } catch (e) {
-    console.error('[clubAuth] Failed to parse session', e)
-    return null
+    console.log('[Club Auth] ✅ Club créé avec succès:', club)
+    return { club, error: null }
+  } catch (err: any) {
+    console.error('[Club Auth] Exception:', err)
+    return { club: null, error: err }
   }
 }
 
 /**
- * Vérifier si un club est connecté
+ * Récupère les clubs de l'utilisateur connecté
  */
-export function isClubAuthenticated(): boolean {
-  return getClubSession() !== null
+export async function getUserClubs(): Promise<ClubWithMembership[]> {
+  const supabase = supabaseBrowser
+
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return []
+  }
+
+  // Récupérer les memberships avec les infos du club
+  const { data, error } = await supabase
+    .from('club_memberships')
+    .select(`
+      role,
+      clubs:club_id (
+        id,
+        name,
+        city,
+        club_code,
+        email,
+        phone,
+        address
+      )
+    `)
+    .eq('user_id', user.id)
+
+  if (error) {
+    console.error('[Club Auth] Get clubs error:', error)
+    return []
+  }
+
+  // Formatter les données
+  return (data || []).map((item: any) => ({
+    id: item.clubs.id,
+    name: item.clubs.name,
+    city: item.clubs.city,
+    club_code: item.clubs.club_code,
+    email: item.clubs.email,
+    phone: item.clubs.phone,
+    address: item.clubs.address,
+    role: item.role,
+  }))
+}
+
+/**
+ * Récupère le premier club de l'utilisateur (pour simplifier)
+ */
+export async function getDefaultClub(): Promise<ClubWithMembership | null> {
+  const clubs = await getUserClubs()
+  return clubs.length > 0 ? clubs[0] : null
+}
+
+/**
+ * Déconnexion
+ */
+export async function signOut() {
+  const supabase = supabaseBrowser
+  
+  const { error } = await supabase.auth.signOut()
+  
+  if (error) {
+    console.error('[Club Auth] Sign out error:', error)
+    return { error }
+  }
+
+  return { error: null }
+}
+
+/**
+ * Récupère la session actuelle
+ */
+export async function getSession() {
+  const supabase = supabaseBrowser
+  
+  const { data: { session }, error } = await supabase.auth.getSession()
+  
+  if (error) {
+    console.error('[Club Auth] Get session error:', error)
+    return null
+  }
+
+  return session
+}
+
+/**
+ * Vérifie si l'utilisateur est connecté
+ */
+export async function isAuthenticated(): Promise<boolean> {
+  const session = await getSession()
+  return session !== null
+}
+
+/**
+ * Vérifie si l'utilisateur est membre d'un club spécifique
+ */
+export async function isMemberOfClub(clubId: string): Promise<boolean> {
+  const supabase = supabaseBrowser
+
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) {
+    return false
+  }
+
+  const { data, error } = await supabase
+    .from('club_memberships')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('club_id', clubId)
+    .single()
+
+  return !error && data !== null
+}
+
+/**
+ * Hook React pour écouter les changements de session
+ */
+export function onAuthStateChange(callback: (user: any) => void) {
+  const supabase = supabaseBrowser
+  
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    (_event, session) => {
+      callback(session?.user || null)
+    }
+  )
+
+  return subscription
 }

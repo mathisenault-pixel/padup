@@ -8,7 +8,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getTodayDateString, addDays, formatDateLong, type AvailabilitySlot } from "@/lib/slots";
+import { getCurrentClub } from "@/lib/getClub";
 
 type CourtPlanning = {
   court_id: string;
@@ -38,8 +40,9 @@ type PlanningResponse = {
 };
 
 export default function ClubPlanningPage() {
-  // TODO: Récupérer clubId depuis l'auth/session
-  const clubId = "ba43c579-e522-4b51-8542-737c2c6452bb";
+  const router = useRouter();
+  const [club, setClub] = useState<any>(null);
+  const [clubId, setClubId] = useState<string | null>(null);
 
   const [dateStr, setDateStr] = useState(getTodayDateString());
   const [view, setView] = useState<"day" | "week">("day");
@@ -47,10 +50,34 @@ export default function ClubPlanningPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Vérifier la connexion au montage
+  useEffect(() => {
+    const loadData = async () => {
+      const { club: userClub, session } = await getCurrentClub();
+      
+      if (!session) {
+        router.push('/club/auth/login');
+        return;
+      }
+
+      if (!userClub) {
+        alert('Aucun club associé');
+        router.push('/club/dashboard');
+        return;
+      }
+
+      setClub(userClub);
+      setClubId(userClub.id);
+    };
+
+    loadData();
+  }, [router]);
+
   /**
    * Charger le planning depuis l'API
    */
   async function loadPlanning() {
+    if (!clubId) return;
     setLoading(true);
     setError(null);
 
@@ -98,9 +125,11 @@ export default function ClubPlanningPage() {
    * Charger le planning au montage et quand les paramètres changent
    */
   useEffect(() => {
-    loadPlanning();
+    if (clubId) {
+      loadPlanning();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateStr, view]);
+  }, [dateStr, view, clubId]);
 
   /**
    * Navigation de date
@@ -117,9 +146,19 @@ export default function ClubPlanningPage() {
     setDateStr(getTodayDateString());
   }
 
+  if (!club) return null;
+
   return (
     <main style={{ padding: 24, maxWidth: 1200 }}>
-      <h1>Planning Club</h1>
+      <div style={{ marginBottom: 16 }}>
+        <button
+          onClick={() => router.push('/club/dashboard')}
+          style={{ color: '#007bff', marginBottom: 8 }}
+        >
+          ← Retour au dashboard
+        </button>
+        <h1>Planning Club - {club.name}</h1>
+      </div>
 
       {/* Navigation */}
       <div

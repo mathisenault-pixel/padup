@@ -1,10 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getClubSession } from '@/lib/clubAuth'
+import { useRouter } from 'next/navigation'
+import { getCurrentClub } from '@/lib/getClub'
 import { useReservationsStore, type Reservation, type BlockedSlot } from '@/store/reservationsStore'
 
 export default function ClubReservationsPage() {
+  const router = useRouter()
+  const [clubId, setClubId] = useState<string | null>(null)
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([])
   const [activeTab, setActiveTab] = useState<'reservations' | 'blocks'>('reservations')
@@ -17,13 +20,28 @@ export default function ClubReservationsPage() {
   } = useReservationsStore()
 
   useEffect(() => {
-    const session = getClubSession()
-    if (!session) return
+    const loadData = async () => {
+      const { club, session } = await getCurrentClub()
+      
+      if (!session) {
+        router.push('/club/auth/login')
+        return
+      }
 
-    loadData(session.clubId)
-  }, [])
+      if (!club) {
+        alert('Aucun club associé')
+        router.push('/club/dashboard')
+        return
+      }
 
-  const loadData = (clubId: string) => {
+      setClubId(club.id)
+      loadReservations(club.id)
+    }
+
+    loadData()
+  }, [router])
+
+  const loadReservations = (clubId: string) => {
     const res = getReservationsByClub(clubId)
     const blocks = getBlockedSlotsByClub(clubId)
     setReservations(res)
@@ -32,22 +50,18 @@ export default function ClubReservationsPage() {
 
   const handleCancelReservation = (reservationId: string) => {
     if (!confirm('Voulez-vous vraiment annuler cette réservation ?')) return
+    if (!clubId) return
 
     cancelReservation(reservationId)
-    const session = getClubSession()
-    if (session) {
-      loadData(session.clubId)
-    }
+    loadReservations(clubId)
   }
 
   const handleUnblock = (blockId: string) => {
     if (!confirm('Voulez-vous vraiment débloquer ce créneau ?')) return
+    if (!clubId) return
 
     unblockSlot(blockId)
-    const session = getClubSession()
-    if (session) {
-      loadData(session.clubId)
-    }
+    loadReservations(clubId)
   }
 
   const formatDate = (dateStr: string) => {

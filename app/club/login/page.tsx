@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { loginClubWithCode } from '@/lib/clubAuth'
+import { supabaseBrowser as supabase } from '@/lib/supabaseBrowser'
 
 export default function ClubLoginPage() {
   const router = useRouter()
-  const [code, setCode] = useState('')
+  const [clubId, setClubId] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -17,16 +17,22 @@ export default function ClubLoginPage() {
     setIsLoading(true)
 
     try {
-      const result = loginClubWithCode(code, password)
+      const { data, error: loginError } = await supabase
+        .from('clubs')
+        .select('*')
+        .eq('club_code', clubId)
+        .eq('password', password)
+        .single()
 
-      if (result.success) {
-        console.log('[Club Login] ✅ Success:', result.session)
-        router.push('/club')
+      if (data) {
+        console.log('[Club Login] ✅ Success:', data)
+        localStorage.setItem('club', JSON.stringify(data))
+        router.push('/club/dashboard')
       } else {
-        setError(result.error || 'Erreur de connexion')
+        setError('Identifiant ou mot de passe incorrect')
       }
     } catch (err) {
-      setError('Erreur inattendue')
+      setError('Identifiant ou mot de passe incorrect')
       console.error('[Club Login] Error:', err)
     } finally {
       setIsLoading(false)
@@ -57,8 +63,8 @@ export default function ClubLoginPage() {
             <input
               id="code"
               type="text"
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              value={clubId}
+              onChange={(e) => setClubId(e.target.value.toUpperCase())}
               placeholder="Ex: PADUP-1234"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all font-mono uppercase"

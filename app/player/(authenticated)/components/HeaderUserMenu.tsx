@@ -35,7 +35,14 @@ export default function HeaderUserMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 py-2 w-44 bg-white rounded-xl shadow-lg border border-black/10 z-[100]">
+        <div className="absolute right-0 top-full mt-1 py-2 w-52 bg-white rounded-xl shadow-lg border border-black/10 z-[100]">
+          <Link
+            href="/player/reservations"
+            onClick={() => setIsOpen(false)}
+            className="block px-4 py-2.5 text-sm font-medium text-black hover:bg-black/5 transition-colors"
+          >
+            Mes réservations
+          </Link>
           <Link
             href="/player/compte"
             onClick={() => setIsOpen(false)}

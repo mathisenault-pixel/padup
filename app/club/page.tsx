@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getClubSession } from '@/lib/clubAuth'
+import { useRouter } from 'next/navigation'
+import { getCurrentClub } from '@/lib/getClub'
 import { getClubById } from '@/lib/data/clubs'
 import { useReservationsStore } from '@/store/reservationsStore'
 import Link from 'next/link'
 
 export default function ClubDashboardPage() {
+  const router = useRouter()
   const [clubData, setClubData] = useState<any>(null)
   const [stats, setStats] = useState({
     todayReservations: 0,
@@ -18,26 +20,40 @@ export default function ClubDashboardPage() {
   const { getReservationsByClub, getReservationsByDate, getBlockedSlotsByClub } = useReservationsStore()
 
   useEffect(() => {
-    const session = getClubSession()
-    if (!session) return
+    const loadData = async () => {
+      const { club, session } = await getCurrentClub()
+      
+      if (!session) {
+        router.push('/club/auth/login')
+        return
+      }
 
-    // Charger les données du club
-    const club = getClubById(session.clubId)
-    setClubData(club)
+      if (!club) {
+        alert('Aucun club associé')
+        router.push('/club/dashboard')
+        return
+      }
 
-    // Calculer les stats
-    const today = new Date().toISOString().split('T')[0]
-    const allReservations = getReservationsByClub(session.clubId)
-    const todayReservations = getReservationsByDate(session.clubId, today)
-    const blockedSlots = getBlockedSlotsByClub(session.clubId)
+      // Charger les données du club (utilise l'ancien système local pour les stats)
+      const localClubData = getClubById(club.id)
+      setClubData(localClubData || club)
 
-    setStats({
-      todayReservations: todayReservations.length,
-      totalReservations: allReservations.length,
-      blockedSlots: blockedSlots.length,
-      activeReservations: allReservations.filter(r => r.status === 'confirmed').length,
-    })
-  }, [])
+      // Calculer les stats
+      const today = new Date().toISOString().split('T')[0]
+      const allReservations = getReservationsByClub(club.id)
+      const todayReservations = getReservationsByDate(club.id, today)
+      const blockedSlots = getBlockedSlotsByClub(club.id)
+
+      setStats({
+        todayReservations: todayReservations.length,
+        totalReservations: allReservations.length,
+        blockedSlots: blockedSlots.length,
+        activeReservations: allReservations.filter(r => r.status === 'confirmed').length,
+      })
+    }
+
+    loadData()
+  }, [router])
 
   if (!clubData) {
     return (

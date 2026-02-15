@@ -197,7 +197,6 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                     
                     {/* Prix */}
                     <div className="flex items-baseline gap-2 mb-2">
-                      <span className="text-sm text-slate-400 line-through">12,49€</span>
                       <span className="text-2xl font-semibold text-slate-900">9,99€</span>
                       <span className="text-sm text-slate-500">/mois</span>
                     </div>
@@ -396,10 +395,8 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                       <div className="flex justify-between items-center">
                         <div>
                           <span className="text-sm text-slate-600">Abonnement Pad'up +</span>
-                          <span className="text-xs text-slate-400 ml-1">(1er mois)</span>
                         </div>
                         <div className="text-right">
-                          <div className="text-xs text-slate-400 line-through">12,49€</div>
                           <span className="text-sm font-semibold text-slate-900">9,99€</span>
                         </div>
                       </div>
@@ -445,7 +442,7 @@ export default function PremiumModal({ onClose, onSubscribe, onContinueWithout, 
                       <div className="text-xs text-slate-600 space-y-1">
                         <div>✓ Économie : {remiseRestaurant.toFixed(2)}€</div>
                         <div>✓ -20% sur futurs repas</div>
-                        <div>✓ Abo : <span className="line-through">12,49€</span> 9,99€/mois</div>
+                        <div>✓ Abo : 9,99€/mois</div>
                       </div>
                     </div>
                   )}

@@ -2,32 +2,46 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getClubSession, logoutClub } from '@/lib/clubAuth'
+import { getCurrentClub } from '@/lib/getClub'
+import { signOut } from '@/lib/clubAuth'
 import { getClubById, type ClubData } from '@/lib/data/clubs'
 
 export default function ClubSettingsPage() {
   const router = useRouter()
   const [clubData, setClubData] = useState<ClubData | null>(null)
-  const [session, setSession] = useState<any>(null)
+  const [club, setClub] = useState<any>(null)
 
   useEffect(() => {
-    const currentSession = getClubSession()
-    setSession(currentSession)
+    const loadData = async () => {
+      const { club: userClub, session } = await getCurrentClub()
+      
+      if (!session) {
+        router.push('/club/auth/login')
+        return
+      }
 
-    if (currentSession) {
-      const club = getClubById(currentSession.clubId)
-      setClubData(club || null)
+      if (!userClub) {
+        alert('Aucun club associé')
+        router.push('/club/dashboard')
+        return
+      }
+
+      setClub(userClub)
+      const localClubData = getClubById(userClub.id)
+      setClubData(localClubData || null)
     }
-  }, [])
 
-  const handleLogout = () => {
+    loadData()
+  }, [router])
+
+  const handleLogout = async () => {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-      logoutClub()
-      router.push('/club/login')
+      await signOut()
+      router.push('/club/auth/login')
     }
   }
 
-  if (!clubData || !session) {
+  if (!clubData || !club) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-900 border-t-transparent"></div>
@@ -49,24 +63,18 @@ export default function ClubSettingsPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between py-3 border-b border-gray-100">
             <span className="text-sm font-semibold text-gray-500">Email</span>
-            <span className="text-sm font-medium text-gray-900">{session.email}</span>
+            <span className="text-sm font-medium text-gray-900">{clubData.email || 'N/A'}</span>
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-100">
             <span className="text-sm font-semibold text-gray-500">Rôle</span>
             <span className="inline-block px-3 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
-              Administrateur
+              {club.role || 'Administrateur'}
             </span>
           </div>
           <div className="flex items-center justify-between py-3">
-            <span className="text-sm font-semibold text-gray-500">Connecté depuis</span>
-            <span className="text-sm font-medium text-gray-900">
-              {new Date(session.ts).toLocaleDateString('fr-FR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+            <span className="text-sm font-semibold text-gray-500">Club ID</span>
+            <span className="text-sm font-mono text-gray-600">
+              {club.id}
             </span>
           </div>
         </div>
