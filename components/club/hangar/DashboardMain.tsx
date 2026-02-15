@@ -66,9 +66,20 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
   const priceOffpeak = (settings?.price_offpeak_cents || 4000) / 100
   const revenus = confirmed * priceOffpeak
 
-  const nbTerrains = courts.length
+  // Calcul du taux d'occupation basé sur les heures d'ouverture réelles
+  const nbTerrains = courts.length || 1 // Au moins 1 pour éviter division par 0
   const slotMinutes = settings?.slot_minutes || 90
-  const totalSlots = nbTerrains * 10 // Simplifié
+  
+  // Calculer le nombre de créneaux par jour par terrain
+  // Ex: Si ouvert de 8h à 23h = 15h = 900 min, et créneaux de 90 min = 10 créneaux
+  const openHours = settings?.open_hours || { "1": { start: "08:00", end: "23:00" } }
+  const firstDay = openHours["1"] || openHours["0"] || { start: "08:00", end: "23:00" }
+  const [startH, startM] = firstDay.start.split(":").map(Number)
+  const [endH, endM] = firstDay.end.split(":").map(Number)
+  const totalMinutesOpen = (endH * 60 + endM) - (startH * 60 + startM)
+  const slotsPerCourtPerDay = Math.floor(totalMinutesOpen / slotMinutes)
+  
+  const totalSlots = nbTerrains * slotsPerCourtPerDay
   const tauxOccupation = totalSlots > 0 ? Math.round((confirmed / totalSlots) * 100) : 0
 
   const now = new Date()
