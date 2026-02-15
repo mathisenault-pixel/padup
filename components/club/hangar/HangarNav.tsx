@@ -1,12 +1,29 @@
-import Link from "next/link";
+"use client"
 
-export default function HangarNav({ active = "dashboard" }: { active?: string }) {
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+
+export default function HangarNav() {
+  const pathname = usePathname()
+
   const tabs = [
     { id: "dashboard", label: "Dashboard", href: "/club/hangar" },
     { id: "courts", label: "Terrains", href: "/club/hangar/courts" },
     { id: "reservations", label: "Réservations", href: "/club/hangar/reservations" },
     { id: "settings", label: "Paramètres", href: "/club/hangar/settings" },
-  ];
+  ]
+
+  // Déterminer l'onglet actif en fonction de l'URL
+  const getActiveTab = () => {
+    if (pathname === "/club/hangar") return "dashboard"
+    if (pathname?.startsWith("/club/hangar/courts")) return "courts"
+    if (pathname?.startsWith("/club/hangar/reservations")) return "reservations"
+    if (pathname?.startsWith("/club/hangar/settings")) return "settings"
+    if (pathname?.startsWith("/club/hangar/dashboard")) return "dashboard"
+    return "dashboard"
+  }
+
+  const active = getActiveTab()
 
   return (
     <nav className="w-full border-b border-slate-800/60 bg-slate-950/40 backdrop-blur supports-[backdrop-filter]:bg-slate-950/30">
@@ -30,5 +47,5 @@ export default function HangarNav({ active = "dashboard" }: { active?: string })
         <div className="ml-auto text-xs text-slate-500">Hangar • Club</div>
       </div>
     </nav>
-  );
+  )
 }
