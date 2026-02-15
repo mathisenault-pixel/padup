@@ -8,13 +8,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-type UserProfile = {
-  id: string
-  full_name: string | null
-  email: string | null
-  phone: string | null
-}
-
 type Booking = {
   id: string
   club_id: string
@@ -24,16 +17,6 @@ type Booking = {
   status: string
   created_at: string
   created_by: string
-  profiles: UserProfile[] | UserProfile | null
-}
-
-// Helper pour obtenir le profil utilisateur
-function getUserProfile(booking: Booking): UserProfile | null {
-  if (!booking.profiles) return null
-  if (Array.isArray(booking.profiles)) {
-    return booking.profiles[0] || null
-  }
-  return booking.profiles
 }
 
 type Court = {
@@ -100,20 +83,14 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
 
   // Export CSV
   const exportCsv = () => {
-    const headers = ["Date", "Heure début", "Heure fin", "Terrain", "Client", "Email", "Téléphone", "Statut"]
-    const rows = bookings.map((b) => {
-      const profile = getUserProfile(b)
-      return [
-        new Date(b.slot_start).toLocaleDateString("fr-FR"),
-        formatTime(b.slot_start),
-        formatTime(b.slot_end),
-        courtsMap[b.court_id] || "—",
-        profile?.full_name || "—",
-        profile?.email || "—",
-        profile?.phone || "—",
-        b.status === "confirmed" ? "Confirmée" : "Annulée",
-      ]
-    })
+    const headers = ["Date", "Heure début", "Heure fin", "Terrain", "Statut"]
+    const rows = bookings.map((b) => [
+      new Date(b.slot_start).toLocaleDateString("fr-FR"),
+      formatTime(b.slot_start),
+      formatTime(b.slot_end),
+      courtsMap[b.court_id] || "—",
+      b.status === "confirmed" ? "Confirmée" : "Annulée",
+    ])
 
     const csvContent = [
       headers.join(","),
@@ -168,30 +145,15 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       setModalError("")
       setSelectedCourt("")
       setSelectedTime("")
-      // Recharger les bookings avec infos utilisateur
+      // Recharger les bookings
       const { data } = await supabase
         .from("bookings")
-        .select(`
-          id, 
-          club_id, 
-          court_id, 
-          slot_start, 
-          slot_end, 
-          status, 
-          created_at,
-          created_by,
-          profiles:created_by (
-            id,
-            full_name,
-            email,
-            phone
-          )
-        `)
+        .select('id, club_id, court_id, slot_start, slot_end, status, created_at, created_by')
         .eq("club_id", clubId)
         .gte("slot_start", new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
         .lte("slot_start", new Date(new Date().setHours(23, 59, 59, 999)).toISOString())
         .order("slot_start", { ascending: true })
-      if (data) setBookings(data as any)
+      if (data) setBookings(data)
     }
   }
 
@@ -228,58 +190,38 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Heure</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Terrain</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Client</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Contact</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-slate-700 uppercase tracking-wide">Statut</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {bookings.map((b) => {
-                  const profile = getUserProfile(b)
-                  return (
-                    <tr key={b.id} className="hover:bg-blue-50/50 transition">
-                      <td className="px-4 py-4">
-                        <div className="text-slate-900 font-semibold">
-                          {formatTime(b.slot_start)}
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          → {formatTime(b.slot_end)}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="text-slate-900 font-medium">
-                          {courtsMap[b.court_id] || "—"}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="text-slate-900 font-semibold">
-                          {profile?.full_name || "—"}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="text-slate-700 text-sm">
-                          {profile?.email || "—"}
-                        </div>
-                        {profile?.phone && (
-                          <div className="text-xs text-slate-500 mt-0.5">
-                            {profile.phone}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-4 py-4">
-                        <div
-                          className={`inline-flex text-xs font-semibold px-3 py-1.5 rounded-full ${
-                            b.status === "confirmed"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-rose-100 text-rose-700"
-                          }`}
-                        >
-                          {b.status === "confirmed" ? "✓ Confirmée" : "✕ Annulée"}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
+                {bookings.map((b) => (
+                  <tr key={b.id} className="hover:bg-blue-50/50 transition">
+                    <td className="px-4 py-4">
+                      <div className="text-slate-900 font-semibold">
+                        {formatTime(b.slot_start)}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        → {formatTime(b.slot_end)}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="text-slate-900 font-medium">
+                        {courtsMap[b.court_id] || "—"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div
+                        className={`inline-flex text-xs font-semibold px-3 py-1.5 rounded-full ${
+                          b.status === "confirmed"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-rose-100 text-rose-700"
+                        }`}
+                      >
+                        {b.status === "confirmed" ? "✓ Confirmée" : "✕ Annulée"}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
