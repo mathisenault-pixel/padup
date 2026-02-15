@@ -23,9 +23,10 @@ export default function AutocompleteInput({
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Filtrer les suggestions basées sur la valeur actuelle
-  const filteredSuggestions = suggestions.filter(s =>
-    s.toLowerCase().includes(value.toLowerCase())
-  )
+  // Si le champ est vide, afficher les 10 premières suggestions
+  const filteredSuggestions = value 
+    ? suggestions.filter(s => s.toLowerCase().includes(value.toLowerCase()))
+    : suggestions.slice(0, 10)
 
   // Fermer le dropdown au clic extérieur
   useEffect(() => {

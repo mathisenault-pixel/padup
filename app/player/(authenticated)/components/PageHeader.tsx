@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react'
 import AutocompleteInput from './AutocompleteInput'
+import DatePicker from './DatePicker'
 import { useScrollDirection } from '@/hooks/useScrollDirection'
 
 type SearchBarField = {
@@ -9,7 +10,7 @@ type SearchBarField = {
   placeholder: string
   value: string
   onChange: (value: string) => void
-  type?: 'text' | 'select'
+  type?: 'text' | 'select' | 'date'
   options?: { value: string; label: string }[]
   suggestions?: string[]
 }
@@ -18,6 +19,7 @@ type PageHeaderProps = {
   title: string
   subtitle: string
   leftField: SearchBarField
+  middleField?: SearchBarField
   rightField: SearchBarField
   buttonLabel: string
   onSearch: () => void
@@ -30,6 +32,7 @@ export default function PageHeader({
   title,
   subtitle,
   leftField,
+  middleField,
   rightField,
   buttonLabel,
   onSearch,
@@ -71,6 +74,7 @@ export default function PageHeader({
           <div className="w-full max-w-6xl mx-auto px-4 min-w-0">
             <SearchBar
               leftField={leftField}
+              middleField={middleField}
               rightField={rightField}
               buttonLabel={buttonLabel}
               onSearch={onSearch}
@@ -114,6 +118,7 @@ export default function PageHeader({
         <div className="w-full max-w-6xl mx-auto px-4 min-w-0">
           <SearchBar
             leftField={leftField}
+            middleField={middleField}
             rightField={rightField}
             buttonLabel={buttonLabel}
             onSearch={onSearch}
@@ -132,6 +137,7 @@ export default function PageHeader({
 // Composant interne pour la barre de recherche (réutilisable)
 function SearchBar({
   leftField,
+  middleField,
   rightField,
   buttonLabel,
   onSearch,
@@ -139,6 +145,7 @@ function SearchBar({
   activeFiltersCount,
 }: {
   leftField: SearchBarField
+  middleField?: SearchBarField
   rightField: SearchBarField
   buttonLabel: string
   onSearch: () => void
@@ -151,7 +158,7 @@ function SearchBar({
       <div className="flex items-center gap-4 flex-1 min-w-0">
         {/* Champ gauche */}
         {leftField.suggestions && leftField.suggestions.length > 0 ? (
-          <div className="flex-[1.2] min-w-0">
+          <div className="flex-1 min-w-0">
             <AutocompleteInput
               label={leftField.label}
               placeholder={leftField.placeholder}
@@ -161,7 +168,7 @@ function SearchBar({
             />
           </div>
         ) : (
-          <div className="flex-[1.2] px-4 py-2 min-w-0">
+          <div className="flex-1 px-4 py-2 min-w-0">
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               {leftField.label}
             </label>
@@ -173,6 +180,48 @@ function SearchBar({
               className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
             />
           </div>
+        )}
+
+        {/* Séparateur si middleField existe */}
+        {middleField && <div className="hidden md:block w-px bg-slate-200 self-stretch"></div>}
+
+        {/* Champ du milieu (optionnel) */}
+        {middleField && (
+          <>
+            {middleField.type === 'date' ? (
+              <div className="flex-1 min-w-0">
+                <DatePicker
+                  label={middleField.label}
+                  placeholder={middleField.placeholder}
+                  value={middleField.value}
+                  onChange={middleField.onChange}
+                />
+              </div>
+            ) : middleField.suggestions && middleField.suggestions.length > 0 ? (
+              <div className="flex-1 min-w-0">
+                <AutocompleteInput
+                  label={middleField.label}
+                  placeholder={middleField.placeholder}
+                  value={middleField.value}
+                  onChange={middleField.onChange}
+                  suggestions={middleField.suggestions}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 px-4 py-2 min-w-0">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  {middleField.label}
+                </label>
+                <input
+                  type="text"
+                  value={middleField.value}
+                  onChange={(e) => middleField.onChange(e.target.value)}
+                  placeholder={middleField.placeholder}
+                  className="w-full text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none bg-transparent"
+                />
+              </div>
+            )}
+          </>
         )}
 
         {/* Séparateur */}

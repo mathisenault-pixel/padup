@@ -64,6 +64,7 @@ export default function ClubsPage() {
   // États pour le header de recherche
   const [headerSearchTerm, setHeaderSearchTerm] = useState('')
   const [headerCitySearch, setHeaderCitySearch] = useState('')
+  const [headerDateSearch, setHeaderDateSearch] = useState('')
   
   // État pour les métriques de conduite (OSRM)
   const [drivingMetrics, setDrivingMetrics] = useState<Map<string, { km: number; min: number }>>(new Map())
@@ -336,6 +337,13 @@ export default function ClubsPage() {
             value: headerSearchTerm,
             onChange: setHeaderSearchTerm,
             suggestions: clubNameSuggestions
+          }}
+          middleField={{
+            label: 'Quand ?',
+            placeholder: 'Sélectionner une date',
+            value: headerDateSearch,
+            onChange: setHeaderDateSearch,
+            type: 'date'
           }}
           rightField={{
             label: t('clubs.ou'),
