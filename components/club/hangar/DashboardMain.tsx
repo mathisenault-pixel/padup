@@ -49,8 +49,24 @@ function formatTime(iso: string): string {
   })
 }
 
+type TimeSlot = {
+  courtId: string
+  courtName: string
+  date: string
+  start: string
+  end: string
+  isBooked: boolean
+}
+
 export default function DashboardMain({ clubId, initialBookings, courts, settings }: Props) {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings)
+  
+  // Onglets : "reservations" ou "disponibilites"
+  const [activeTab, setActiveTab] = useState<'reservations' | 'disponibilites'>('reservations')
+  
+  // Filtres pour les disponibilités
+  const [periodFilter, setPeriodFilter] = useState<'today' | '7days' | 'month'>('today')
+  const [selectedCourtFilter, setSelectedCourtFilter] = useState<string>('all')
   
   // Modal ajout réservation
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -103,6 +119,113 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
       isEmpty: courtBookings.length === 0
     }
   })
+
+  // ============================================
+  // GÉNÉRATION DES CRÉNEAUX DISPONIBLES
+  // ============================================
+  
+  // Fonction pour générer tous les créneaux possibles sur une période
+  const generateAllSlots = (): TimeSlot[] => {
+    const slots: TimeSlot[] = []
+    const slotDuration = settings?.slot_minutes || 90
+    
+    // Déterminer la plage de dates selon le filtre
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    let startDate = new Date(today)
+    let endDate = new Date(today)
+    
+    if (periodFilter === 'today') {
+      endDate.setDate(endDate.getDate() + 1)
+    } else if (periodFilter === '7days') {
+      endDate.setDate(endDate.getDate() + 7)
+    } else if (periodFilter === 'month') {
+      endDate.setMonth(endDate.getMonth() + 1)
+    }
+    
+    // Pour chaque jour dans la période
+    const currentDate = new Date(startDate)
+    while (currentDate < endDate) {
+      const dayOfWeek = currentDate.getDay() // 0=dimanche, 1=lundi, etc.
+      const dayKey = dayOfWeek === 0 ? 'sun' : dayOfWeek === 1 ? 'mon' : dayOfWeek === 2 ? 'tue' : dayOfWeek === 3 ? 'wed' : dayOfWeek === 4 ? 'thu' : dayOfWeek === 5 ? 'fri' : 'sat'
+      
+      const openHours = settings?.open_hours || {}
+      const daySchedule = openHours[dayKey] || openHours['mon'] || { open: '08:00', close: '23:00' }
+      
+      // Parser les heures d'ouverture
+      const [openH, openM] = daySchedule.open.split(':').map(Number)
+      const [closeH, closeM] = daySchedule.close.split(':').map(Number)
+      
+      const openMinutes = openH * 60 + openM
+      const closeMinutes = closeH * 60 + closeM
+      
+      // Pour chaque terrain
+      courts.forEach(court => {
+        // Générer tous les créneaux pour ce terrain ce jour-là
+        let currentMinutes = openMinutes
+        
+        while (currentMinutes + slotDuration <= closeMinutes) {
+          const startH = Math.floor(currentMinutes / 60)
+          const startM = currentMinutes % 60
+          const endMinutes = currentMinutes + slotDuration
+          const endH = Math.floor(endMinutes / 60)
+          const endM = endMinutes % 60
+          
+          const slotStart = new Date(currentDate)
+          slotStart.setHours(startH, startM, 0, 0)
+          
+          const slotEnd = new Date(currentDate)
+          slotEnd.setHours(endH, endM, 0, 0)
+          
+          // Vérifier si ce créneau est réservé
+          const isBooked = bookings.some(b => 
+            b.court_id === court.id &&
+            b.status === 'confirmed' &&
+            new Date(b.slot_start).getTime() === slotStart.getTime()
+          )
+          
+          slots.push({
+            courtId: court.id,
+            courtName: court.name,
+            date: currentDate.toISOString().split('T')[0],
+            start: slotStart.toISOString(),
+            end: slotEnd.toISOString(),
+            isBooked
+          })
+          
+          currentMinutes += slotDuration
+        }
+      })
+      
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+    
+    return slots
+  }
+  
+  // Générer tous les créneaux
+  const allSlots = generateAllSlots()
+  
+  // Filtrer pour n'avoir que les créneaux DISPONIBLES (non réservés)
+  let availableSlots = allSlots.filter(slot => !slot.isBooked)
+  
+  // Appliquer le filtre terrain si sélectionné
+  if (selectedCourtFilter !== 'all') {
+    availableSlots = availableSlots.filter(slot => slot.courtId === selectedCourtFilter)
+  }
+  
+  // Grouper les créneaux disponibles par date
+  const slotsByDate = availableSlots.reduce((acc, slot) => {
+    if (!acc[slot.date]) {
+      acc[slot.date] = []
+    }
+    acc[slot.date].push(slot)
+    return acc
+  }, {} as Record<string, TimeSlot[]>)
+  
+  // Compter les créneaux disponibles
+  const totalAvailableSlots = availableSlots.length
 
   // Export CSV
   const exportCsv = () => {
@@ -182,6 +305,7 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
 
   return (
     <section className="space-y-6">
+      {/* KPIs */}
       <div className="flex gap-4 overflow-x-auto py-2 pb-4">
         <KPI title="Réservations (confirmées)" value={confirmed} small="Aujourd'hui" />
         <KPI title="Annulations" value={cancelled} small="Aujourd'hui" />
@@ -194,77 +318,220 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
         />
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-slate-900">Planning du jour par terrain</h2>
-          <span className="text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-medium">
-            {bookings.filter(b => b.status === "confirmed").length} réservation{bookings.filter(b => b.status === "confirmed").length > 1 ? 's' : ''}
+      {/* Onglets : Réservations / Créneaux disponibles */}
+      <div className="flex gap-2 border-b-2 border-slate-200">
+        <button
+          onClick={() => setActiveTab('reservations')}
+          className={`px-5 py-3 font-semibold text-sm transition-all ${
+            activeTab === 'reservations'
+              ? 'text-blue-600 border-b-2 border-blue-600 -mb-0.5'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          📅 Réservations du jour
+        </button>
+        <button
+          onClick={() => setActiveTab('disponibilites')}
+          className={`px-5 py-3 font-semibold text-sm transition-all ${
+            activeTab === 'disponibilites'
+              ? 'text-blue-600 border-b-2 border-blue-600 -mb-0.5'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          ✓ Créneaux disponibles
+          <span className="ml-2 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-bold">
+            {totalAvailableSlots}
           </span>
-        </div>
-
-        {bookings.length === 0 ? (
-          <div className="text-center py-12 text-sm text-slate-500">
-            Aucune réservation aujourd'hui
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {bookingsByCourt.map(({ court, bookings: courtBookings, isEmpty }) => (
-              <div
-                key={court.id}
-                className={`border-2 rounded-xl p-4 transition-all ${
-                  isEmpty
-                    ? "border-slate-200 bg-slate-50/50"
-                    : "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white shadow-sm"
-                }`}
-              >
-                {/* Header terrain */}
-                <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${isEmpty ? "bg-slate-300" : "bg-emerald-500"}`}></div>
-                    <h3 className="font-bold text-slate-900">{court.name}</h3>
-                  </div>
-                  <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                    isEmpty
-                      ? "bg-slate-200 text-slate-600"
-                      : "bg-emerald-100 text-emerald-700"
-                  }`}>
-                    {courtBookings.length}
-                  </span>
-                </div>
-
-                {/* Liste des réservations ou message vide */}
-                {isEmpty ? (
-                  <div className="text-center py-6">
-                    <div className="text-3xl mb-2">✓</div>
-                    <p className="text-xs text-slate-500 font-medium">Disponible toute la journée</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {courtBookings.map((b) => (
-                      <div
-                        key={b.id}
-                        className="bg-white border border-emerald-200 rounded-lg p-3 hover:shadow-sm transition"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="text-sm font-bold text-slate-900">
-                            {formatTime(b.slot_start)}
-                          </span>
-                        </div>
-                        <div className="text-xs text-slate-500 ml-6">
-                          → {formatTime(b.slot_end)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        </button>
       </div>
+
+      {/* Vue : Réservations */}
+      {activeTab === 'reservations' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-semibold text-slate-900">Planning du jour par terrain</h2>
+            <span className="text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-medium">
+              {bookings.filter(b => b.status === "confirmed").length} réservation{bookings.filter(b => b.status === "confirmed").length > 1 ? 's' : ''}
+            </span>
+          </div>
+
+          {bookings.length === 0 ? (
+            <div className="text-center py-12 text-sm text-slate-500">
+              Aucune réservation aujourd'hui
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {bookingsByCourt.map(({ court, bookings: courtBookings, isEmpty }) => (
+                <div
+                  key={court.id}
+                  className={`border-2 rounded-xl p-4 transition-all ${
+                    isEmpty
+                      ? "border-slate-200 bg-slate-50/50"
+                      : "border-emerald-200 bg-gradient-to-br from-emerald-50 to-white shadow-sm"
+                  }`}
+                >
+                  {/* Header terrain */}
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${isEmpty ? "bg-slate-300" : "bg-emerald-500"}`}></div>
+                      <h3 className="font-bold text-slate-900">{court.name}</h3>
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      isEmpty
+                        ? "bg-slate-200 text-slate-600"
+                        : "bg-emerald-100 text-emerald-700"
+                    }`}>
+                      {courtBookings.length}
+                    </span>
+                  </div>
+
+                  {/* Liste des réservations ou message vide */}
+                  {isEmpty ? (
+                    <div className="text-center py-6">
+                      <div className="text-3xl mb-2">✓</div>
+                      <p className="text-xs text-slate-500 font-medium">Disponible toute la journée</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {courtBookings.map((b) => (
+                        <div
+                          key={b.id}
+                          className="bg-white border border-emerald-200 rounded-lg p-3 hover:shadow-sm transition"
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm font-bold text-slate-900">
+                              {formatTime(b.slot_start)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-500 ml-6">
+                            → {formatTime(b.slot_end)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Vue : Créneaux disponibles */}
+      {activeTab === 'disponibilites' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          {/* Filtres */}
+          <div className="flex flex-col md:flex-row gap-4 mb-5 pb-5 border-b-2 border-slate-200">
+            <div className="flex-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-2">Période</label>
+              <select
+                value={periodFilter}
+                onChange={(e) => setPeriodFilter(e.target.value as any)}
+                className="w-full px-4 py-2 bg-white border-2 border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="today">Aujourd'hui</option>
+                <option value="7days">7 prochains jours</option>
+                <option value="month">Mois courant</option>
+              </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-2">Terrain</label>
+              <select
+                value={selectedCourtFilter}
+                onChange={(e) => setSelectedCourtFilter(e.target.value)}
+                className="w-full px-4 py-2 bg-white border-2 border-slate-200 rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="all">Tous les terrains</option>
+                {courts.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end">
+              <div className="px-5 py-2 bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-300 rounded-xl">
+                <div className="text-xs text-emerald-700 font-semibold uppercase">Disponibles</div>
+                <div className="text-2xl font-bold text-emerald-900">{totalAvailableSlots}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Liste des créneaux disponibles groupés par date */}
+          {Object.keys(slotsByDate).length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-5xl mb-4">📭</div>
+              <p className="text-slate-600 font-medium">Aucun créneau disponible sur cette période</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {Object.entries(slotsByDate).map(([date, slots]) => {
+                const dateObj = new Date(date)
+                const dateFormatted = dateObj.toLocaleDateString('fr-FR', { 
+                  weekday: 'long', 
+                  day: 'numeric', 
+                  month: 'long' 
+                })
+                
+                // Grouper par terrain pour ce jour
+                const slotsByCourt = slots.reduce((acc, slot) => {
+                  if (!acc[slot.courtId]) {
+                    acc[slot.courtId] = {
+                      courtName: slot.courtName,
+                      slots: []
+                    }
+                  }
+                  acc[slot.courtId].slots.push(slot)
+                  return acc
+                }, {} as Record<string, { courtName: string, slots: TimeSlot[] }>)
+
+                return (
+                  <div key={date} className="border-2 border-blue-100 rounded-xl overflow-hidden">
+                    {/* Header date */}
+                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-3 flex items-center justify-between">
+                      <h3 className="text-white font-bold capitalize">{dateFormatted}</h3>
+                      <span className="px-3 py-1 bg-white/20 backdrop-blur text-white text-xs font-bold rounded-full">
+                        {slots.length} créneaux
+                      </span>
+                    </div>
+
+                    {/* Liste des créneaux par terrain */}
+                    <div className="p-4 space-y-4">
+                      {Object.entries(slotsByCourt).map(([courtId, { courtName, slots: courtSlots }]) => (
+                        <div key={courtId} className="bg-slate-50 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <h4 className="font-bold text-slate-900">{courtName}</h4>
+                            <span className="ml-auto text-xs font-semibold text-slate-600 bg-white px-2 py-1 rounded-full">
+                              {courtSlots.length}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                            {courtSlots.map((slot, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-white border-2 border-emerald-200 rounded-lg px-3 py-2 text-center hover:border-emerald-400 hover:shadow-sm transition"
+                              >
+                                <div className="text-xs font-bold text-emerald-700">
+                                  {formatTime(slot.start)}
+                                </div>
+                                <div className="text-xs text-slate-500">
+                                  {formatTime(slot.end)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-white to-amber-50/30 border border-amber-100 rounded-xl p-5 shadow-sm">
