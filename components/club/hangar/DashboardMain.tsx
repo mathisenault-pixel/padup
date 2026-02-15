@@ -337,8 +337,19 @@ export default function DashboardMain({ clubId, initialBookings, courts, setting
     setModalLoading(true)
     setModalError("")
 
-    const slotStart = new Date(`${selectedDate}T${selectedTime}`)
+    // Créer la date en forçant l'heure locale (pas de conversion timezone automatique)
+    const [hours, minutes] = selectedTime.split(':').map(Number)
+    const [year, month, day] = selectedDate.split('-').map(Number)
+    
+    const slotStart = new Date(year, month - 1, day, hours, minutes, 0, 0)
     const slotEnd = new Date(slotStart.getTime() + slotMinutes * 60 * 1000)
+
+    console.log('[HANGAR DASHBOARD] Creating booking:')
+    console.log('  - Selected date:', selectedDate)
+    console.log('  - Selected time:', selectedTime)
+    console.log('  - Slot start (local):', slotStart.toLocaleString('fr-FR'))
+    console.log('  - Slot start (ISO):', slotStart.toISOString())
+    console.log('  - Slot end (ISO):', slotEnd.toISOString())
 
     const { data: userData } = await supabase.auth.getUser()
     if (!userData.user) {
