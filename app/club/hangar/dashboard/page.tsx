@@ -37,14 +37,19 @@ export default async function HangarDashboardPage() {
     return <div className="text-white p-8">Club introuvable</div>;
   }
 
-  // 2️⃣ récupérer les bookings du jour
-  const today = new Date().toISOString().split("T")[0];
+  // 2️⃣ récupérer les bookings du jour (timezone locale)
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
 
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("*")
+    .select("id, slot_start, slot_end, status, created_at, court_id, club_id")
     .eq("club_id", club.id)
-    .eq("booking_date", today)
+    .gte("slot_start", start.toISOString())
+    .lte("slot_start", end.toISOString())
     .order("slot_start", { ascending: true });
 
   const confirmed =
@@ -120,6 +125,17 @@ export default async function HangarDashboardPage() {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* DEBUG TEMPORAIRE */}
+        <div className="mt-6 rounded-2xl border border-yellow-400/30 bg-yellow-400/10 p-5">
+          <div className="text-sm font-semibold text-yellow-200 mb-2">🔍 DEBUG INFO</div>
+          <div className="text-xs text-yellow-100/80 space-y-1">
+            <div><strong>Club ID:</strong> {club.id}</div>
+            <div><strong>Start (ISO):</strong> {start.toISOString()}</div>
+            <div><strong>End (ISO):</strong> {end.toISOString()}</div>
+            <div><strong>Bookings trouvés:</strong> {bookings?.length ?? 0}</div>
           </div>
         </div>
 
