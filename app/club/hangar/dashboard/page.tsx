@@ -42,15 +42,6 @@ export default async function HangarDashboardPage() {
     .lte('slot_start', end.toISOString())
     .order('slot_start', { ascending: true })
 
-  return (
-    <>
-      <DashboardLive clubId={club.id} initialBookings={bookings ?? []} />
-      <div className="min-h-screen bg-black text-white p-8">
-        <h1 className="text-3xl font-semibold">Le Hangar — Dashboard</h1>
-        <p className="mt-2 text-slate-400">
-          {bookings?.length ?? 0} réservation(s) aujourd'hui
-        </p>
-      </div>
-    </>
-  )
+  // 3️⃣ Afficher le dashboard live
+  return <DashboardLive clubId={club.id} initialBookings={bookings ?? []} />
 }
